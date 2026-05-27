@@ -1,0 +1,30 @@
+{
+  "artifact_name": "chromatic_design_studios_pdr_pack",
+  "version": "0.1.0",
+  "created": "2026-05-27",
+  "purpose": "Repo-ready PDR and scaffold pack for Chromatic Design Studios.",
+  "target_repo": "chromatic-design-studios",
+  "depends_on": [
+    "Node.js",
+    "Docker",
+    "T3/Next.js",
+    "Tailwind",
+    "shadcn/ui",
+    "LiteLLM",
+    "n8n",
+    "Open WebUI",
+    "ComfyUI",
+    "Ollama"
+  ],
+  "produces": [
+    "PDR",
+    "repo tree",
+    "service map",
+    "playbooks",
+    "handoff queue",
+    "implementation prompts",
+    "docker compose scaffold"
+  ],
+  "validation": "See validation/VALIDATION_CHECKLIST.md",
+  "repair_guidance": "If the scaffold drifts, compare against CHROMATIC_TREES.md and docs/REPO_TREE.md, then restore missing folders/files."
+}

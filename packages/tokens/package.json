@@ -1,0 +1,18 @@
+{
+  "name": "@chromatic/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./colors": "./src/colors.ts",
+    "./spacing": "./src/spacing.ts",
+    "./typography": "./src/typography.ts",
+    "./motion": "./src/motion.ts",
+    "./effects": "./src/effects.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

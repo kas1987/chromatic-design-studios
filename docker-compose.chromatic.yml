@@ -1,0 +1,46 @@
+name: chromatic-design-studios
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: cds-litellm
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - ./services/litellm/config.example.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    profiles: ["ai"]
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: cds-n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    profiles: ["automation"]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: cds-open-webui
+    ports:
+      - "3001:8080"
+    volumes:
+      - open_webui_data:/app/backend/data
+    profiles: ["ai"]
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cds-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    profiles: ["local-models"]
+
+volumes:
+  n8n_data:
+  open_webui_data:
+  ollama_data:

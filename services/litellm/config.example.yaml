@@ -1,0 +1,18 @@
+model_list:
+  - model_name: local-llama
+    litellm_params:
+      model: ollama/llama3.1
+      api_base: http://ollama:11434
+
+  - model_name: openai-compatible-placeholder
+    litellm_params:
+      model: openai/example-model
+      api_key: os.environ/OPENAI_API_KEY
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 1
+  timeout: 60
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

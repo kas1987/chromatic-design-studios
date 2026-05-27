@@ -1,0 +1,59 @@
+# Target Repo Tree
+
+```text
+chromatic-design-studios/
+  apps/
+    web/
+      README.md
+    api/
+      README.md
+    worker/
+      README.md
+  packages/
+    ui/
+      README.md
+    tokens/
+      README.md
+    prompts/
+      README.md
+    agents/
+      README.md
+    workflows/
+      README.md
+    schemas/
+      README.md
+  services/
+    litellm/
+      README.md
+      config.example.yaml
+    n8n/
+      README.md
+      workflows/
+    open-webui/
+      README.md
+    comfyui/
+      README.md
+      asset_registry.md
+    ollama/
+      README.md
+      model_matrix.md
+  docs/
+    PDR/
+    playbooks/
+    taxonomy/
+    architecture/
+  handoffs/
+    AGENT_HANDOFF_QUEUE.md
+  prompts/
+    CLAUDE_DESIGN_SCAFFOLD_PROMPT.md
+    CODEX_SCAFFOLD_PROMPT.md
+  scripts/
+    bootstrap_chromatic_design_studios.ps1
+    bootstrap_chromatic_design_studios.sh
+  manifests/
+    artifact_manifest.json
+  validation/
+    VALIDATION_CHECKLIST.md
+  CHROMATIC_TREES.md
+  docker-compose.chromatic.yml
+```
