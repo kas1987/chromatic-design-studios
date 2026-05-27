@@ -1,0 +1,147 @@
+/* ========================================
+   Chromatic Layout CSS
+   Flex, Grid, and Container Primitives
+   ======================================== */
+
+/* ----- Flex Primitives ----- */
+.chromatic-flex {
+  display: flex;
+}
+
+.chromatic-flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.chromatic-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.chromatic-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.chromatic-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chromatic-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chromatic-flex-gap-1 { gap: var(--space-1); }
+.chromatic-flex-gap-2 { gap: var(--space-2); }
+.chromatic-flex-gap-3 { gap: var(--space-3); }
+.chromatic-flex-gap-4 { gap: var(--space-4); }
+.chromatic-flex-gap-5 { gap: var(--space-5); }
+.chromatic-flex-gap-6 { gap: var(--space-6); }
+
+/* ----- Grid Primitives ----- */
+.chromatic-grid {
+  display: grid;
+}
+
+.chromatic-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.chromatic-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.chromatic-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.chromatic-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.chromatic-grid-gap-2 { gap: var(--space-2); }
+.chromatic-grid-gap-3 { gap: var(--space-3); }
+.chromatic-grid-gap-4 { gap: var(--space-4); }
+.chromatic-grid-gap-5 { gap: var(--space-5); }
+
+/* ----- Container ----- */
+.chromatic-container {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+.chromatic-container-sm {
+  max-width: 640px;
+}
+
+.chromatic-container-md {
+  max-width: 768px;
+}
+
+.chromatic-container-lg {
+  max-width: 1024px;
+}
+
+.chromatic-container-xl {
+  max-width: 1280px;
+}
+
+/* ----- Section Spacing ----- */
+.chromatic-section {
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-7);
+}
+
+.chromatic-section-lg {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.chromatic-section-xl {
+  padding-top: var(--space-9);
+  padding-bottom: var(--space-9);
+}
+
+/* ----- Responsive Breakpoints ----- */
+@media (max-width: 640px) {
+  .chromatic-grid-2,
+  .chromatic-grid-3,
+  .chromatic-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .chromatic-flex-row {
+    flex-direction: column;
+  }
+
+  .chromatic-section,
+  .chromatic-section-lg,
+  .chromatic-section-xl {
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-5);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .chromatic-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .chromatic-grid-3,
+  .chromatic-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

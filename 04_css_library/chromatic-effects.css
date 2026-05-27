@@ -1,0 +1,119 @@
+/* ========================================
+   Chromatic Effects CSS
+   Glow, Glassmorphism, Holographic Gradients
+   ======================================== */
+
+/* ----- Glow Utilities ----- */
+.chromatic-glow-sm {
+  box-shadow: var(--glow-sm) var(--glow-color-primary);
+}
+
+.chromatic-glow-md {
+  box-shadow: var(--glow-md) var(--glow-color-primary);
+}
+
+.chromatic-glow-lg {
+  box-shadow: var(--glow-lg) var(--glow-color-primary);
+}
+
+.chromatic-glow-accent-sm {
+  box-shadow: var(--glow-sm) var(--glow-color-accent);
+}
+
+.chromatic-glow-accent-md {
+  box-shadow: var(--glow-md) var(--glow-color-accent);
+}
+
+.chromatic-glow-accent-lg {
+  box-shadow: var(--glow-lg) var(--glow-color-accent);
+}
+
+.chromatic-glow-white-sm {
+  box-shadow: var(--glow-sm) var(--glow-color-white);
+}
+
+.chromatic-glow-white-md {
+  box-shadow: var(--glow-md) var(--glow-color-white);
+}
+
+/* ----- Glassmorphism ----- */
+.chromatic-glass {
+  background: rgba(18, 18, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(124, 58, 237, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.chromatic-glass-strong {
+  background: rgba(18, 18, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ----- Holographic Gradients ----- */
+.chromatic-hero-gradient {
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #2e1065 100%);
+}
+
+.chromatic-holographic {
+  background: linear-gradient(180deg, rgba(124,58,237,0.15) 0%, rgba(6,182,212,0.05) 100%);
+}
+
+.chromatic-glow-edge {
+  background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.3), transparent 70%);
+}
+
+.chromatic-accent-sweep {
+  background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%);
+}
+
+.chromatic-aurora {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
+}
+
+/* ----- Text Effects ----- */
+.chromatic-text-glow {
+  text-shadow: 0 0 16px var(--glow-color-primary);
+}
+
+.chromatic-text-glow-accent {
+  text-shadow: 0 0 16px var(--glow-color-accent);
+}
+
+.chromatic-text-gradient {
+  background: linear-gradient(90deg, var(--color-primary-400), var(--color-accent-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ----- Borders ----- */
+.chromatic-border-glow {
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  box-shadow: inset 0 0 16px rgba(124, 58, 237, 0.05);
+}
+
+.chromatic-border-glow-accent {
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  box-shadow: inset 0 0 16px rgba(6, 182, 212, 0.05);
+}
+
+/* ----- Divider ----- */
+.chromatic-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  border: none;
+}
+
+.chromatic-divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-primary-600), transparent);
+  border: none;
+  box-shadow: 0 0 8px var(--glow-color-primary);
+}
