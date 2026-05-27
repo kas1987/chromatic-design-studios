@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-05-27",
+  "package": "chromatic-design-studios-pdr",
+  "seed_manifest": [
+    {
+      "path": "implementation_seed/chromatic-design-studios/00_governance/CONFIDENCE_GATE_PLAYBOOK.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/00_governance/GO_MODE_PLAYBOOK.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/00_governance/MODEL_ROUTING_PLAYBOOK.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/01_brand/brand_manifest.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/01_brand/visual_language.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/02_design_tokens/tokens.colors.json",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/02_design_tokens/tokens.spacing.json",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/02_design_tokens/tokens.typography.json",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/04_css_library/chromatic-base.css",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/04_css_library/chromatic-components.css",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/05_prompts/claude-design/implementation.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/05_prompts/openart/hero-assets.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/06_agents/css-architect.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/06_agents/visual-director.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/08_examples/hero-page/example.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/CHROMATIC_DESIGN_SYSTEM.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/DESIGN_QUEUE.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/PROJECT_STATE.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/README.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    },
+    {
+      "path": "implementation_seed/chromatic-design-studios/getdesign.md",
+      "class": "seed_scaffold",
+      "purpose": "Original Chromatic Design Studios scaffold artifact",
+      "status": "provided"
+    }
+  ]
+}

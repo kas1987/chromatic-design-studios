@@ -1,0 +1,76 @@
+{
+  "background": {
+    "default": "#0a0a0f",
+    "elevated": "#12121a",
+    "overlay": "#1a1a2e"
+  },
+  "surface": {
+    "default": "#12121a",
+    "hover": "#1a1a2e",
+    "active": "#252540",
+    "disabled": "#0f0f14"
+  },
+  "primary": {
+    "50": "#f5f3ff",
+    "100": "#ede9fe",
+    "200": "#ddd6fe",
+    "300": "#c4b5fd",
+    "400": "#a78bfa",
+    "500": "#8b5cf6",
+    "600": "#7c3aed",
+    "700": "#6d28d9",
+    "800": "#5b21b6",
+    "900": "#4c1d95",
+    "950": "#2e1065"
+  },
+  "accent": {
+    "50": "#ecfeff",
+    "100": "#cffafe",
+    "200": "#a5f3fc",
+    "300": "#67e8f9",
+    "400": "#22d3ee",
+    "500": "#06b6d4",
+    "600": "#0891b2",
+    "700": "#0e7490",
+    "800": "#155e75",
+    "900": "#164e63",
+    "950": "#083344"
+  },
+  "text": {
+    "primary": "#f8fafc",
+    "secondary": "#94a3b8",
+    "muted": "#475569",
+    "disabled": "#334155",
+    "inverse": "#0a0a0f"
+  },
+  "semantic": {
+    "success": "#22c55e",
+    "successGlow": "#4ade80",
+    "warning": "#f59e0b",
+    "warningGlow": "#fbbf24",
+    "error": "#ef4444",
+    "errorGlow": "#f87171",
+    "info": "#3b82f6",
+    "infoGlow": "#60a5fa"
+  },
+  "border": {
+    "default": "#1e293b",
+    "hover": "#334155",
+    "focus": "#7c3aed",
+    "active": "#06b6d4"
+  },
+  "glow": {
+    "primary": "rgba(124,58,237,0.4)",
+    "primaryStrong": "rgba(124,58,237,0.6)",
+    "accent": "rgba(6,182,212,0.4)",
+    "accentStrong": "rgba(6,182,212,0.6)",
+    "white": "rgba(248,250,252,0.2)",
+    "whiteStrong": "rgba(248,250,252,0.4)"
+  },
+  "gradient": {
+    "hero": "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #2e1065 100%)",
+    "holographic": "linear-gradient(180deg, rgba(124,58,237,0.15) 0%, rgba(6,182,212,0.05) 100%)",
+    "glowEdge": "radial-gradient(circle at 50% 0%, rgba(124,58,237,0.3), transparent 70%)",
+    "accentSweep": "linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%)"
+  }
+}
