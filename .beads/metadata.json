@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "chromatic_design_studios",
+  "project_id": "3950d2b9-35a6-4f55-bd79-aa2bf8150716"
+}
