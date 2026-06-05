@@ -122,7 +122,7 @@ function buildScreen(screenDir, mode = 'dark') {
     return `  <div class="token-row">
     <label>${t.label} <span class="token-value" data-token-output="${t.path}">${current}</span></label>
     <input type="range" min="${t.min}" max="${t.max}" step="${t.step}"
-           data-token="${t.path}" data-token-css="${t.cssVar}" value="${num}">
+           data-token="${t.path}" data-token-css="${t.cssVar}" data-token-unit="${t.unit ?? ''}" value="${num}">
   </div>`;
   }).join('\n');
 
@@ -151,10 +151,26 @@ ${rows}
     <button style="background:var(--color-primary-600);color:var(--color-text-onprimary, #fff);border:none;
                    border-radius:var(--radius-md,8px);padding:10px 18px;cursor:pointer">Open Dashboard</button>
   </div>
-</div>`;
+</div>
 
-  // Note: the range live-apply sets the raw number; preview vars expecting px
-  // still read e.g. "12" — acceptable for preview. apply re-attaches the unit.
+<script>
+// Live preview for range tokens: length CSS vars (e.g. --radius-lg) need a unit,
+// so write value+unit (e.g. "12px") to :root rather than the bare number, which
+// would resolve to an invalid/initial radius. apply re-attaches the unit on save.
+(function () {
+  var root = document.documentElement;
+  document.querySelectorAll('input[type=range][data-token-css]').forEach(function (el) {
+    el.addEventListener('input', function () {
+      var unit = el.getAttribute('data-token-unit') || '';
+      var v = el.value + unit;
+      root.style.setProperty(el.getAttribute('data-token-css'), v);
+      var out = document.querySelector('[data-token-output="' + el.getAttribute('data-token') + '"]');
+      if (out) out.textContent = v;
+    });
+  });
+})();
+</script>`;
+
   const file = path.join(screenDir, 'chromatic-tokens.html');
   fs.writeFileSync(file, html);
   console.log(`[token-studio] wrote ${mode} tuner screen -> ${file}`);

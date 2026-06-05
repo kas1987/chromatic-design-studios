@@ -53,11 +53,14 @@ function walk(obj, prefix, onLeaf) {
 const twColors = {};
 for (const group of ['background', 'surface', 'text', 'border', 'semantic', 'glow']) {
   twColors[group] = {};
-  walk(colors[group], `color-${group}`, (name, val) => {
+  const prefix = `color-${group}`;
+  walk(colors[group], prefix, (name, val) => {
     pushVar(name, val);
-    // last segment is the tailwind key for this group
-    const seg = name.split('-').pop();
-    twColors[group][seg] = `var(--${name})`;
+    // Tailwind key = the full nested path under the group (kebab), NOT just the
+    // last segment — otherwise sibling tokens like successGlow/warningGlow all
+    // collapse to `glow` and collide (only the last would survive).
+    const key = name.slice(prefix.length + 1);
+    twColors[group][key] = `var(--${name})`;
   });
 }
 for (const scale of ['primary', 'accent']) {
@@ -100,6 +103,18 @@ const twFontSize = {};
 for (const [k, v] of Object.entries(typography.scale)) {
   pushVar(`text-${k}`, v.rem);
   twFontSize[k] = [v.rem, { lineHeight: String(v.lineHeight), letterSpacing: v.letterSpacing }];
+}
+// Role utilities (text-label, text-display, text-h1, …). Roles reference scale +
+// lineHeight/letterSpacing/weight token keys; resolve them so `text-<role>` emits
+// a complete utility. Role keys (display/h1/label/…) never collide with scale keys.
+for (const [k, r] of Object.entries(typography.role)) {
+  const sc = typography.scale[r.size];
+  if (!sc) continue;
+  twFontSize[k] = [sc.rem, {
+    lineHeight: String(typography.lineHeight[r.lineHeight] ?? sc.lineHeight),
+    letterSpacing: typography.letterSpacing[r.letterSpacing] ?? sc.letterSpacing,
+    fontWeight: String(typography.weight[r.weight] ?? 400),
+  }];
 }
 const twFontWeight = {};
 for (const [k, v] of Object.entries(typography.weight)) twFontWeight[k] = String(v);

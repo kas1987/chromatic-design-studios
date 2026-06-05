@@ -12,6 +12,7 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",
+    "pretypecheck": "npm run tokens",
     "typecheck": "tsc --noEmit --project apps/web/tsconfig.json"
   },
   "devDependencies": {

@@ -46,8 +46,14 @@ export function Button({
 }: ButtonProps) {
   const cls = `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`.trim();
   if (href) {
+    // Forward the remaining props (onClick, aria-*, data-*, …) to the anchor so
+    // linked CTAs keep their handlers, not just the button branch.
     return (
-      <a href={href} className={cls}>
+      <a
+        href={href}
+        className={cls}
+        {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+      >
         {children}
       </a>
     );

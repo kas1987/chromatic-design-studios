@@ -34,4 +34,7 @@ if command -v bd >/dev/null 2>&1; then
 fi
 # --- END BEADS INTEGRATION v1.0.5 ---
 
-exec "$(dirname "$0")/pre-push.sh" "$@"
+# Invoke via `bash` rather than exec'ing the script directly: the committed tree
+# stores pre-push.sh as mode 100644 (non-executable), so a direct exec would fail
+# with "Permission denied" on a fresh clone using core.hooksPath.
+exec bash "$(dirname "$0")/pre-push.sh" "$@"

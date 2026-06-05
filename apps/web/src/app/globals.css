@@ -1,9 +1,11 @@
+/* Chromatic design tokens (auto-generated from 02_design_tokens/*.json).
+ * Must precede the @tailwind directives: CSS @import is only valid before other
+ * rules, and Tailwind expands its directives into rules in place. */
+@import "../styles/chromatic-tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Chromatic design tokens (auto-generated from 02_design_tokens/*.json). */
-@import "../styles/chromatic-tokens.css";
 
 /* Bind the token font families to the next/font-loaded faces (layout.tsx). */
 :root {
