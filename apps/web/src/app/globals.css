@@ -26,6 +26,40 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
+/* Skip-to-content link — visually hidden until focused (keyboard a11y). */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  margin: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-primary-600);
+  color: var(--color-text-onprimary, #fff);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  transform: translateY(-150%);
+  transition: transform var(--duration-fast, 150ms) ease;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: none;
+  box-shadow: var(--glow-focus);
+}
+
+/* Honor reduced-motion globally (Design Law #5; supplements per-component guards). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @layer utilities {
   /* Glass / holographic surface — Design Law #5: glow, don't blur (kept subtle). */
   .glass {

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button, Card, Badge, Input } from "@chromatic/ui";
 import { ThemeToggle } from "../../components/ThemeToggle";
 
@@ -43,12 +44,12 @@ export default function StudioPage() {
 
       <header className="glass sticky top-0 z-50">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <a href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-md bg-gradient-accentSweep" />
             <span className="font-heading font-semibold tracking-tight text-text-primary">
               Chromatic Studio
             </span>
-          </a>
+          </Link>
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-text-secondary sm:inline">
               Design system gallery
@@ -58,7 +59,7 @@ export default function StudioPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-12 px-6 py-12">
+      <main id="main" className="mx-auto max-w-6xl space-y-12 px-6 py-12">
         <div className="space-y-2">
           <h1 className="font-heading text-3xl font-bold text-text-primary glow-text">
             Component Studio
@@ -153,9 +154,9 @@ export default function StudioPage() {
 
       <footer className="glass">
         <div className="mx-auto flex max-w-6xl justify-between px-6 py-4 text-xs text-text-muted">
-          <a href="/" className="hover:text-text-primary">
+          <Link href="/" className="hover:text-text-primary">
             ← Back to home
-          </a>
+          </Link>
           <span>Chromatic Studio v0.4.0</span>
         </div>
       </footer>

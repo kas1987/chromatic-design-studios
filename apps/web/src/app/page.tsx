@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { Hero } from "@chromatic/ui";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export default function Home() {
   return (
@@ -17,17 +19,23 @@ export default function Home() {
               Chromatic Design Studios
             </span>
           </div>
-          <nav className="hidden gap-6 text-sm text-text-secondary md:flex">
-            <a href="#" className="transition-colors hover:text-text-primary">Dashboard</a>
-            <a href="#" className="transition-colors hover:text-text-primary">Assets</a>
-            <a href="#" className="transition-colors hover:text-text-primary">Prompts</a>
-            <a href="#" className="transition-colors hover:text-text-primary">Agents</a>
-          </nav>
+          <div className="flex items-center gap-6">
+            <nav
+              aria-label="Primary"
+              className="hidden gap-6 text-sm text-text-secondary md:flex"
+            >
+              <a href="#" className="transition-colors hover:text-text-primary">Dashboard</a>
+              <a href="#" className="transition-colors hover:text-text-primary">Assets</a>
+              <a href="#" className="transition-colors hover:text-text-primary">Prompts</a>
+              <Link href="/studio" className="transition-colors hover:text-text-primary">Studio</Link>
+            </nav>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
       {/* Hero — canonical token-driven component */}
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         <Hero
           badge="Design System"
           title="AI Design"
@@ -41,7 +49,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="glass mt-auto">
         <div className="mx-auto flex max-w-7xl justify-between px-6 py-4 text-xs text-text-muted">
-          <span>Chromatic Design Studios v0.2.0</span>
+          <span>Chromatic Design Studios v0.4.0</span>
           <span>Chromatic Harness</span>
         </div>
       </footer>

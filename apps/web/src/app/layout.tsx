@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,9 +16,42 @@ const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_DESC =
+  "Local-first AI design and operations control center — a governed, token-driven design system for the Chromatic Harness ecosystem.";
+
 export const metadata: Metadata = {
-  title: "Chromatic Design Studios",
-  description: "Local-first AI design and operations control center",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Chromatic Design Studios",
+    template: "%s · Chromatic Design Studios",
+  },
+  description: SITE_DESC,
+  applicationName: "Chromatic Design Studios",
+  authors: [{ name: "Chromatic Harness" }],
+  keywords: ["design system", "design tokens", "AI", "Next.js", "Tailwind"],
+  icons: { icon: "/icon.svg", shortcut: "/icon.svg", apple: "/icon.svg" },
+  manifest: "/manifest.webmanifest",
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    title: "Chromatic Design Studios",
+    description: SITE_DESC,
+    siteName: "Chromatic Design Studios",
+    url: SITE_URL,
+  },
+  twitter: { card: "summary", title: "Chromatic Design Studios", description: SITE_DESC },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "dark light",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
+    { media: "(prefers-color-scheme: light)", color: "#faf9fc" },
+  ],
 };
 
 // No-flash theme init: runs before paint, applies the persisted choice to
@@ -38,6 +71,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${plexSans.variable} ${plexMono.variable} antialiased min-h-screen`}
       >
+        <a href="#main" className="skip-link">
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>
