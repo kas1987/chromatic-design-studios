@@ -5,7 +5,7 @@
  * Phase 1: Rebuild db/ccs-registry.db (SQLite) from source files:
  *   - 02_design_tokens/*.json  → tokens table
  *   - packages/ui/src/components/*.tsx → components table
- *   - css-library/*.css        → css_classes table
+ *   - 04_css_library (recursive) *.css → css_classes table
  *
  * Phase 2: Sync registry tables to Postgres (if DATABASE_URL is set).
  *   - Atomically replaces registry_tokens + registry_components
@@ -24,7 +24,7 @@ import { DatabaseSync } from 'node:sqlite';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TOKENS_DIR = path.join(ROOT, '02_design_tokens');
 const COMPONENTS_DIR = path.join(ROOT, 'packages', 'ui', 'src', 'components');
-const CSS_DIR = path.join(ROOT, 'css-library');
+const CSS_DIR = path.join(ROOT, '04_css_library');
 const DB_PATH = path.join(ROOT, 'db', 'ccs-registry.db');
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -78,6 +78,17 @@ function parseCssClasses(src) {
     }
   }
   return classes;
+}
+
+/** Recursively collect all .css file paths under a directory. */
+function walkCssFiles(dir) {
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkCssFiles(full));
+    else if (entry.isFile() && entry.name.endsWith('.css')) out.push(full);
+  }
+  return out;
 }
 
 function hashSources(paths) {
@@ -164,7 +175,10 @@ function buildSqlite() {
   sourceFiles.push(...tokenFiles.map(f => path.join(TOKENS_DIR, f)));
 
   for (const file of tokenFiles) {
-    const category = file.replace(/^tokens\./, '').replace(/\.json$/, '');
+    const category = file
+      .replace(/^tokens\./, '')
+      .replace(/\.json$/, '')
+      .replace(/\.(light|luxe|zelex)$/, '');
     const theme = file.includes('.light') ? 'light'
                 : file.includes('.luxe')  ? 'luxe'
                 : file.includes('.zelex') ? 'zelex'
@@ -195,14 +209,18 @@ function buildSqlite() {
 
   // ── CSS Classes ───────────────────────────────────────────────────────────
   if (fs.existsSync(CSS_DIR)) {
-    const cssFiles = fs.readdirSync(CSS_DIR).filter(f => f.endsWith('.css'));
-    sourceFiles.push(...cssFiles.map(f => path.join(CSS_DIR, f)));
+    const cssFiles = walkCssFiles(CSS_DIR);
+    sourceFiles.push(...cssFiles);
 
-    for (const file of cssFiles) {
-      const theme = file.includes('luxe') ? 'luxe' : 'base';
-      const src = fs.readFileSync(path.join(CSS_DIR, file), 'utf8');
+    for (const filePath of cssFiles) {
+      const relPath = path.relative(CSS_DIR, filePath).replace(/\\/g, '/');
+      const theme = /(^|\/)zelex\//.test(relPath) ? 'zelex'
+                  : relPath.includes('luxe')      ? 'luxe'
+                  : relPath.includes('light')     ? 'light'
+                  : 'base';
+      const src = fs.readFileSync(filePath, 'utf8');
       for (const { className, properties } of parseCssClasses(src)) {
-        insertClass.run(className, file, theme, JSON.stringify(properties));
+        insertClass.run(className, relPath, theme, JSON.stringify(properties));
         cssClassCount++;
       }
     }

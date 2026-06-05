@@ -1,8 +1,8 @@
 import http from 'node:http';
-import { handleTokens } from './routes/tokens.js';
-import { handleComponents } from './routes/components.js';
-import { handleUsage } from './routes/usage.js';
-import { handleAgentLog } from './routes/agent-log.js';
+import { handleTokens } from './routes/tokens.ts';
+import { handleComponents } from './routes/components.ts';
+import { handleUsage } from './routes/usage.ts';
+import { handleAgentLog } from './routes/agent-log.ts';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3002;
 
