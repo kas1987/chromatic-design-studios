@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Chromatic Rift — MetaChromatic</title>
+<link rel="stylesheet" href="rift/rift.css?v=2"/>
+</head>
+<body>
+
+<div class="stage" data-screen-label="01 Chromatic Rift">
+
+  <!-- L1 — Background nebula + starfield -->
+  <canvas id="nebula" class="layer"></canvas>
+  <canvas id="stars" class="layer"></canvas>
+
+  <!-- L5 — Lens flares & glow overlays -->
+  <div class="flares" aria-hidden="true">
+    <span class="flare cyan"></span>
+    <span class="flare violet"></span>
+    <span class="flare magenta"></span>
+    <span class="flare gold"></span>
+    <span class="flare teal"></span>
+  </div>
+  <div class="lens-streak" aria-hidden="true"></div>
+  <div class="lens-streak v" aria-hidden="true"></div>
+
+  <!-- L2 — Central crystal rift -->
+  <div class="rift" aria-hidden="true">
+    <!-- Lightning bolts inside the rift -->
+    <div class="bolts">
+      <svg viewBox="-200 -300 400 600" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="boltGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"  stop-color="#2de2e6" stop-opacity="0"/>
+            <stop offset="40%" stop-color="#a5f3fc"/>
+            <stop offset="60%" stop-color="#c77dff"/>
+            <stop offset="100%" stop-color="#7b61ff" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="boltGlow"><feGaussianBlur stdDeviation="2"/></filter>
+        </defs>
+        <path class="bolt" d="M -40,-260 L -10,-180 L -50,-90 L -8,10 L -55,110 L -20,240" fill="none" stroke="url(#boltGrad)" stroke-width="1.4" filter="url(#boltGlow)"/>
+        <path class="bolt b2" d="M 60,-240 L 30,-160 L 70,-60 L 20,40 L 65,140 L 35,250" fill="none" stroke="url(#boltGrad)" stroke-width="1.2" filter="url(#boltGlow)"/>
+        <path class="bolt b3" d="M 10,-280 L -20,-200 L 5,-100 L -15,0 L 18,90 L -5,200" fill="none" stroke="url(#boltGrad)" stroke-width="1" opacity=".7"/>
+      </svg>
+    </div>
+
+    <!-- Crystal centerpiece (faceted SVG) -->
+    <div class="crystal-wrap">
+      <svg viewBox="-100 -150 200 300" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="facetA" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"  stop-color="#2de2e6" stop-opacity=".95"/>
+            <stop offset="100%" stop-color="#4f6bff" stop-opacity=".25"/>
+          </linearGradient>
+          <linearGradient id="facetB" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"  stop-color="#c77dff" stop-opacity=".90"/>
+            <stop offset="100%" stop-color="#7b61ff" stop-opacity=".25"/>
+          </linearGradient>
+          <linearGradient id="facetC" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%"  stop-color="#fb923c" stop-opacity=".70"/>
+            <stop offset="100%" stop-color="#c77dff" stop-opacity=".20"/>
+          </linearGradient>
+          <linearGradient id="facetD" x1="100%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%"  stop-color="#00f5d4" stop-opacity=".75"/>
+            <stop offset="100%" stop-color="#2de2e6" stop-opacity=".20"/>
+          </linearGradient>
+          <radialGradient id="core" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"  stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="40%" stop-color="#a5f3fc" stop-opacity=".6"/>
+            <stop offset="100%" stop-color="#2de2e6" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="crystalGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3"/>
+          </filter>
+        </defs>
+
+        <!-- Crystal silhouette outline glow -->
+        <polygon points="0,-140 60,-30 30,90 0,140 -30,90 -60,-30"
+                 fill="rgba(45,226,230,.06)"
+                 stroke="rgba(199,125,255,.55)"
+                 stroke-width=".6"
+                 filter="url(#crystalGlow)"/>
+
+        <!-- Upper facets -->
+        <polygon class="facet-pulse a" points="0,-140 60,-30 0,0"   fill="url(#facetA)" />
+        <polygon class="facet-pulse b" points="0,-140 -60,-30 0,0"  fill="url(#facetB)" />
+        <!-- Lower facets -->
+        <polygon class="facet-pulse c" points="0,140 60,-30 0,0"    fill="url(#facetC)" />
+        <polygon class="facet-pulse d" points="0,140 -60,-30 0,0"   fill="url(#facetD)" />
+
+        <!-- Inner crystalline lines -->
+        <g stroke="rgba(255,255,255,.55)" stroke-width=".6" fill="none">
+          <line x1="0" y1="-140" x2="0" y2="140"/>
+          <line x1="-60" y1="-30" x2="60" y2="-30"/>
+          <line x1="0" y1="-140" x2="-30" y2="90"/>
+          <line x1="0" y1="-140" x2="30" y2="90"/>
+          <line x1="0" y1="140" x2="-60" y2="-30"/>
+          <line x1="0" y1="140" x2="60" y2="-30"/>
+        </g>
+
+        <!-- Bright core highlight -->
+        <circle cx="0" cy="0" r="38" fill="url(#core)"/>
+        <circle cx="0" cy="0" r="3" fill="#fff" opacity=".95"/>
+
+        <!-- Subtle edge highlights -->
+        <polygon points="0,-140 60,-30 30,-100" fill="rgba(255,255,255,.18)"/>
+        <polygon points="0,-140 -60,-30 -30,-100" fill="rgba(255,255,255,.10)"/>
+      </svg>
+    </div>
+
+    <!-- Orbiting shards (small crystals) -->
+    <div class="shards">
+      <div class="shard s1"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(45,226,230,.25)" stroke="rgba(45,226,230,.85)" stroke-width=".8"/></svg></div>
+      <div class="shard s2"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(199,125,255,.25)" stroke="rgba(199,125,255,.85)" stroke-width=".8"/></svg></div>
+      <div class="shard s3"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(123,97,255,.25)" stroke="rgba(123,97,255,.85)" stroke-width=".8"/></svg></div>
+      <div class="shard s4"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(251,146,60,.20)" stroke="rgba(251,146,60,.80)" stroke-width=".8"/></svg></div>
+      <div class="shard s5"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(0,245,212,.22)" stroke="rgba(0,245,212,.85)" stroke-width=".8"/></svg></div>
+      <div class="shard s6"><svg viewBox="-20 -30 40 60"><polygon points="0,-28 14,-4 0,28 -14,-4" fill="rgba(251,191,36,.22)" stroke="rgba(251,191,36,.85)" stroke-width=".8"/></svg></div>
+    </div>
+
+    <!-- Orbital rings on the floor -->
+    <div class="orbits">
+      <div class="ring markers"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="ring r4"></div>
+    </div>
+
+    <!-- Floor glow under crystal -->
+    <div class="floor-glow"></div>
+  </div>
+
+  <!-- L3 — Floating particle field -->
+  <canvas id="particles" class="layer"></canvas>
+
+  <!-- L6 — Interactive UI -->
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40">
+        <defs>
+          <linearGradient id="bm" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"  stop-color="#2de2e6"/>
+            <stop offset="50%" stop-color="#7b61ff"/>
+            <stop offset="100%" stop-color="#c77dff"/>
+          </linearGradient>
+        </defs>
+        <polygon points="20,3 34,20 20,37 6,20" fill="url(#bm)" opacity=".95"/>
+        <polygon points="20,3 20,37 6,20"  fill="rgba(0,0,0,.22)"/>
+        <line x1="20" y1="3"  x2="20" y2="37" stroke="rgba(255,255,255,.45)" stroke-width=".6"/>
+        <line x1="6"  y1="20" x2="34" y2="20" stroke="rgba(255,255,255,.30)" stroke-width=".6"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-name">MetaChromatic</div>
+        <div class="brand-sub">Prism · Network · Codex</div>
+      </div>
+    </div>
+
+    <nav class="topnav">
+      <div class="tn active">Network</div>
+      <div class="tn">Personas</div>
+      <div class="tn">Codex</div>
+      <div class="tn">Explore</div>
+      <div class="tn">Archive</div>
+    </nav>
+
+    <div class="top-actions">
+      <button class="icon-btn" title="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+      </button>
+      <button class="icon-btn" title="Alerts" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        <span class="ping"></span>
+      </button>
+      <button class="icon-btn" title="Profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Title block -->
+  <div class="titleblock">
+    <div class="eyebrow"><span class="dot"></span>Rift Status · Open</div>
+    <h1 class="h1">The <em>Chromatic</em><br/><b>Rift</b> Awakens.</h1>
+    <p class="sub">Twelve personas aligned. Network stable. Step through — the spectrum is listening.</p>
+  </div>
+
+  <!-- Holographic persona cards -->
+  <article class="holo c1">
+    <div class="holo-row">
+      <div class="holo-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2de2e6" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </div>
+      <div>
+        <div class="holo-id">HOLO ID · 001</div>
+        <div class="holo-name">Visionary Strategist</div>
+        <div class="holo-tier legacy" style="margin-top:4px"><span class="dot"></span>Legacy · Octahedron</div>
+      </div>
+    </div>
+    <svg class="holo-radar" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(45,226,230,.35)" stroke-width=".8"/>
+      <circle cx="30" cy="30" r="18" fill="none" stroke="rgba(45,226,230,.25)" stroke-width=".8"/>
+      <circle cx="30" cy="30" r="10" fill="none" stroke="rgba(45,226,230,.20)" stroke-width=".8"/>
+      <line x1="4" y1="30" x2="56" y2="30" stroke="rgba(45,226,230,.18)" stroke-width=".6"/>
+      <line x1="30" y1="4" x2="30" y2="56" stroke="rgba(45,226,230,.18)" stroke-width=".6"/>
+      <circle cx="30" cy="30" r="2.5" fill="#2de2e6"/>
+      <circle cx="44" cy="22" r="1.5" fill="#c77dff"/>
+      <circle cx="22" cy="40" r="1.2" fill="#fbbf24"/>
+    </svg>
+    <div class="holo-divider"></div>
+    <dl class="holo-meta">
+      <dt>Aurora</dt><dd>S+ · 0.94</dd>
+      <dt>Dialect</dt><dd>VEXYN</dd>
+      <dt>Confidence</dt><dd>A · 0.88</dd>
+      <dt>Synced</dt><dd>2m ago</dd>
+    </dl>
+    <div class="holo-bars">
+      <div class="holo-bar"><span>FACE</span><span class="track"><span class="fill" style="width:92%"></span></span><span class="val">0.92</span></div>
+      <div class="holo-bar"><span>BODY</span><span class="track"><span class="fill" style="width:84%; background:linear-gradient(90deg,#c77dff,#7b61ff);box-shadow:0 0 8px rgba(199,125,255,.6)"></span></span><span class="val">0.84</span></div>
+      <div class="holo-bar"><span>SYM</span><span class="track"><span class="fill" style="width:79%; background:linear-gradient(90deg,#fbbf24,#fb923c);box-shadow:0 0 8px rgba(251,191,36,.55)"></span></span><span class="val">0.79</span></div>
+    </div>
+  </article>
+
+  <article class="holo c2">
+    <div class="holo-row">
+      <div class="holo-avatar" style="background:linear-gradient(135deg, rgba(0,245,212,.30), rgba(45,226,230,.30)); box-shadow:0 0 18px rgba(0,245,212,.40)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#00f5d4" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </div>
+      <div>
+        <div class="holo-id">HOLO ID · 007</div>
+        <div class="holo-name">Oracle Mirror</div>
+        <div class="holo-tier nova" style="margin-top:4px"><span class="dot"></span>Nova · Dodecahedron</div>
+      </div>
+    </div>
+    <svg class="holo-radar" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="rgba(0,245,212,.35)" stroke-width=".8"/>
+      <circle cx="30" cy="30" r="18" fill="none" stroke="rgba(0,245,212,.25)" stroke-width=".8"/>
+      <circle cx="30" cy="30" r="10" fill="none" stroke="rgba(0,245,212,.20)" stroke-width=".8"/>
+      <line x1="4" y1="30" x2="56" y2="30" stroke="rgba(0,245,212,.18)" stroke-width=".6"/>
+      <line x1="30" y1="4" x2="30" y2="56" stroke="rgba(0,245,212,.18)" stroke-width=".6"/>
+      <circle cx="30" cy="30" r="2.5" fill="#00f5d4"/>
+      <circle cx="18" cy="20" r="1.4" fill="#2de2e6"/>
+      <circle cx="40" cy="44" r="1.1" fill="#fbbf24"/>
+    </svg>
+    <div class="holo-divider"></div>
+    <dl class="holo-meta">
+      <dt>Aurora</dt><dd>A · 0.81</dd>
+      <dt>Dialect</dt><dd>SOLARYN</dd>
+      <dt>Confidence</dt><dd>A · 0.86</dd>
+      <dt>Synced</dt><dd>14m ago</dd>
+    </dl>
+    <div class="holo-bars">
+      <div class="holo-bar"><span>FACE</span><span class="track"><span class="fill" style="width:81%; background:linear-gradient(90deg,#00f5d4,#2de2e6);box-shadow:0 0 8px rgba(0,245,212,.6)"></span></span><span class="val">0.81</span></div>
+      <div class="holo-bar"><span>BODY</span><span class="track"><span class="fill" style="width:88%"></span></span><span class="val">0.88</span></div>
+      <div class="holo-bar"><span>SYM</span><span class="track"><span class="fill" style="width:73%; background:linear-gradient(90deg,#7b61ff,#c77dff);box-shadow:0 0 8px rgba(123,97,255,.55)"></span></span><span class="val">0.73</span></div>
+    </div>
+  </article>
+
+  <!-- Right side dashboard -->
+  <section class="dash">
+    <div class="dash-head">
+      <div>
+        <div class="dash-greet">Welcome back, <b>Creator</b>.</div>
+        <div class="dash-line">Your AI Persona Network awaits.</div>
+      </div>
+      <div class="dash-time">
+        <span>2026·05·26</span>
+        <b>10:39:42</b>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi cyan" style="position:relative">
+        <div class="l">Active</div>
+        <div class="v">12</div>
+        <div class="s">Linked</div>
+      </div>
+      <div class="kpi teal">
+        <div class="l">Network</div>
+        <div class="v">●</div>
+        <div class="s">Aligned</div>
+      </div>
+      <div class="kpi gold" style="position:relative">
+        <div class="l">Energy</div>
+        <div class="v">98%</div>
+        <div class="s">Optimal</div>
+        <svg class="energy-ring" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(251,191,36,.15)" stroke-width="3"/>
+          <circle cx="18" cy="18" r="14" fill="none" stroke="#fbbf24" stroke-width="3"
+                  stroke-dasharray="88" stroke-dashoffset="2"
+                  transform="rotate(-90 18 18)"
+                  style="filter:drop-shadow(0 0 4px rgba(251,191,36,.7))"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="label">Recent Activity</div>
+      <div class="activity">
+        <div class="act">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="title">Visionary Strategist</div>
+            <div class="meta">Generated new vision map</div>
+          </div>
+          <div class="time">2m</div>
+        </div>
+        <div class="act violet">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.5 5.5L20 10l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-1.5z"/></svg>
+          </div>
+          <div>
+            <div class="title">Insight Catalyst</div>
+            <div class="meta">Unlocked deep insight</div>
+          </div>
+          <div class="time">15m</div>
+        </div>
+        <div class="act gold">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>
+          </div>
+          <div>
+            <div class="title">Code Weaver</div>
+            <div class="meta">Deployed new function</div>
+          </div>
+          <div class="time">1h</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="label">Upcoming</div>
+      <div class="activity">
+        <div class="act teal">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polygon points="12,2 22,12 12,22 2,12" fill="none"/></svg>
+          </div>
+          <div>
+            <div class="title">Crystal Convergence</div>
+            <div class="meta">All-network alignment</div>
+          </div>
+          <div class="time">2h 45m</div>
+        </div>
+        <div class="act violet">
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg>
+          </div>
+          <div>
+            <div class="title">Persona Sync</div>
+            <div class="meta">Scheduled rotation</div>
+          </div>
+          <div class="time">5h 20m</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-footer">
+      <b>Awaken.</b> &nbsp;Align.&nbsp; Ascend.
+    </div>
+  </section>
+
+  <!-- HUD corners -->
+  <span class="bracket tl"></span>
+  <span class="bracket tr"></span>
+  <span class="bracket bl"></span>
+  <span class="bracket br"></span>
+
+  <!-- HUD bottom -->
+  <footer class="hud-bottom">
+    <div class="group">
+      <span class="stat ok"><span class="dot bg"></span>Rift · Stable</span>
+      <span class="stat ok"><span class="dot bg"></span>Telemetry · 60Hz</span>
+      <span class="stat warn"><span class="dot bg"></span>Aurora · Shifting</span>
+    </div>
+    <div class="group">
+      <span class="stat idle">SECTOR · 04—PRISM</span>
+      <span class="stat idle">BUILD · 2026.05.26</span>
+      <span class="stat ok"><span class="dot bg"></span>DSSM · v1.0</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="rift/rift.js?v=2"></script>
+</body>
+</html>

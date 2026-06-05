@@ -1,0 +1,881 @@
+/* --- Radiant Text --- */
+.radiant {
+  background: linear-gradient(135deg, var(--a), var(--b));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Glow Levels (R0 = no glow, R1-R3 ascending intensity) --- */
+.glow-r1 {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--a) 40%, transparent));
+}
+
+.glow-r2 {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--a) 55%, transparent))
+    drop-shadow(0 0 20px color-mix(in srgb, var(--b) 25%, transparent));
+}
+
+.glow-r3 {
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--a) 70%, transparent))
+    drop-shadow(0 0 32px color-mix(in srgb, var(--b) 35%, transparent))
+    drop-shadow(0 0 60px color-mix(in srgb, var(--a) 15%, transparent));
+}
+
+/* --- Radiance Decay Animation --- */
+@keyframes radiant-decay {
+  0% {
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--a) 70%, transparent))
+      drop-shadow(0 0 32px color-mix(in srgb, var(--b) 35%, transparent));
+    opacity: 1;
+  }
+  100% {
+    filter: drop-shadow(0 0 0px transparent);
+    opacity: 0.85;
+  }
+}
+
+.radiant-decay {
+  animation: radiant-decay 2.4s ease-out forwards;
+}
+
+/* --- Accessibility Overrides --- */
+@media (forced-colors: active) {
+  .radiant {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+
+  .glow-r1,
+  .glow-r2,
+  .glow-r3 {
+    filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .radiant {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+    color: #ffffff;
+  }
+
+  .glow-r1,
+  .glow-r2,
+  .glow-r3 {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radiant-decay {
+    animation: none;
+  }
+}
+
+[data-reduce-transparency='true'] .radiant {
+  -webkit-text-fill-color: currentColor;
+  background: none;
+  color: var(--mercury);
+}
+
+[data-reduce-transparency='true'] .glow-r1,
+[data-reduce-transparency='true'] .glow-r2,
+[data-reduce-transparency='true'] .glow-r3 {
+  filter: none;
+}
+
+/* --- Wave Glow Animation (audio-reactive style) --- */
+/* Irregular waveform rise from the bottom, layered timings for pseudo-random motion. */
+
+@keyframes wave-glow-audio {
+  0% {
+    height: 16%;
+    opacity: 0.06;
+    transform: translateY(10%);
+    clip-path: polygon(
+      0% 100%,
+      0% 92%,
+      8% 84%,
+      16% 74%,
+      24% 82%,
+      32% 68%,
+      40% 78%,
+      48% 64%,
+      56% 76%,
+      64% 67%,
+      72% 80%,
+      80% 71%,
+      88% 83%,
+      96% 75%,
+      100% 80%,
+      100% 100%
+    );
+  }
+  14% {
+    height: 34%;
+    opacity: 0.2;
+    transform: translateY(0%);
+    clip-path: polygon(
+      0% 100%,
+      0% 80%,
+      8% 58%,
+      16% 46%,
+      24% 66%,
+      32% 40%,
+      40% 62%,
+      48% 36%,
+      56% 58%,
+      64% 42%,
+      72% 64%,
+      80% 47%,
+      88% 68%,
+      96% 52%,
+      100% 62%,
+      100% 100%
+    );
+  }
+  31% {
+    height: 24%;
+    opacity: 0.13;
+    transform: translateY(6%);
+    clip-path: polygon(
+      0% 100%,
+      0% 88%,
+      8% 78%,
+      16% 70%,
+      24% 82%,
+      32% 66%,
+      40% 79%,
+      48% 64%,
+      56% 77%,
+      64% 67%,
+      72% 81%,
+      80% 69%,
+      88% 84%,
+      96% 72%,
+      100% 80%,
+      100% 100%
+    );
+  }
+  49% {
+    height: 44%;
+    opacity: 0.24;
+    transform: translateY(-1%);
+    clip-path: polygon(
+      0% 100%,
+      0% 72%,
+      8% 44%,
+      16% 30%,
+      24% 58%,
+      32% 24%,
+      40% 52%,
+      48% 20%,
+      56% 48%,
+      64% 26%,
+      72% 54%,
+      80% 32%,
+      88% 60%,
+      96% 36%,
+      100% 50%,
+      100% 100%
+    );
+  }
+  66% {
+    height: 32%;
+    opacity: 0.18;
+    transform: translateY(3%);
+    clip-path: polygon(
+      0% 100%,
+      0% 82%,
+      8% 62%,
+      16% 50%,
+      24% 69%,
+      32% 44%,
+      40% 64%,
+      48% 41%,
+      56% 61%,
+      64% 47%,
+      72% 68%,
+      80% 51%,
+      88% 72%,
+      96% 56%,
+      100% 66%,
+      100% 100%
+    );
+  }
+  82% {
+    height: 38%;
+    opacity: 0.21;
+    transform: translateY(-1%);
+    clip-path: polygon(
+      0% 100%,
+      0% 78%,
+      8% 56%,
+      16% 42%,
+      24% 63%,
+      32% 38%,
+      40% 59%,
+      48% 35%,
+      56% 57%,
+      64% 41%,
+      72% 64%,
+      80% 46%,
+      88% 69%,
+      96% 50%,
+      100% 60%,
+      100% 100%
+    );
+  }
+  100% {
+    height: 18%;
+    opacity: 0.08;
+    transform: translateY(10%);
+    clip-path: polygon(
+      0% 100%,
+      0% 91%,
+      8% 83%,
+      16% 75%,
+      24% 82%,
+      32% 72%,
+      40% 79%,
+      48% 70%,
+      56% 78%,
+      64% 73%,
+      72% 81%,
+      80% 74%,
+      88% 83%,
+      96% 77%,
+      100% 81%,
+      100% 100%
+    );
+  }
+}
+
+@keyframes wave-glow-audio-b {
+  0% {
+    height: 14%;
+    opacity: 0.05;
+    transform: translateY(12%);
+    clip-path: polygon(
+      0% 100%,
+      0% 92%,
+      10% 84%,
+      22% 76%,
+      34% 86%,
+      46% 70%,
+      58% 84%,
+      70% 72%,
+      82% 85%,
+      92% 78%,
+      100% 84%,
+      100% 100%
+    );
+  }
+  30% {
+    height: 40%;
+    opacity: 0.22;
+    transform: translateY(-2%);
+    clip-path: polygon(
+      0% 100%,
+      0% 74%,
+      10% 42%,
+      22% 66%,
+      34% 30%,
+      46% 60%,
+      58% 26%,
+      70% 56%,
+      82% 34%,
+      92% 62%,
+      100% 46%,
+      100% 100%
+    );
+  }
+  58% {
+    height: 26%;
+    opacity: 0.14;
+    transform: translateY(4%);
+    clip-path: polygon(
+      0% 100%,
+      0% 86%,
+      10% 74%,
+      22% 64%,
+      34% 78%,
+      46% 60%,
+      58% 76%,
+      70% 62%,
+      82% 79%,
+      92% 68%,
+      100% 76%,
+      100% 100%
+    );
+  }
+  100% {
+    height: 16%;
+    opacity: 0.06;
+    transform: translateY(10%);
+    clip-path: polygon(
+      0% 100%,
+      0% 90%,
+      10% 82%,
+      22% 74%,
+      34% 84%,
+      46% 70%,
+      58% 82%,
+      70% 72%,
+      82% 84%,
+      92% 76%,
+      100% 82%,
+      100% 100%
+    );
+  }
+}
+
+@keyframes wave-glow-audio-c {
+  0% {
+    height: 18%;
+    opacity: 0.06;
+    transform: translateY(10%);
+    clip-path: polygon(
+      0% 100%,
+      0% 90%,
+      8% 80%,
+      18% 74%,
+      28% 84%,
+      38% 68%,
+      48% 82%,
+      58% 70%,
+      68% 84%,
+      78% 66%,
+      88% 81%,
+      96% 72%,
+      100% 80%,
+      100% 100%
+    );
+  }
+  22% {
+    height: 46%;
+    opacity: 0.24;
+    transform: translateY(-3%);
+    clip-path: polygon(
+      0% 100%,
+      0% 70%,
+      8% 36%,
+      18% 56%,
+      28% 24%,
+      38% 50%,
+      48% 18%,
+      58% 46%,
+      68% 22%,
+      78% 52%,
+      88% 28%,
+      96% 58%,
+      100% 34%,
+      100% 100%
+    );
+  }
+  63% {
+    height: 30%;
+    opacity: 0.17;
+    transform: translateY(2%);
+    clip-path: polygon(
+      0% 100%,
+      0% 82%,
+      8% 58%,
+      18% 72%,
+      28% 50%,
+      38% 68%,
+      48% 46%,
+      58% 66%,
+      68% 52%,
+      78% 70%,
+      88% 56%,
+      96% 74%,
+      100% 60%,
+      100% 100%
+    );
+  }
+  100% {
+    height: 20%;
+    opacity: 0.08;
+    transform: translateY(8%);
+    clip-path: polygon(
+      0% 100%,
+      0% 90%,
+      8% 80%,
+      18% 74%,
+      28% 84%,
+      38% 68%,
+      48% 82%,
+      58% 70%,
+      68% 84%,
+      78% 66%,
+      88% 81%,
+      96% 72%,
+      100% 80%,
+      100% 100%
+    );
+  }
+}
+
+@keyframes wave-mirror-audio {
+  0% {
+    bottom: -30%;
+    opacity: 0.04;
+    transform: scaleY(0.82) translateY(8%);
+  }
+  19% {
+    bottom: -10%;
+    opacity: 0.1;
+    transform: scaleY(1) translateY(-2%);
+  }
+  37% {
+    bottom: -26%;
+    opacity: 0.06;
+    transform: scaleY(0.86) translateY(5%);
+  }
+  58% {
+    bottom: -8%;
+    opacity: 0.11;
+    transform: scaleY(1.03) translateY(-3%);
+  }
+  79% {
+    bottom: -24%;
+    opacity: 0.07;
+    transform: scaleY(0.9) translateY(3%);
+  }
+  100% {
+    bottom: -30%;
+    opacity: 0.05;
+    transform: scaleY(0.82) translateY(8%);
+  }
+}
+
+@keyframes wave-mirror-audio-b {
+  0% {
+    bottom: -32%;
+    opacity: 0.035;
+    transform: scaleY(0.8) translateY(10%);
+  }
+  25% {
+    bottom: -12%;
+    opacity: 0.095;
+    transform: scaleY(0.98) translateY(-1%);
+  }
+  50% {
+    bottom: -28%;
+    opacity: 0.05;
+    transform: scaleY(0.85) translateY(7%);
+  }
+  75% {
+    bottom: -9%;
+    opacity: 0.105;
+    transform: scaleY(1.02) translateY(-3%);
+  }
+  100% {
+    bottom: -32%;
+    opacity: 0.04;
+    transform: scaleY(0.8) translateY(10%);
+  }
+}
+
+@keyframes wave-mirror-audio-c {
+  0% {
+    bottom: -28%;
+    opacity: 0.04;
+    transform: scaleY(0.84) translateY(8%);
+  }
+  20% {
+    bottom: -8%;
+    opacity: 0.11;
+    transform: scaleY(1.05) translateY(-4%);
+  }
+  45% {
+    bottom: -26%;
+    opacity: 0.055;
+    transform: scaleY(0.88) translateY(6%);
+  }
+  70% {
+    bottom: -11%;
+    opacity: 0.1;
+    transform: scaleY(1) translateY(-2%);
+  }
+  100% {
+    bottom: -28%;
+    opacity: 0.045;
+    transform: scaleY(0.84) translateY(8%);
+  }
+}
+
+@keyframes wave-jitter {
+  0% {
+    filter: saturate(1) brightness(1);
+  }
+  100% {
+    filter: saturate(1.18) brightness(1.08);
+  }
+}
+
+@keyframes wave-line-audio {
+  0% {
+    transform: translateY(0) scaleX(1);
+    clip-path: polygon(
+      0% 70%,
+      8% 46%,
+      16% 64%,
+      24% 36%,
+      32% 58%,
+      40% 30%,
+      48% 54%,
+      56% 34%,
+      64% 60%,
+      72% 40%,
+      80% 66%,
+      88% 42%,
+      96% 62%,
+      100% 52%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  24% {
+    transform: translateY(-3px) scaleX(1.01);
+    clip-path: polygon(
+      0% 62%,
+      8% 24%,
+      16% 56%,
+      24% 16%,
+      32% 52%,
+      40% 10%,
+      48% 48%,
+      56% 12%,
+      64% 54%,
+      72% 18%,
+      80% 58%,
+      88% 26%,
+      96% 60%,
+      100% 34%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  52% {
+    transform: translateY(2px) scaleX(0.995);
+    clip-path: polygon(
+      0% 74%,
+      8% 54%,
+      16% 70%,
+      24% 46%,
+      32% 66%,
+      40% 44%,
+      48% 64%,
+      56% 48%,
+      64% 68%,
+      72% 52%,
+      80% 70%,
+      88% 56%,
+      96% 72%,
+      100% 60%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  76% {
+    transform: translateY(-4px) scaleX(1.015);
+    clip-path: polygon(
+      0% 66%,
+      8% 28%,
+      16% 60%,
+      24% 14%,
+      32% 54%,
+      40% 8%,
+      48% 50%,
+      56% 18%,
+      64% 56%,
+      72% 20%,
+      80% 60%,
+      88% 30%,
+      96% 64%,
+      100% 40%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  100% {
+    transform: translateY(0) scaleX(1);
+    clip-path: polygon(
+      0% 70%,
+      8% 46%,
+      16% 64%,
+      24% 36%,
+      32% 58%,
+      40% 30%,
+      48% 54%,
+      56% 34%,
+      64% 60%,
+      72% 40%,
+      80% 66%,
+      88% 42%,
+      96% 62%,
+      100% 52%,
+      100% 100%,
+      0% 100%
+    );
+  }
+}
+
+@keyframes wave-line-audio-glow {
+  0% {
+    opacity: 0.22;
+    filter: blur(0px) saturate(1.1);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(0.6px) saturate(1.28);
+  }
+  100% {
+    opacity: 0.24;
+    filter: blur(0px) saturate(1.12);
+  }
+}
+
+.wave-line-audio {
+  height: 22px;
+  will-change: transform, clip-path, opacity, filter;
+  animation:
+    wave-line-audio 1.15s cubic-bezier(0.3, 0, 0.2, 1) infinite,
+    wave-line-audio-glow 0.72s steps(9, end) infinite alternate,
+    wave-jitter 0.26s steps(16, end) infinite alternate;
+}
+
+.wave-line-audio-mirror {
+  height: 18px;
+  will-change: transform, clip-path, opacity, filter;
+  transform: translateY(10px) scaleY(0.78);
+  filter: blur(10px) saturate(1.06);
+  animation:
+    wave-line-audio 1.32s cubic-bezier(0.32, 0, 0.22, 1) infinite reverse,
+    wave-line-audio-glow 0.9s steps(8, end) infinite alternate-reverse,
+    wave-jitter 0.34s steps(12, end) infinite alternate-reverse;
+}
+
+.wave-glow-animate {
+  will-change: height, opacity, transform, clip-path;
+  animation:
+    wave-glow-audio 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite,
+    wave-jitter 0.36s steps(14, end) infinite alternate;
+}
+
+.wave-mirror-animate {
+  will-change: bottom, opacity, transform;
+  animation:
+    wave-mirror-audio 1.95s cubic-bezier(0.28, 0, 0.22, 1) infinite,
+    wave-jitter 0.42s steps(13, end) infinite alternate-reverse;
+}
+
+.wave-glow-animate-bright {
+  will-change: height, opacity, transform, clip-path;
+  filter: saturate(1.25) brightness(1.2);
+  animation:
+    wave-glow-audio-c 1.45s cubic-bezier(0.3, 0, 0.2, 1) infinite,
+    wave-jitter 0.3s steps(16, end) infinite alternate;
+}
+
+.wave-mirror-animate-bright {
+  will-change: bottom, opacity, transform;
+  filter: saturate(1.2) brightness(1.16);
+  animation:
+    wave-mirror-audio-c 1.6s cubic-bezier(0.28, 0, 0.22, 1) infinite,
+    wave-jitter 0.34s steps(15, end) infinite alternate-reverse;
+}
+
+/* --- Global application: all cards + buttons --- */
+/* Automatically adds the same bottom audio-wave treatment to interactive surfaces. */
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  contain: layout style;
+  --wave-glow-keyframe: wave-glow-audio;
+  --wave-mirror-keyframe: wave-mirror-audio;
+  --wave-glow-duration: 1.9s;
+  --wave-mirror-duration: 2.1s;
+  --wave-jitter-duration: 0.38s;
+  --wave-jitter-steps: 14;
+  --wave-jitter-steps-alt: 13;
+}
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+):nth-child(3n + 1) {
+  --wave-glow-keyframe: wave-glow-audio;
+  --wave-mirror-keyframe: wave-mirror-audio;
+  --wave-glow-duration: 1.95s;
+  --wave-mirror-duration: 2.12s;
+  --wave-jitter-duration: 0.4s;
+  --wave-jitter-steps: 13;
+  --wave-jitter-steps-alt: 12;
+}
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+):nth-child(3n + 2) {
+  --wave-glow-keyframe: wave-glow-audio-b;
+  --wave-mirror-keyframe: wave-mirror-audio-b;
+  --wave-glow-duration: 1.62s;
+  --wave-mirror-duration: 1.84s;
+  --wave-jitter-duration: 0.32s;
+  --wave-jitter-steps: 15;
+  --wave-jitter-steps-alt: 14;
+}
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+):nth-child(3n + 3) {
+  --wave-glow-keyframe: wave-glow-audio-c;
+  --wave-mirror-keyframe: wave-mirror-audio-c;
+  --wave-glow-duration: 1.42s;
+  --wave-mirror-duration: 1.66s;
+  --wave-jitter-duration: 0.28s;
+  --wave-jitter-steps: 17;
+  --wave-jitter-steps-alt: 16;
+}
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--wave-from, var(--a)) 56%, transparent) 0%,
+    color-mix(in srgb, var(--wave-to, var(--b)) 30%, transparent) 72%,
+    transparent 100%
+  );
+}
+
+:is(
+  .glass-panel,
+  .glass-panel-depth,
+  .glass-strong,
+  .glass-subtle,
+  .glass-card-depth,
+  .glass-shell
+)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -28%;
+  height: 35%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(18px);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--wave-from, var(--a)) 24%, transparent) 0%,
+    color-mix(in srgb, var(--wave-to, var(--b)) 14%, transparent) 58%,
+    transparent 100%
+  );
+}
+
+:is(
+    .glass-panel,
+    .glass-panel-depth,
+    .glass-strong,
+    .glass-subtle,
+    .glass-card-depth,
+    .glass-shell
+  ):is(:hover, :focus-visible)::before {
+  opacity: 1;
+  will-change: height, opacity, transform, clip-path;
+  animation:
+    var(--wave-glow-keyframe, wave-glow-audio) var(--wave-glow-duration, 1.9s)
+      cubic-bezier(0.3, 0, 0.2, 1) infinite,
+    wave-jitter var(--wave-jitter-duration, 0.38s) steps(var(--wave-jitter-steps, 14), end) infinite
+      alternate;
+}
+
+:is(
+    .glass-panel,
+    .glass-panel-depth,
+    .glass-strong,
+    .glass-subtle,
+    .glass-card-depth,
+    .glass-shell
+  ):is(:hover, :focus-visible)::after {
+  opacity: 1;
+  will-change: bottom, opacity, transform;
+  animation:
+    var(--wave-mirror-keyframe, wave-mirror-audio) var(--wave-mirror-duration, 2.1s)
+      cubic-bezier(0.28, 0, 0.22, 1) infinite,
+    wave-jitter calc(var(--wave-jitter-duration, 0.38s) + 0.07s)
+      steps(var(--wave-jitter-steps-alt, 13), end) infinite alternate-reverse;
+}
+
+/* Accessibility: Disable animations when motion is reduced */
+@media (prefers-reduced-motion: reduce) {
+  .wave-glow-animate,
+  .wave-mirror-animate,
+  .wave-glow-animate-bright,
+  .wave-mirror-animate-bright,
+  .wave-line-audio,
+  .wave-line-audio-mirror {
+    animation: none;
+  }
+
+  :is(
+    .glass-panel,
+    .glass-panel-depth,
+    .glass-strong,
+    .glass-subtle,
+    .glass-card-depth,
+    .glass-shell
+  )::before,
+  :is(
+    .glass-panel,
+    .glass-panel-depth,
+    .glass-strong,
+    .glass-subtle,
+    .glass-card-depth,
+    .glass-shell
+  )::after {
+    animation: none;
+  }
+}

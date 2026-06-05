@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Prismatic Plasma — MetaChromatic Wallpaper</title>
+<link rel="icon" href="lib/metachromatic-icon.svg">
+<link rel="stylesheet" href="lib/wallpaper.css">
+</head>
+<body>
+<div id="mc-vignette"></div>
+
+<script type="x-shader/x-fragment" id="frag">
+void main(){
+  vec2 st = gl_FragCoord.xy / u_res;
+  vec2 uv = (gl_FragCoord.xy - 0.5*u_res) / u_res.y;
+  float t  = u_time * (0.25 + u_motion*0.6);
+
+  vec2 m = (u_mouse - 0.5); m.x *= u_res.x/u_res.y;
+
+  // shockwaves warp the plasma
+  vec3 rp = rippleAt(st);
+  uv += rp.xy * 0.45;
+
+  vec2 p = uv * 3.0;
+  float dm = length(uv - m);
+  float fl = u_flow;
+
+  // ── classic interfering sine waves = plasma ──
+  float v = 0.0;
+  v += sin(p.x*1.6 + t);
+  v += sin(p.y*1.7 - t*1.1);
+  v += sin((p.x + p.y)*1.25 + t*0.8);
+  v += (0.6+0.8*fl)*sin(length(p - m*3.0)*2.2 - t*2.0);    // radial wave from cursor
+  v += 1.3*sin(dm*11.0 - t*3.5)*exp(-dm*1.6)*u_present;    // tight ring around cursor
+  // mouse motion injects turbulence
+  v += (1.5+2.5*fl)*length(u_mouseV)*sin(dm*6.0 - t*2.0);
+  v += fl*0.7*sin(length(p)*3.5 + t*1.3);                  // extra flow turbulence
+  v /= 4.0;
+
+  float plasma = 0.5 + 0.5*sin(v*3.14159 + t*0.4);
+  float raw = plasma + t*0.04;
+  float idx = fract(raw);
+
+  // crystalline mode: snap plasma into faceted bands with seams
+  float seam = 0.0;
+  if(u_crystal > 0.001){
+    float steps = mix(40.0, 6.0, u_crystal);
+    idx = mix(idx, floor(idx*steps)/steps + 0.5/steps, u_crystal);
+    float fr = fract(raw*steps);
+    seam = (1.0 - smoothstep(0.0, 0.13, min(fr, 1.0-fr))) * u_crystal;
+  }
+
+  vec3 col = palRamp(idx);
+
+  // bright electric filaments along the wave crests
+  float fil = abs(sin(v*6.2831));
+  col += pow(1.0 - fil, 4.0) * palRamp(fract(idx + 0.35)) * 0.9 * (1.0 - u_crystal*0.7);
+
+  // bloom + energy from clicks
+  col += rp.z * 1.7;
+  col += rp.z * palRamp(fract(idx + 0.6)) * 1.2;
+
+  // cursor core glow
+  col += pow(max(0.0, 1.0 - dm*1.2), 5.0) * palRamp(fract(t*0.2+0.5)) * 0.6 * u_present;
+
+  // faceted seams
+  col *= 1.0 - seam*0.6;
+  col += seam * palRamp(fract(idx+0.5)) * 0.15;
+
+  col *= 1.0 - 0.22*dot(uv,uv);
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script src="lib/chrome-dock.js"></script>
+<script src="lib/shader-runtime.js"></script>
+<script>
+  MCWallpaper.init({ index: 2, fragId: 'frag', motion: 0.75 });
+</script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+{
+  "schema_id": "ccs-character-metadata-spec.v1",
+  "version": "1.0.0",
+  "updated_at": "2026-04-28",
+  "sections": {
+    "identity": {
+      "required": [
+        "model_slug",
+        "display_name",
+        "trigger_word"
+      ],
+      "recommended": [
+        "aliases",
+        "version",
+        "consolidated_at"
+      ]
+    },
+    "personal_career": {
+      "required_groups": [
+        "personal",
+        "career"
+      ],
+      "personal_fields": [
+        "age",
+        "born",
+        "birthplace",
+        "nationality",
+        "ethnicity",
+        "sexuality",
+        "years_active_start",
+        "years_active_end"
+      ],
+      "career_fields": [
+        "profession_primary",
+        "professions"
+      ]
+    },
+    "physical": {
+      "required": [
+        "ethnicity",
+        "nationality",
+        "hair_color",
+        "eye_color",
+        "body_type",
+        "height_cm",
+        "weight_kg",
+        "bra_cup",
+        "cup_letter",
+        "cup_size_class",
+        "boobs",
+        "bust",
+        "waist",
+        "hips",
+        "pubic_hair"
+      ],
+      "augmentation_targets": [
+        "tattoos",
+        "piercings",
+        "hair_length",
+        "skin_tone",
+        "build_detail"
+      ]
+    },
+    "aurora": {
+      "required": [
+        "quadrant",
+        "tier",
+        "confidence_grade"
+      ],
+      "numeric_breakdown": [
+        "score_overall",
+        "score_face",
+        "score_body",
+        "score_whr",
+        "score_symmetry",
+        "score_skin"
+      ],
+      "flags": [
+        "nat_anchor",
+        "cup_anchor",
+        "needs_review"
+      ]
+    },
+    "face": {
+      "required": [
+        "face_shape",
+        "face_shape_confidence",
+        "jaw",
+        "cheekbones",
+        "nose",
+        "lips",
+        "brows",
+        "eyes",
+        "facial_thirds"
+      ],
+      "advanced": [
+        "raw_geometry",
+        "face_generation_tags",
+        "generation_tags"
+      ]
+    },
+    "assets": {
+      "required": [
+        "cover_image",
+        "profile_thumb",
+        "canonical_face",
+        "gallery_sample",
+        "local_image_count",
+        "local_image_paths"
+      ]
+    },
+    "content_nsfw": {
+      "required": [
+        "content_level",
+        "nsfw_tier",
+        "content"
+      ],
+      "content_fields": [
+        "acts",
+        "tags",
+        "has_video",
+        "has_vr"
+      ]
+    },
+    "lora_generation": {
+      "required": [
+        "trained",
+        "lora_path",
+        "checkpoint_step",
+        "base_checkpoint",
+        "training_date",
+        "quality_score",
+        "recommended_strength"
+      ],
+      "recommended": [
+        "notes"
+      ]
+    },
+    "stats_social": {
+      "required_groups": [
+        "stats",
+        "social"
+      ],
+      "stats_fields": [
+        "rating_score",
+        "votes",
+        "favorited",
+        "gallery_count",
+        "image_count",
+        "video_count"
+      ],
+      "social_fields": [
+        "instagram",
+        "twitter",
+        "onlyfans",
+        "linktree"
+      ]
+    }
+  },
+  "normalized_tables": [
+    "models",
+    "model_physical",
+    "model_personal",
+    "model_career",
+    "model_face",
+    "model_aurora",
+    "model_assets",
+    "model_content",
+    "model_lora",
+    "model_stats",
+    "model_social",
+    "model_aliases",
+    "model_links",
+    "model_personality"
+  ],
+  "frontend_display_layers": [
+    "card_view",
+    "profile_header",
+    "stats_strip",
+    "physical_panel",
+    "generation_panel",
+    "content_panel",
+    "face_panel"
+  ]
+}

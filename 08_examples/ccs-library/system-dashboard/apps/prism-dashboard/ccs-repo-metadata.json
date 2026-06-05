@@ -1,0 +1,22 @@
+{
+  "repo": {
+    "name": "04-Prism",
+    "owner": "kas1987",
+    "current_branch": "main",
+    "default_branch": "main"
+  },
+  "system": {
+    "name": "CCS",
+    "metadata_contract": "ccs-character-metadata-spec.v1",
+    "metadata_contract_version": "1.0.0"
+  },
+  "governance": {
+    "always_attach_to": [
+      "webhooks",
+      "webnodes",
+      "connector_full_update_payloads",
+      "scraped_models_server_responses"
+    ],
+    "as_of": "2026-04-28"
+  }
+}

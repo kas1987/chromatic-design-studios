@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Prism Hero Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:#030610;font-family:'Space Grotesk',system-ui,sans-serif;}
+
+/* ── SCENE ── */
+#bg{position:fixed;inset:0;z-index:0;}
+.scene{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;padding:20px;}
+
+/* ── CARD ── */
+.card{
+  position:relative;width:min(560px,96vw);border-radius:28px;padding:40px 36px 36px;
+  overflow:hidden;
+  background:linear-gradient(145deg,rgba(20,14,40,.65),rgba(8,6,20,.8));
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 30px 80px rgba(0,0,0,.7),
+    0 0 60px rgba(139,92,246,.15),
+    0 0 120px rgba(0,212,255,.08);
+}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,.055) 0%,transparent 45%);pointer-events:none;border-radius:28px;}
+
+/* ── AMBIENT BG ── */
+.card-glow{position:absolute;inset:-50%;background:radial-gradient(ellipse at 50% 40%,rgba(139,92,246,.25) 0%,rgba(0,212,255,.12) 35%,transparent 70%);pointer-events:none;animation:breathe 4s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.8;}50%{transform:scale(1.08);opacity:1;}}
+
+/* ── ENERGY RINGS ── */
+.rings{position:absolute;left:50%;top:0;transform:translateX(-50%);width:340px;height:340px;pointer-events:none;}
+.ring{position:absolute;inset:0;border-radius:50%;}
+.ring svg{width:100%;height:100%;animation:ring-spin 6s linear infinite;}
+.ring:nth-child(2) svg{animation-duration:9s;animation-direction:reverse;}
+.ring:nth-child(3) svg{animation-duration:12s;}
+@keyframes ring-spin{to{transform:rotate(360deg);}}
+
+/* ── PRISM ── */
+.prism-wrap{display:flex;justify-content:center;align-items:flex-end;height:220px;position:relative;z-index:2;}
+.prism-3d{
+  perspective:700px;
+  transform-style:preserve-3d;
+  animation:prism-float 6s ease-in-out infinite;
+}
+@keyframes prism-float{
+  0%{transform:translateY(0px);}
+  50%{transform:translateY(-12px);}
+  100%{transform:translateY(0px);}
+}
+.prism-svg{
+  filter:drop-shadow(0 0 24px rgba(139,92,246,.8)) drop-shadow(0 0 48px rgba(0,212,255,.4)) drop-shadow(0 0 8px rgba(224,64,251,.6));
+  animation:prism-tilt 8s ease-in-out infinite;
+  transform-origin:50% 60%;
+}
+@keyframes prism-tilt{
+  0%,100%{transform:rotateY(-10deg) rotateX(4deg);}
+  33%{transform:rotateY(10deg) rotateX(-3deg);}
+  66%{transform:rotateY(0deg) rotateX(5deg);}
+}
+
+/* ── BASE GLOW ── */
+.base-glow{
+  position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  width:180px;height:30px;
+  background:radial-gradient(ellipse,rgba(139,92,246,.7) 0%,rgba(0,212,255,.3) 40%,transparent 75%);
+  filter:blur(10px);
+  animation:base-pulse 3s ease-in-out infinite;
+}
+@keyframes base-pulse{0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1);}50%{opacity:1;transform:translateX(-50%) scaleX(1.15);}}
+
+/* ── TEXT ── */
+.text-layer{position:relative;z-index:2;margin-top:8px;}
+.hero-title{
+  font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.05;letter-spacing:-.02em;
+  background:linear-gradient(90deg,#7df9ff 0%,#c77dff 45%,#ffb86b 80%,#ff6ef7 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  background-size:200% auto;
+  animation:text-shimmer 4s linear infinite;
+}
+@keyframes text-shimmer{0%{background-position:0% center;}100%{background-position:200% center;}}
+.hero-sub{
+  margin-top:10px;font-size:14px;font-weight:300;
+  color:rgba(255,255,255,.55);line-height:1.6;letter-spacing:.02em;
+  text-shadow:0 0 20px rgba(139,92,246,.3);
+}
+.hero-sub span{color:rgba(200,170,255,.7);}
+
+/* ── CTA ── */
+.cta{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:22px;padding:11px 24px;
+  border-radius:10px;
+  border:1px solid rgba(139,92,246,.5);
+  background:rgba(139,92,246,.08);
+  color:rgba(200,160,255,.9);
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:border-color .3s,box-shadow .3s,background .3s,color .3s;
+}
+.cta::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(139,92,246,.15),transparent);transform:translateX(-100%);transition:transform .5s;}
+.cta:hover{border-color:rgba(139,92,246,.9);box-shadow:0 0 20px rgba(139,92,246,.4),0 0 40px rgba(139,92,246,.2);color:white;background:rgba(139,92,246,.15);}
+.cta:hover::before{transform:translateX(100%);}
+.cta-arrow{font-size:14px;transition:transform .3s;}
+.cta:hover .cta-arrow{transform:translateX(4px);}
+
+/* ── STATUS ── */
+.status-bar{
+  display:flex;align-items:center;gap:8px;margin-top:20px;
+  padding:8px 14px;border-radius:8px;
+  background:rgba(0,245,155,.06);border:1px solid rgba(0,245,155,.15);
+  width:fit-content;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#00f59b;box-shadow:0 0 8px rgba(0,245,155,.8);animation:status-blink 2s ease-in-out infinite;}
+@keyframes status-blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.status-text{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,245,155,.8);}
+
+/* ── PARTICLES (canvas) ── */
+#particles{position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:28px;}
+
+/* ── CORNER ACCENTS ── */
+.corner{position:absolute;width:18px;height:18px;pointer-events:none;}
+.corner.tl{top:14px;left:14px;border-top:1px solid rgba(0,212,255,.5);border-left:1px solid rgba(0,212,255,.5);}
+.corner.tr{top:14px;right:14px;border-top:1px solid rgba(224,64,251,.5);border-right:1px solid rgba(224,64,251,.5);}
+.corner.bl{bottom:14px;left:14px;border-bottom:1px solid rgba(0,212,255,.3);border-left:1px solid rgba(0,212,255,.3);}
+.corner.br{bottom:14px;right:14px;border-bottom:1px solid rgba(224,64,251,.3);border-right:1px solid rgba(224,64,251,.3);}
+
+/* ── SCAN LINE ── */
+.scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.4),transparent);animation:scan 6s ease-in-out infinite;pointer-events:none;z-index:3;}
+@keyframes scan{0%,100%{top:-2px;opacity:0;}10%{opacity:1;}90%{opacity:.5;}95%{top:calc(100% + 2px);opacity:0;}}
+</style>
+</head>
+<body>
+
+<!-- Ambient bg canvas -->
+<canvas id="bg"></canvas>
+
+<div class="scene">
+  <div class="card" id="hero-card">
+    <canvas id="particles"></canvas>
+
+    <!-- Corner accents -->
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <!-- Scan line -->
+    <div class="scan"></div>
+
+    <!-- Ambient inner glow -->
+    <div class="card-glow"></div>
+
+    <!-- Energy rings -->
+    <div class="rings">
+      <div class="ring"><svg viewBox="0 0 340 340"><circle cx="170" cy="170" r="130" fill="none" stroke="url(#r1)" stroke-width="1.5" stroke-dasharray="20 8" opacity=".6"/><defs><linearGradient id="r1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff" stop-opacity=".8"/><stop offset="50%" stop-color="#8b5cf6" stop-opacity=".8"/><stop offset="100%" stop-color="#e040fb" stop-opacity=".8"/></linearGradient></defs></svg></div>
+      <div class="ring"><svg viewBox="0 0 340 340"><circle cx="170" cy="170" r="155" fill="none" stroke="url(#r2)" stroke-width=".8" stroke-dasharray="40 12" opacity=".35"/><defs><linearGradient id="r2" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fbbf24" stop-opacity=".7"/><stop offset="50%" stop-color="#00f59b" stop-opacity=".7"/><stop offset="100%" stop-color="#00d4ff" stop-opacity=".7"/></linearGradient></defs></svg></div>
+      <div class="ring"><svg viewBox="0 0 340 340"><circle cx="170" cy="170" r="108" fill="none" stroke="url(#r3)" stroke-width="1" stroke-dasharray="6 14" opacity=".45"/><defs><linearGradient id="r3" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#e040fb" stop-opacity=".9"/><stop offset="100%" stop-color="#00d4ff" stop-opacity=".9"/></linearGradient></defs></svg></div>
+    </div>
+
+    <!-- 3D Prism -->
+    <div class="prism-wrap">
+      <div class="base-glow"></div>
+      <div class="prism-3d">
+        <svg class="prism-svg" width="160" height="230" viewBox="0 0 200 290">
+          <defs>
+            <linearGradient id="pA" x1="0%"y1="0%"x2="100%"y2="100%"><stop offset="0%"stop-color="#00d4ff"stop-opacity=".97"/><stop offset="40%"stop-color="#8b5cf6"stop-opacity=".9"/><stop offset="100%"stop-color="#e040fb"stop-opacity=".95"/></linearGradient>
+            <linearGradient id="pB" x1="100%"y1="0%"x2="0%"y2="100%"><stop offset="0%"stop-color="#fbbf24"stop-opacity=".85"/><stop offset="60%"stop-color="#f97316"stop-opacity=".65"/><stop offset="100%"stop-color="#e040fb"stop-opacity=".4"/></linearGradient>
+            <linearGradient id="pC" x1="0%"y1="0%"x2="0%"y2="100%"><stop offset="0%"stop-color="#00f59b"stop-opacity=".85"/><stop offset="100%"stop-color="#4f8ef7"stop-opacity=".6"/></linearGradient>
+            <linearGradient id="pD" x1="0%"y1="0%"x2="100%"y2="100%"><stop offset="0%"stop-color="#00d4ff"stop-opacity=".7"/><stop offset="100%"stop-color="#8b5cf6"stop-opacity=".5"/></linearGradient>
+            <radialGradient id="pH" cx="50%"cy="85%"r="40%"><stop offset="0%"stop-color="#8b5cf6"stop-opacity=".7"/><stop offset="100%"stop-color="#8b5cf6"stop-opacity="0"/></radialGradient>
+            <filter id="pGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="pShine"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Base halo -->
+          <ellipse cx="100"cy="260"rx="85"ry="28"fill="url(#pH)"/>
+          <!-- Facets -->
+          <polygon points="100,6 168,96 100,128 32,96" fill="url(#pA)" filter="url(#pGlow)" opacity=".93"/>
+          <polygon points="168,96 156,204 100,232 100,128" fill="url(#pB)" filter="url(#pShine)" opacity=".85"/>
+          <polygon points="32,96 44,204 100,232 100,128" fill="url(#pC)" filter="url(#pShine)" opacity=".85"/>
+          <polygon points="44,204 100,278 156,204 100,232" fill="url(#pD)" opacity=".7"/>
+          <!-- Inner shine lines -->
+          <line x1="100"y1="6"x2="100"y2="128" stroke="rgba(255,255,255,.4)" stroke-width=".8"/>
+          <line x1="32"y1="96"x2="168"y2="96" stroke="rgba(255,255,255,.2)" stroke-width=".6"/>
+          <line x1="100"y1="128"x2="100"y2="278" stroke="rgba(255,255,255,.15)" stroke-width=".5"/>
+          <!-- Edge highlights -->
+          <line x1="100"y1="6"x2="32"y2="96" stroke="rgba(0,212,255,.7)" stroke-width="1.4"/>
+          <line x1="100"y1="6"x2="168"y2="96" stroke="rgba(224,64,251,.7)" stroke-width="1.4"/>
+          <line x1="44"y1="204"x2="100"y2="278" stroke="rgba(0,212,255,.4)" stroke-width=".8"/>
+          <line x1="156"y1="204"x2="100"y2="278" stroke="rgba(224,64,251,.4)" stroke-width=".8"/>
+          <!-- Apex glow -->
+          <circle cx="100"cy="6"r="5"fill="white"opacity=".95"><animate attributeName="opacity"values=".5;1;.5"dur="2.5s"repeatCount="indefinite"/></circle>
+          <circle cx="100"cy="6"r="10"fill="none"stroke="rgba(255,255,255,.3)"stroke-width=".8"><animate attributeName="r"values="8;16;8"dur="2.5s"repeatCount="indefinite"/><animate attributeName="opacity"values=".4;0;.4"dur="2.5s"repeatCount="indefinite"/></circle>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Text -->
+    <div class="text-layer">
+      <h1 class="hero-title">THE PRISM<br/>AWAITS.</h1>
+      <p class="hero-sub">Navigate the network. Uncover the truth.<br/><span>Transcend the Veil.</span></p>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px;">
+        <button class="cta" id="cta-btn">VIEW SYSTEM MAP <span class="cta-arrow">→</span></button>
+        <div class="status-bar"><div class="status-dot"></div><span class="status-text">System Online</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── BACKGROUND AMBIENT CANVAS ──────────────────────────────
+(function(){
+  const cv=document.getElementById('bg'), cx=cv.getContext('2d');
+  let W,H; const orbs=[
+    {x:.15,y:.4,r:.35,c:'rgba(139,92,246,'},
+    {x:.85,y:.15,c:'rgba(0,212,255,',r:.28},
+    {x:.6,y:.9,c:'rgba(224,64,251,',r:.25},
+  ];
+  function resize(){cv.width=W=innerWidth;cv.height=H=innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  let t=0;
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    orbs.forEach((o,i)=>{
+      const ox=o.x*W+Math.sin(t*.0003+i)*W*.04;
+      const oy=o.y*H+Math.cos(t*.0004+i)*H*.04;
+      const r=o.r*Math.min(W,H);
+      const g=cx.createRadialGradient(ox,oy,0,ox,oy,r);
+      const a=.18+Math.sin(t*.001+i)*.06;
+      g.addColorStop(0,o.c+a+')');g.addColorStop(1,o.c+'0)');
+      cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    });
+    t++;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── PARTICLE SYSTEM ─────────────────────────────────────────
+(function(){
+  const card=document.getElementById('hero-card');
+  const cv=document.getElementById('particles');
+  const ctx=cv.getContext('2d');
+  const COLS=['#00d4ff','#8b5cf6','#e040fb','#00f59b','#fbbf24','#f472b6'];
+  let W,H,particles=[];
+
+  function resize(){
+    const r=card.getBoundingClientRect();
+    cv.width=W=r.width; cv.height=H=r.height;
+  }
+  resize(); new ResizeObserver(resize).observe(card);
+
+  class Particle{
+    constructor(){this.reset(true);}
+    reset(init){
+      this.x=Math.random()*W; this.y=init?Math.random()*H:H+10;
+      this.size=Math.random()*2.5+.5;
+      this.speed=Math.random()*.4+.1;
+      this.vx=(Math.random()-.5)*.3;
+      this.vy=-(this.speed);
+      this.color=COLS[Math.floor(Math.random()*COLS.length)];
+      this.alpha=Math.random()*.6+.1;
+      this.life=1;this.maxLife=Math.random()*300+200;this.age=init?Math.random()*this.maxLife:0;
+      this.glow=Math.random()>.7;
+      this.spark=false; this.sparkTimer=0;
+    }
+    update(){
+      this.x+=this.vx; this.y+=this.vy;
+      this.age++;
+      const p=this.age/this.maxLife;
+      this.life=p<.1?p/.1:p>.8?(1-p)/.2:1;
+      if(this.age>this.maxLife||this.y<-10)this.reset(false);
+      // occasional drift
+      if(Math.random()<.02)this.vx+=(Math.random()-.5)*.1;
+      this.vx*=.99;
+    }
+    draw(){
+      ctx.save();
+      ctx.globalAlpha=this.alpha*this.life;
+      if(this.glow){ctx.shadowBlur=8;ctx.shadowColor=this.color;}
+      ctx.fillStyle=this.color;
+      ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Spark burst
+  function burst(x,y,n=12){
+    for(let i=0;i<n;i++){
+      const p=new Particle();
+      p.x=x;p.y=y;
+      const a=Math.random()*Math.PI*2;
+      const s=Math.random()*2+.5;
+      p.vx=Math.cos(a)*s; p.vy=Math.sin(a)*s-.5;
+      p.size=Math.random()*2+.5;
+      p.maxLife=60+Math.random()*40;p.age=0;
+      p.glow=true;
+      particles.push(p);
+    }
+  }
+
+  // Init
+  for(let i=0;i<60;i++)particles.push(new Particle());
+
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // Random spark burst occasionally
+    if(frame%240===0)burst(W*.3+Math.random()*W*.4,H*.1+Math.random()*H*.6,8);
+    particles.forEach(p=>{p.update();p.draw();});
+    particles=particles.filter(p=>p.age<p.maxLife+10);
+    while(particles.length<60)particles.push(new Particle());
+    frame++;requestAnimationFrame(draw);
+  }
+  draw();
+
+  // CTA ripple
+  document.getElementById('cta-btn').addEventListener('click',function(e){
+    const r=this.getBoundingClientRect();
+    const cx2=r.left-card.getBoundingClientRect().left+r.width/2;
+    const cy2=r.top-card.getBoundingClientRect().top+r.height/2;
+    burst(cx2,cy2,20);
+  });
+})();
+</script>
+</body>
+</html>

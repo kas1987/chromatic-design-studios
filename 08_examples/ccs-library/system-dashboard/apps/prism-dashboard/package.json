@@ -1,0 +1,15 @@
+{
+  "name": "prism-dashboard",
+  "version": "1.0.0",
+  "description": "Psychometric analytics dashboard with live data connectors",
+  "scripts": {
+    "start": "npx serve . -p 3001 --no-clipboard",
+    "dev": "npx serve . -p 3001 --no-clipboard",
+    "open": "npx serve . -p 3001 --no-clipboard & sleep 2 && open http://localhost:3001/System%20Dashboard.html"
+  },
+  "keywords": ["prism", "dashboard", "analytics", "psychometric"],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}

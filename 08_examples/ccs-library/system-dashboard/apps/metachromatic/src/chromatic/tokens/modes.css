@@ -1,0 +1,58 @@
+/* Mode Gradients (from Figma - improved differentiation) */
+
+[data-mode='hero'] {
+  --a: #a855f7; /* Purple - Vibrant hero mode */
+  --b: #06b6d4; /* Cyan */
+}
+
+[data-mode='browse'] {
+  --a: #3b82f6; /* Blue */
+  --b: #06b6d4; /* Cyan */
+}
+
+[data-mode='tag'] {
+  --a: #8b5cf6; /* Purple */
+  --b: #d946ef; /* Pink */
+}
+
+[data-mode='review'] {
+  --a: #f59e0b; /* Amber */
+  --b: #ef4444; /* Red */
+}
+
+[data-mode='export'] {
+  --a: #ec4899; /* Magenta */
+  --b: #f97316; /* Orange */
+}
+
+/* Additional modes from Figma */
+
+[data-mode='dashboard'] {
+  --a: #10b981; /* Emerald */
+  --b: #14b8a6; /* Teal */
+}
+
+[data-mode='ai-training'] {
+  --a: #4f6bff; /* Indigo */
+  --b: #2de2e6; /* Cyan */
+}
+
+[data-mode='home'] {
+  --a: #10b981; /* Emerald - Home/default mode */
+  --b: #06b6d4; /* Cyan */
+}
+
+[data-mode='settings'] {
+  --a: #6b7280; /* Gray - Settings mode */
+  --b: #9ca3af; /* Light Gray */
+}
+
+[data-mode='storyboard'] {
+  --a: #a855f7; /* Purple */
+  --b: #ec4899; /* Pink */
+}
+
+[data-mode='comfyui'] {
+  --a: #22d3ee; /* Cyan */
+  --b: #6366f1; /* Indigo */
+}

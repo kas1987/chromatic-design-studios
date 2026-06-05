@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Verdant Mist — MetaChromatic Wallpaper</title>
+<link rel="icon" href="lib/metachromatic-icon.svg">
+<link rel="stylesheet" href="lib/wallpaper.css">
+</head>
+<body>
+<div id="mc-vignette"></div>
+
+<script type="x-shader/x-fragment" id="frag">
+void main(){
+  vec2 st = gl_FragCoord.xy / u_res;
+  vec2 m  = (u_mouse - 0.5);
+  float t = u_time * (0.3 + u_motion*0.5);
+  vec3 rp = rippleAt(st);
+
+  vec2 z = (st - 0.5)*0.94 + 0.5;
+  z += (u_mouse - 0.5) * vec2(0.018, 0.012);
+
+  float water = smoothstep(0.34, 0.16, st.y);   // lower = the river
+
+  // ── base: gentle canopy sway + water shimmer ──
+  vec2 sway = vec2(sin(st.y*5.0 + t*0.5), 0.0) * 0.0015;
+  vec2 wat  = vec2(0.0, sin(st.x*30.0 - t*1.6) * 0.0022) * water;
+  vec3 base = bg(z + sway + wat + rp.xy*0.035*water);
+
+  vec3 fx = base;
+
+  // god rays from the upper canopy — angle follows the cursor
+  vec2 rc = st - vec2(0.5 + m.x*0.3, 1.12);
+  float rang = atan(rc.x, -rc.y);
+  float rays = pow(0.5 + 0.5*sin(rang*42.0 + t*0.6), 6.0);
+  rays *= smoothstep(1.0, 0.18, st.y);
+  fx += rays * vec3(1.0,0.96,0.78) * 0.5;
+
+  // drifting fog
+  float fog = fbm(st*3.0 + vec2(t*0.4, 0.0));
+  fx += smoothstep(0.5, 1.0, fog) * 0.12 * vec3(0.82,0.9,0.85) * (1.0 - water);
+
+  // river ripple highlight
+  fx += rp.z * mix(vec3(0.7,0.9,0.8), palRamp(0.4), 0.4) * 1.2 * water;
+  fx += rp.z * 0.35;
+
+  // fireflies / pollen
+  float ff = 0.0;
+  for(int i=0;i<2;i++){
+    float fi = float(i);
+    vec2 g = st * vec2(26.0 + fi*12.0, 18.0 + fi*8.0) + vec2(sin(t*0.3+fi)*2.0, t*0.18);
+    vec2 ip = floor(g), fp = fract(g); float hh = hash21(ip + fi*7.0);
+    vec2 cp = 0.5 + 0.35*vec2(sin(t*1.5+hh*30.0), cos(t*1.3+hh*20.0));
+    ff += smoothstep(0.09, 0.0, length(fp-cp)) * step(0.82, hh) * (0.5 + 0.5*sin(t*3.0 + hh*40.0));
+  }
+  fx += ff * mix(vec3(0.85,1.0,0.45), palRamp(0.7), 0.4) * 1.2;
+
+  vec3 col = mix(base, fx, u_blend);
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script src="lib/chrome-dock.js"></script>
+<script src="lib/shader-runtime.js"></script>
+<script>
+  MCWallpaper.init({ index: 6, fragId: 'frag', motion: 0.55, blend: 0.5, image: 'assets/bg/jungle.jpg' });
+</script>
+</body>
+</html>
