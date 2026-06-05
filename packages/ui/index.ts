@@ -7,4 +7,9 @@ export {
   type ButtonSize,
   Card,
   type CardProps,
+  Badge,
+  type BadgeProps,
+  type BadgeTone,
+  Input,
+  type InputProps,
 } from "./src/components";

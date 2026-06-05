@@ -38,7 +38,7 @@ export function Hero({
             {badge}
           </span>
         )}
-        <h1 className="font-heading text-4xl font-bold text-text-primary glow-text">
+        <h1 className="font-heading text-2xl font-bold text-text-primary glow-text sm:text-3xl md:text-4xl">
           {title}
           {titleAccent && (
             <>

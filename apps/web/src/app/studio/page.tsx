@@ -1,4 +1,4 @@
-import { Button, Card } from "@chromatic/ui";
+import { Button, Card, Badge, Input } from "@chromatic/ui";
 
 export const metadata = {
   title: "Studio — Chromatic Design System",
@@ -96,6 +96,31 @@ export default function StudioPage() {
             <Button size="sm">Small</Button>
             <Button size="md">Medium</Button>
             <Button size="lg">Large</Button>
+          </div>
+        </Section>
+
+        <Section title="Badges">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge>Default</Badge>
+            <Badge tone="primary">Primary</Badge>
+            <Badge tone="accent">Accent</Badge>
+            <Badge tone="success">Success</Badge>
+            <Badge tone="warning">Warning</Badge>
+            <Badge tone="error">Error</Badge>
+          </div>
+        </Section>
+
+        <Section title="Inputs">
+          <div className="grid max-w-xl gap-4 sm:grid-cols-2">
+            <Input label="Project name" placeholder="chromatic-studio" />
+            <Input label="Token prefix" placeholder="cds-" hint="Used for issue IDs" />
+            <Input
+              label="Invalid example"
+              defaultValue="bad value"
+              invalid
+              hint="This field has an error"
+            />
+            <Input label="Disabled" placeholder="unavailable" disabled />
           </div>
         </Section>
 
