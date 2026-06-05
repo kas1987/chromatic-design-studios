@@ -51,10 +51,46 @@ const TUNABLE = [
   { path: 'spacing.semantic.radius.lg', label: 'Radius lg', type: 'range', cssVar: '--radius-lg', min: 0, max: 36, step: 1, unit: 'px' },
 ];
 
+// Light-mode tunable set: only the mode-dependent colors live in the override
+// file. cssVar names match the dark vars (the `.light` block overrides them).
+const TUNABLE_LIGHT = [
+  { path: 'colors.background.default', label: 'Background', type: 'color', cssVar: '--color-background-default' },
+  { path: 'colors.background.elevated', label: 'Surface (elevated)', type: 'color', cssVar: '--color-background-elevated' },
+  { path: 'colors.surface.default', label: 'Surface default', type: 'color', cssVar: '--color-surface-default' },
+  { path: 'colors.text.primary', label: 'Text primary', type: 'color', cssVar: '--color-text-primary' },
+  { path: 'colors.text.secondary', label: 'Text secondary', type: 'color', cssVar: '--color-text-secondary' },
+  { path: 'colors.text.muted', label: 'Text muted', type: 'color', cssVar: '--color-text-muted' },
+  { path: 'colors.text.onprimary', label: 'Text on primary (CTA label)', type: 'color', cssVar: '--color-text-onprimary' },
+  { path: 'colors.border.default', label: 'Border', type: 'color', cssVar: '--color-border-default' },
+  { path: 'colors.border.hover', label: 'Border hover', type: 'color', cssVar: '--color-border-hover' },
+];
+
+// Light-mode override file: mirrors the `colors` domain (no `colors.` wrapper).
+// The same dotted `colors.<group>.<key>` paths used by the dark tuner address it,
+// minus the leading `colors.` segment.
+const LIGHT_FILE = 'tokens.colors.light.json';
+
 function readToken(dotted) {
   const [domain, ...rest] = dotted.split('.');
   const obj = JSON.parse(fs.readFileSync(path.join(TOKENS_DIR, FILE_FOR_DOMAIN[domain]), 'utf8'));
   return rest.reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+function readLightToken(dotted) {
+  // strip leading `colors.` — the light file IS the colors object
+  const rest = dotted.replace(/^colors\./, '').split('.');
+  const obj = JSON.parse(fs.readFileSync(path.join(TOKENS_DIR, LIGHT_FILE), 'utf8'));
+  return rest.reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+function writeLightToken(dotted, value) {
+  const rest = dotted.replace(/^colors\./, '').split('.');
+  const file = path.join(TOKENS_DIR, LIGHT_FILE);
+  const obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+  let node = obj;
+  for (let i = 0; i < rest.length - 1; i++) node = node[rest[i]] ??= {};
+  node[rest[rest.length - 1]] = value;
+  fs.writeFileSync(file, JSON.stringify(obj, null, 2) + '\n');
 }
 
 function writeToken(dotted, value) {
@@ -68,9 +104,14 @@ function writeToken(dotted, value) {
 }
 
 // ---- screen: emit the token-tuner HTML fragment ----------------------------
-function buildScreen(screenDir) {
-  const rows = TUNABLE.map((t) => {
-    const current = readToken(t.path) ?? '';
+// mode: 'dark' tunes tokens.colors.json (+spacing); 'light' tunes the override file.
+function buildScreen(screenDir, mode = 'dark') {
+  const isLight = mode === 'light';
+  const tunable = isLight ? TUNABLE_LIGHT : TUNABLE;
+  const reader = isLight ? readLightToken : readToken;
+
+  const rows = tunable.map((t) => {
+    const current = reader(t.path) ?? '';
     if (t.type === 'color') {
       return `  <div class="token-row">
     <label>${t.label} <span class="token-value" data-token-output="${t.path}">${current}</span></label>
@@ -85,15 +126,21 @@ function buildScreen(screenDir) {
   </div>`;
   }).join('\n');
 
-  const html = `<h2>Tune Chromatic tokens</h2>
+  const applyCmd = isLight ? 'apply-light' : 'apply';
+  const title = isLight ? 'Tune Chromatic LIGHT mode' : 'Tune Chromatic tokens';
+  // Light preview sits on a light backdrop so contrast reads true while tuning.
+  const stageBg = isLight ? 'var(--color-background-default, #faf9fc)' : '';
+  const stageStyle = isLight ? ` style="background:${stageBg}"` : '';
+
+  const html = `<h2>${title}</h2>
 <p class="subtitle">Drag to preview live. Values are saved to state/tokens.json — then run
-<code>chromatic-token-studio.mjs apply</code> to write them back into 02_design_tokens/.</p>
+<code>chromatic-token-studio.mjs ${applyCmd}</code> to write them back into 02_design_tokens/.</p>
 
 <div class="tokens">
 ${rows}
 </div>
 
-<div class="preview-stage" data-bg="muted">
+<div class="preview-stage" data-bg="muted"${stageStyle}>
   <div style="background:var(--color-background-elevated);border:1px solid var(--color-border-default);
               border-radius:var(--radius-lg,12px);padding:24px 28px;max-width:420px">
     <span style="display:inline-block;border:1px solid var(--color-border-default);border-radius:9999px;
@@ -101,7 +148,7 @@ ${rows}
                  color:var(--color-text-secondary)">Design System</span>
     <h3 style="color:var(--color-text-primary);margin:12px 0 6px;font-size:28px">Chromatic Studios</h3>
     <p style="color:var(--color-text-secondary);margin:0 0 16px">Governed design operations for the Chromatic Harness.</p>
-    <button style="background:var(--color-primary-600);color:var(--color-text-primary);border:none;
+    <button style="background:var(--color-primary-600);color:var(--color-text-onprimary, #fff);border:none;
                    border-radius:var(--radius-md,8px);padding:10px 18px;cursor:pointer">Open Dashboard</button>
   </div>
 </div>`;
@@ -110,12 +157,13 @@ ${rows}
   // still read e.g. "12" — acceptable for preview. apply re-attaches the unit.
   const file = path.join(screenDir, 'chromatic-tokens.html');
   fs.writeFileSync(file, html);
-  console.log(`[token-studio] wrote tuner screen -> ${file}`);
-  console.log('[token-studio] open the companion URL, tune, then run: apply <state_dir>/tokens.json');
+  console.log(`[token-studio] wrote ${mode} tuner screen -> ${file}`);
+  console.log(`[token-studio] open the companion URL, tune, then run: ${applyCmd} <state_dir>/tokens.json`);
 }
 
 // ---- apply: write chosen values back into the token JSON --------------------
-function applyTokens(tokensJsonPath) {
+function applyTokens(tokensJsonPath, mode = 'dark') {
+  const isLight = mode === 'light';
   let chosen;
   try {
     chosen = JSON.parse(fs.readFileSync(tokensJsonPath, 'utf8'));
@@ -123,25 +171,35 @@ function applyTokens(tokensJsonPath) {
     console.error(`[token-studio] cannot read ${tokensJsonPath}: ${e.message}`);
     process.exit(1);
   }
-  const meta = new Map(TUNABLE.map((t) => [t.path, t]));
+  const meta = new Map((isLight ? TUNABLE_LIGHT : TUNABLE).map((t) => [t.path, t]));
+  const writer = isLight ? writeLightToken : writeToken;
   let n = 0;
   for (const [dotted, raw] of Object.entries(chosen)) {
     const t = meta.get(dotted);
     if (!t) continue; // ignore non-Chromatic events
     let value = raw;
     if (t.type === 'range' && t.unit && !String(raw).endsWith(t.unit)) value = `${raw}${t.unit}`;
-    writeToken(dotted, value);
+    writer(dotted, value);
     console.log(`  ${dotted} = ${value}`);
     n++;
   }
-  console.log(`[token-studio] applied ${n} token(s). Now run: npm run tokens`);
+  const target = isLight ? 'tokens.colors.light.json' : '02_design_tokens/';
+  console.log(`[token-studio] applied ${n} ${mode} token(s) -> ${target}. Now run: npm run tokens`);
 }
 
 // ---- CLI --------------------------------------------------------------------
 const [cmd, arg] = process.argv.slice(2);
-if (cmd === 'screen' && arg) buildScreen(path.resolve(arg));
-else if (cmd === 'apply' && arg) applyTokens(path.resolve(arg));
+if (cmd === 'screen' && arg) buildScreen(path.resolve(arg), 'dark');
+else if (cmd === 'screen-light' && arg) buildScreen(path.resolve(arg), 'light');
+else if (cmd === 'apply' && arg) applyTokens(path.resolve(arg), 'dark');
+else if (cmd === 'apply-light' && arg) applyTokens(path.resolve(arg), 'light');
 else {
-  console.error('Usage:\n  chromatic-token-studio.mjs screen <screen_dir>\n  chromatic-token-studio.mjs apply <state_dir>/tokens.json');
+  console.error(
+    'Usage:\n' +
+    '  chromatic-token-studio.mjs screen <screen_dir>             # tune dark tokens\n' +
+    '  chromatic-token-studio.mjs screen-light <screen_dir>       # tune light-mode overrides\n' +
+    '  chromatic-token-studio.mjs apply <state_dir>/tokens.json\n' +
+    '  chromatic-token-studio.mjs apply-light <state_dir>/tokens.json',
+  );
   process.exit(1);
 }

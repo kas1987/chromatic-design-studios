@@ -18,7 +18,7 @@ export interface ButtonProps
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary-600 text-text-primary hover:bg-primary-500 hover:shadow-glow-hover hover:-translate-y-px",
+    "bg-primary-600 text-text-onprimary hover:bg-primary-500 hover:shadow-glow-hover hover:-translate-y-px",
   ghost:
     "border border-border-default text-text-secondary hover:bg-surface-default hover:text-text-primary hover:border-primary-700",
   secondary:

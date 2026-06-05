@@ -21,13 +21,20 @@ export const metadata: Metadata = {
   description: "Local-first AI design and operations control center",
 };
 
+// No-flash theme init: runs before paint, applies the persisted choice to
+// <html> so the correct token set is active on first frame. Dark is default.
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('chromatic-theme');var r=document.documentElement;if(t==='light'){r.classList.add('light');r.classList.remove('dark');}else{r.classList.add('dark');r.classList.remove('light');}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+      </head>
       <body
         className={`${inter.variable} ${plexSans.variable} ${plexMono.variable} antialiased min-h-screen`}
       >

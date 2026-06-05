@@ -1,4 +1,5 @@
 import { Button, Card, Badge, Input } from "@chromatic/ui";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 export const metadata = {
   title: "Studio — Chromatic Design System",
@@ -48,7 +49,12 @@ export default function StudioPage() {
               Chromatic Studio
             </span>
           </a>
-          <span className="text-sm text-text-secondary">Design system gallery</span>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-sm text-text-secondary sm:inline">
+              Design system gallery
+            </span>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

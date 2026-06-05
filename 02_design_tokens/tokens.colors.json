@@ -41,7 +41,8 @@
     "secondary": "#94a3b8",
     "muted": "#475569",
     "disabled": "#334155",
-    "inverse": "#0a0a0f"
+    "inverse": "#0a0a0f",
+    "onprimary": "#f8fafc"
   },
   "semantic": {
     "success": "#22c55e",
