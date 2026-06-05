@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "tokens": "node scripts/build-tokens.mjs",
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",

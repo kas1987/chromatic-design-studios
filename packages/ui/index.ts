@@ -1,1 +1,1 @@
-export {} from "./src/components";
+export { Hero, type HeroProps } from "./src/components";

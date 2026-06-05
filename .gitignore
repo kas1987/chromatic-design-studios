@@ -10,6 +10,13 @@
 out/
 dist/
 
+# Generated token artifacts (rebuilt by scripts/build-tokens.mjs via pre(dev|build))
+apps/web/src/styles/chromatic-tokens.css
+apps/web/src/styles/chromatic-theme.ts
+
+# visual-design companion sessions
+.frontend/
+
 # Environment
 .env
 .env.local
