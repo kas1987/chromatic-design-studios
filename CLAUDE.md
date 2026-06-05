@@ -2,7 +2,7 @@
 
 Design system rig for Chromatic Harness. Start with `getdesign.md` and `CHROMATIC_DESIGN_SYSTEM.md`.
 
-**Issue tracking:** `bd` in `chromatic-harness-v2`. **Handoff:** `.agents/handoffs/latest.json`.
+**Issue tracking:** `bd` is local to THIS repo (Dolt DB `chromatic_design_studios`, prefix `cds-`). Run `bd` from the repo root. `DESIGN_QUEUE.md` holds pre-v0.3 history; bd is the live tracker. **Handoff:** `.agents/handoffs/latest.json`.
 
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:6cd5cc61 -->

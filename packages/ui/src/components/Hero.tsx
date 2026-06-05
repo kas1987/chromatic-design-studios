@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Button } from "./Button";
 
 /**
  * Chromatic Hero — canonical token-driven, above-the-fold section.
@@ -14,31 +15,6 @@ export interface HeroProps {
   subtitle?: React.ReactNode;
   primaryCta?: { label: string; href?: string; onClick?: () => void };
   ghostCta?: { label: string; href?: string; onClick?: () => void };
-}
-
-function Cta({
-  cta,
-  variant,
-}: {
-  cta: NonNullable<HeroProps["primaryCta"]>;
-  variant: "primary" | "ghost";
-}) {
-  const base =
-    "inline-flex items-center justify-center px-5 py-3 rounded-md text-base font-medium transition duration-fast ease-easeOut focus-visible:outline-none focus-visible:shadow-glow-focus";
-  const styles =
-    variant === "primary"
-      ? "bg-primary-600 text-text-primary hover:bg-primary-500 hover:shadow-glow-hover hover:-translate-y-px"
-      : "border border-border-default text-text-secondary hover:bg-surface-default hover:text-text-primary hover:border-primary-700";
-  const className = `${base} ${styles}`;
-  return cta.href ? (
-    <a href={cta.href} className={className}>
-      {cta.label}
-    </a>
-  ) : (
-    <button type="button" onClick={cta.onClick} className={className}>
-      {cta.label}
-    </button>
-  );
 }
 
 export function Hero({
@@ -80,8 +56,16 @@ export function Hero({
         )}
         {(primaryCta || ghostCta) && (
           <div className="flex flex-wrap gap-4">
-            {primaryCta && <Cta cta={primaryCta} variant="primary" />}
-            {ghostCta && <Cta cta={ghostCta} variant="ghost" />}
+            {primaryCta && (
+              <Button variant="primary" href={primaryCta.href} onClick={primaryCta.onClick}>
+                {primaryCta.label}
+              </Button>
+            )}
+            {ghostCta && (
+              <Button variant="ghost" href={ghostCta.href} onClick={ghostCta.onClick}>
+                {ghostCta.label}
+              </Button>
+            )}
           </div>
         )}
       </div>
