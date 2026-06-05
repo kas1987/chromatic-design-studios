@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "pretypecheck": "npm run tokens",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
