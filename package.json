@@ -9,11 +9,16 @@
   ],
   "scripts": {
     "tokens": "node scripts/build-tokens.mjs",
+    "db:build": "node scripts/build-db.mjs",
     "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "node --experimental-strip-types apps/api/src/index.ts",
     "build:web": "npm run build --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",
     "pretypecheck": "npm run tokens",
     "typecheck": "tsc --noEmit --project apps/web/tsconfig.json"
+  },
+  "dependencies": {
+    "postgres": "^3.4.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0"
