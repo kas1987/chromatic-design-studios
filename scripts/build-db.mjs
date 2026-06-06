@@ -46,16 +46,75 @@ function* walkTokens(obj, groupParts = []) {
   }
 }
 
-/** Rough prop extraction from TSX source via regex. */
+/** Strip block (`/* *​/`) and line (`//`) comments from a source fragment. */
+function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
+/**
+ * Extract the declared own props from a `*Props` interface/type in a TSX
+ * source. Handles `extends`/`Omit<...>` clauses (the body is located by brace
+ * matching, not by requiring `{` to follow the name) and nested object-literal
+ * fields (members are scanned at brace/paren depth 0, so `primaryCta?: { ... }`
+ * stays a single prop instead of leaking its inner `label`/`href`/`onClick`).
+ * Inherited DOM attributes from `extends React.*HTMLAttributes` are
+ * intentionally not expanded — only the component's own declared props.
+ */
 function extractProps(src) {
-  const propsMatch = src.match(/(?:interface|type)\s+\w*Props\s*[={][^}]+}/s);
-  if (!propsMatch) return [];
-  const block = propsMatch[0];
+  const decl = /(?:export\s+)?(?:interface|type)\s+(\w*Props)\b/.exec(src);
+  if (!decl) return [];
+
+  // Find the body's opening brace, skipping any `extends ... {` / `= {` clause.
+  // The extends/Omit clauses here use only `<>`/`()`, never `{}`, so the first
+  // brace after the declaration is the body brace.
+  let i = src.indexOf('{', decl.index);
+  if (i === -1) return [];
+
+  // Capture the balanced body between the outermost braces.
+  let depth = 0;
+  let body = '';
+  for (; i < src.length; i++) {
+    const ch = src[i];
+    if (ch === '{') {
+      depth++;
+      if (depth === 1) continue; // skip the opening body brace itself
+    } else if (ch === '}') {
+      depth--;
+      if (depth === 0) break; // closing body brace
+    }
+    body += ch;
+  }
+  if (depth !== 0 && body === '') return [];
+
+  // Split into top-level members on `;`/newline at nesting depth 0. Angle
+  // brackets are deliberately not counted (so arrow types `=> void` and
+  // generics like `Record<…>` don't unbalance the scan).
+  const members = [];
+  let token = '';
+  depth = 0;
+  for (const ch of stripComments(body)) {
+    if (ch === '{' || ch === '(' || ch === '[') depth++;
+    else if (ch === '}' || ch === ')' || ch === ']') depth--;
+
+    if (depth === 0 && (ch === ';' || ch === '\n')) {
+      if (token.trim()) members.push(token.trim());
+      token = '';
+    } else {
+      token += ch;
+    }
+  }
+  if (token.trim()) members.push(token.trim());
+
   const props = [];
-  const propRe = /(\w+)(\??):\s*([^;,\n]+)/g;
-  let m;
-  while ((m = propRe.exec(block)) !== null) {
-    props.push({ name: m[1], type: m[3].trim(), required: m[2] !== '?' });
+  for (const member of members) {
+    const pm = /^(\w+)(\??)\s*:\s*([\s\S]+)$/.exec(member);
+    if (pm) {
+      props.push({
+        name: pm[1],
+        type: pm[3].replace(/\s+/g, ' ').trim(),
+        required: pm[2] !== '?',
+      });
+    }
   }
   return props;
 }
