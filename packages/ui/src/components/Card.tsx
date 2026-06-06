@@ -32,11 +32,14 @@ export function Card({
     ? "transition duration-fast ease-easeOut hover:-translate-y-px hover:border-border-hover hover:shadow-glow-hover cursor-pointer focus-visible:outline-none focus-visible:shadow-glow-focus"
     : "";
 
-  // Interactive cards must be reachable and operable by keyboard/AT, not just
-  // the mouse: expose a button role + tab stop and activate onClick on
-  // Enter/Space. Explicit role/tabIndex from the caller still win.
+  // A card is "clickable" only when it actually has an onClick — that's what
+  // makes the button role, tab stop, and Enter/Space activation meaningful.
+  // `interactive` alone is just hover styling, so a decorative interactive card
+  // stays a plain, non-focusable div (and passes no event-handler function,
+  // which keeps it renderable from a Server Component). Caller role/tabIndex win.
+  const clickable = interactive && onClick != null;
   const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> | undefined =
-    interactive
+    clickable
       ? (e) => {
           if (onClick && (e.key === "Enter" || e.key === " ")) {
             e.preventDefault();
@@ -51,8 +54,8 @@ export function Card({
       className={`rounded-lg border border-border-default bg-background-elevated p-5 shadow-glow-card ${hover} ${className}`.trim()}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      role={interactive ? role ?? "button" : role}
-      tabIndex={interactive ? tabIndex ?? 0 : tabIndex}
+      role={clickable ? role ?? "button" : role}
+      tabIndex={clickable ? tabIndex ?? 0 : tabIndex}
       {...rest}
     >
       {eyebrow && (
