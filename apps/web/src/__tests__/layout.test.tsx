@@ -1,4 +1,4 @@
-import { vi, describe, it, expect } from 'vitest'
+import { vi, describe, it, expect, afterEach } from 'vitest'
 
 // Must be mocked before layout is imported — vi.mock is hoisted automatically
 vi.mock('next/font/google', () => ({
@@ -21,6 +21,12 @@ describe('layout metadata', () => {
 })
 
 describe('RootLayout component', () => {
+  afterEach(() => {
+    document.body.className = ''
+    document.documentElement.className = ''
+    document.documentElement.removeAttribute('lang')
+  })
+
   it('renders children', () => {
     const { getByText } = render(
       <RootLayout>

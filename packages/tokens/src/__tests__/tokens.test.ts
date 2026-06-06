@@ -87,11 +87,14 @@ describe('colors token', () => {
   })
 
   it('primary scale lightens toward 50 (lower = lighter)', () => {
-    // Very rough check: 50 value should be lighter than 900
-    // We compare luminance via a simple hex-to-number comparison isn't perfect,
-    // so we just assert the 50 value is a light color (high R+G+B)
-    const light = parseInt(colors.primary['50'].slice(1), 16)
-    const dark = parseInt(colors.primary['900'].slice(1), 16)
+    const getLuminance = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+    const light = getLuminance(colors.primary['50'])
+    const dark = getLuminance(colors.primary['900'])
     expect(light).toBeGreaterThan(dark)
   })
 })
