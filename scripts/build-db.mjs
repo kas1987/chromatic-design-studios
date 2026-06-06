@@ -445,8 +445,13 @@ async function syncPostgres(tokenCount, componentCount, sourceHash) {
           components.map(c => ({
             name: c.name,
             file_path: c.file_path,
-            props_json: c.props_json ? JSON.parse(c.props_json) : null,
-            tokens_used: c.tokens_used ? JSON.parse(c.tokens_used) : null,
+            // props_json / tokens_used are JSONB columns. Leave them as the raw
+            // JSON *strings* from SQLite — Postgres assignment-casts text→jsonb.
+            // Parsing them to JS arrays/objects makes postgres.js bind them as
+            // PostgreSQL array/record parameters (not JSON), which fails the
+            // insert against a JSONB column.
+            props_json: c.props_json ?? null,
+            tokens_used: c.tokens_used ?? null,
           }))
         )}`;
       }

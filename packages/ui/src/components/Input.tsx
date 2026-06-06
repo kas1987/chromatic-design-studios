@@ -19,6 +19,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // label/control association. Explicit `id` always wins.
     const generatedId = React.useId();
     const inputId = id ?? generatedId;
+    // Tie the hint/error text to the control so screen readers announce it
+    // (only point aria-describedby at the span when a hint is actually shown).
+    const hintId = `${inputId}-hint`;
     const border = invalid
       ? "border-semantic-error focus:border-semantic-error focus:shadow-none"
       : "border-border-default focus:border-border-focus focus:shadow-glow-focus";
@@ -33,11 +36,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           aria-invalid={invalid || undefined}
+          aria-describedby={hint ? hintId : undefined}
           className={`rounded-md border bg-surface-default px-3 py-2 font-body text-base text-text-primary placeholder:text-text-muted transition duration-fast ease-easeOut focus:outline-none ${border} ${className}`.trim()}
           {...rest}
         />
         {hint && (
-          <span className={`text-sm ${invalid ? "text-semantic-error" : "text-text-muted"}`}>
+          <span id={hintId} className={`text-sm ${invalid ? "text-semantic-error" : "text-text-muted"}`}>
             {hint}
           </span>
         )}

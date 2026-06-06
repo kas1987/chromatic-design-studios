@@ -22,14 +22,37 @@ export function Card({
   interactive = false,
   className = "",
   children,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...rest
 }: CardProps) {
   const hover = interactive
-    ? "transition duration-fast ease-easeOut hover:-translate-y-px hover:border-border-hover hover:shadow-glow-hover cursor-pointer"
+    ? "transition duration-fast ease-easeOut hover:-translate-y-px hover:border-border-hover hover:shadow-glow-hover cursor-pointer focus-visible:outline-none focus-visible:shadow-glow-focus"
     : "";
+
+  // Interactive cards must be reachable and operable by keyboard/AT, not just
+  // the mouse: expose a button role + tab stop and activate onClick on
+  // Enter/Space. Explicit role/tabIndex from the caller still win.
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> | undefined =
+    interactive
+      ? (e) => {
+          if (onClick && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            onClick(e as unknown as React.MouseEvent<HTMLDivElement>);
+          }
+          onKeyDown?.(e);
+        }
+      : onKeyDown;
+
   return (
     <div
       className={`rounded-lg border border-border-default bg-background-elevated p-5 shadow-glow-card ${hover} ${className}`.trim()}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={interactive ? role ?? "button" : role}
+      tabIndex={interactive ? tabIndex ?? 0 : tabIndex}
       {...rest}
     >
       {eyebrow && (
