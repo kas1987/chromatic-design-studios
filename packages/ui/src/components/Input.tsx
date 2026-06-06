@@ -14,7 +14,11 @@ export interface InputProps
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   function Input({ label, hint, invalid = false, id, className = "", ...rest }, ref) {
-    const inputId = id || (label ? `in-${Math.abs(hashLabel(String(label)))}` : undefined);
+    // SSR-safe unique id per instance — never derived from label text, so
+    // repeated inputs with the same label still get distinct ids and correct
+    // label/control association. Explicit `id` always wins.
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
     const border = invalid
       ? "border-semantic-error focus:border-semantic-error focus:shadow-none"
       : "border-border-default focus:border-border-focus focus:shadow-glow-focus";
@@ -41,12 +45,5 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-
-// Stable id from a label without Math.random (SSR-safe).
-function hashLabel(s: string): number {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h << 5) - h + s.charCodeAt(i);
-  return h;
-}
 
 export default Input;

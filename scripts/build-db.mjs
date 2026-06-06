@@ -20,6 +20,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
+import { buildTheme } from './build-tokens.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TOKENS_DIR = path.join(ROOT, '02_design_tokens');
@@ -122,23 +123,72 @@ function extractProps(src) {
   return props;
 }
 
+// Tailwind utility prefixes that consume each theme category. A token key only
+// surfaces in source as `<prefix>-<key>` (e.g. fontSize key `base` → `text-base`,
+// boxShadow key `glow-focus` → `shadow-glow-focus`), so the valid-class set must
+// be the cross-product of these prefixes with the actual generated theme keys —
+// the same keys build-tokens.mjs emits — rather than the raw dotted token path.
+const CATEGORY_PREFIXES = {
+  colors: ['bg', 'text', 'border', 'ring', 'from', 'via', 'to', 'outline',
+           'divide', 'fill', 'stroke', 'placeholder', 'caret', 'accent', 'decoration'],
+  spacing: ['p', 'px', 'py', 'pt', 'pr', 'pb', 'pl', 'm', 'mx', 'my', 'mt', 'mr',
+            'mb', 'ml', 'gap', 'gap-x', 'gap-y', 'space-x', 'space-y', 'w', 'h',
+            'min-w', 'min-h', 'max-w', 'max-h', 'inset', 'top', 'right', 'bottom',
+            'left', 'translate-x', 'translate-y', 'size'],
+  borderRadius: ['rounded', 'rounded-t', 'rounded-r', 'rounded-b', 'rounded-l',
+                 'rounded-tl', 'rounded-tr', 'rounded-br', 'rounded-bl'],
+  fontFamily: ['font'],
+  fontSize: ['text'],
+  fontWeight: ['font'],
+  transitionDuration: ['duration'],
+  transitionTimingFunction: ['ease'],
+  boxShadow: ['shadow'],
+  backgroundImage: ['bg'],
+};
+
 /**
- * Derive the design tokens a component depends on by matching known token
- * identifiers against the component source. Token identifiers are the dotted
- * `group.name` path flattened to Tailwind's hyphen form (e.g. `primary.600` →
- * `primary-600`, `text.primary` → `text-primary`), which is exactly how they
- * appear inside utility classes like `bg-primary-600` / `text-text-primary`.
- *
- * A match must sit on a class boundary: preceded by the utility separator `-`
- * or a quote/space, and followed by a quote/space/end. This keeps `primary-600`
- * from matching the `primary` token and avoids partial-overlap false positives.
+ * Build the set of real Tailwind utility classes the design tokens can produce,
+ * derived from the generated `theme` object (buildTheme()) so it never drifts
+ * from what build-tokens.mjs emits. Nested color groups flatten to hyphenated
+ * names exactly like Tailwind (`colors.text.onprimary` → `text-onprimary`), and
+ * `transparent`/`current` are dropped (they are not design tokens).
  */
-function extractTokensUsed(src, tokenIdents) {
+function buildValidClasses(theme) {
+  const valid = new Set();
+  const addLeaves = (obj, prefixes, parts = []) => {
+    for (const [k, v] of Object.entries(obj)) {
+      if (parts.length === 0 && (k === 'transparent' || k === 'current')) continue;
+      const keyPath = [...parts, k];
+      if (v && typeof v === 'object' && !Array.isArray(v)) {
+        addLeaves(v, prefixes, keyPath);
+      } else {
+        const name = keyPath.join('-');
+        for (const p of prefixes) valid.add(`${p}-${name}`);
+      }
+    }
+  };
+  for (const [category, prefixes] of Object.entries(CATEGORY_PREFIXES)) {
+    if (theme[category]) addLeaves(theme[category], prefixes);
+  }
+  return valid;
+}
+
+/**
+ * Derive the design-token utility classes a component depends on by tokenizing
+ * its source and keeping the candidates that are real generated classes. Variant
+ * chains (`hover:`, `focus-visible:`, `placeholder:`) and a leading negative sign
+ * (`-translate-y-px`) are stripped before the membership check, so the stored
+ * `tokens_used` is the exact set of token-backed utilities the component renders.
+ */
+function extractTokensUsed(src, validClasses) {
   const used = new Set();
-  for (const ident of tokenIdents) {
-    const escaped = ident.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`(?:^|[\\s"'\`-])${escaped}(?=$|[\\s"'\`])`);
-    if (re.test(src)) used.add(ident);
+  // Class-like candidates: a letter-led run of [a-z0-9:./-] — captures variants,
+  // decimal spacing (`py-1.5`), and fraction widths; the leading `-` of negative
+  // utilities is naturally excluded by requiring a letter start.
+  const candidates = src.match(/[a-z][a-z0-9:./-]*/gi) || [];
+  for (const raw of candidates) {
+    const base = raw.includes(':') ? raw.slice(raw.lastIndexOf(':') + 1) : raw;
+    if (validClasses.has(base)) used.add(base);
   }
   return [...used].sort();
 }
@@ -252,9 +302,10 @@ function buildSqlite() {
   let componentCount = 0;
   let cssClassCount = 0;
   const sourceFiles = [];
-  // Token identifiers in Tailwind hyphen form, used to derive each component's
-  // token dependency list (tokens_used) from its source.
-  const tokenIdents = new Set();
+  // The real Tailwind utility classes the tokens can generate, used to derive
+  // each component's token dependency list (tokens_used) from its source. Built
+  // from the SAME generated theme as build-tokens.mjs so the two never drift.
+  const validClasses = buildValidClasses(buildTheme().theme);
 
   // ── Tokens ────────────────────────────────────────────────────────────────
   const tokenFiles = fs.readdirSync(TOKENS_DIR).filter(f => f.endsWith('.json'));
@@ -273,8 +324,6 @@ function buildSqlite() {
     for (const { group, name, value } of walkTokens(data)) {
       insertToken.run(category, group || null, name, value, theme);
       tokenCount++;
-      const ident = (group ? `${group}.${name}` : name).replace(/\./g, '-');
-      tokenIdents.add(ident);
     }
   }
 
@@ -289,7 +338,7 @@ function buildSqlite() {
       const src = fs.readFileSync(filePath, 'utf8');
       const name = path.basename(file, '.tsx');
       const props = extractProps(src);
-      const tokensUsed = extractTokensUsed(src, tokenIdents);
+      const tokensUsed = extractTokensUsed(src, validClasses);
       const relPath = path.relative(ROOT, filePath).replace(/\\/g, '/');
       insertComponent.run(name, relPath, JSON.stringify(props), JSON.stringify(tokensUsed));
       componentCount++;

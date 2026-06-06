@@ -31,6 +31,6 @@
   },
   "packageManager": "npm@11.12.1",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.6.0"
   }
 }
