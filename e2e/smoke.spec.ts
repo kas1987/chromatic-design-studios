@@ -16,19 +16,21 @@ test.describe('Home page smoke tests', () => {
   })
 
   test('navigation links are present', async ({ page }) => {
-    await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Assets' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Prompts' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Agents' })).toBeVisible()
+    // Exact names avoid colliding with the "Open Dashboard" hero CTA.
+    await expect(page.getByRole('link', { name: 'Dashboard', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Assets', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Prompts', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Studio', exact: true })).toBeVisible()
   })
 
   test('CTA buttons are visible and interactive', async ({ page }) => {
-    const dashboardBtn = page.getByRole('button', { name: 'Open Dashboard' })
-    const pdrBtn = page.getByRole('button', { name: 'Read the PDR' })
-    await expect(dashboardBtn).toBeVisible()
-    await expect(pdrBtn).toBeVisible()
-    await dashboardBtn.click()
-    await pdrBtn.click()
+    // Hero CTAs render via the Button component as links (href set), not <button>.
+    const dashboardCta = page.getByRole('link', { name: 'Open Dashboard' })
+    const pdrCta = page.getByRole('link', { name: 'Read the PDR' })
+    await expect(dashboardCta).toBeVisible()
+    await expect(pdrCta).toBeVisible()
+    await dashboardCta.click()
+    await pdrCta.click()
   })
 
   test('no console errors on page load', async ({ page }) => {
@@ -48,7 +50,7 @@ test.describe('Home page smoke tests', () => {
 
   test('footer shows correct version', async ({ page }) => {
     const footer = page.getByRole('contentinfo')
-    await expect(footer).toContainText('Chromatic Design Studios v0.1.0')
+    await expect(footer).toContainText('Chromatic Design Studios v0.4.0')
   })
 
   test('page renders on mobile viewport', async ({ page }) => {

@@ -34,7 +34,10 @@ const SIZES: Record<ButtonSize, string> = {
 const BASE =
   "inline-flex items-center justify-center rounded-md font-medium transition duration-fast ease-easeOut " +
   "focus-visible:outline-none focus-visible:shadow-glow-focus " +
-  "disabled:opacity-50 disabled:pointer-events-none";
+  "disabled:opacity-50 disabled:pointer-events-none " +
+  // Anchors ignore the `disabled` attribute, so mirror the dimmed/non-interactive
+  // treatment via aria-disabled for the linked-and-disabled branch below.
+  "aria-disabled:opacity-50 aria-disabled:pointer-events-none";
 
 export function Button({
   variant = "primary",
@@ -42,10 +45,29 @@ export function Button({
   href,
   className = "",
   children,
+  disabled,
   ...rest
 }: ButtonProps) {
   const cls = `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`.trim();
   if (href) {
+    // Anchors don't honor the `disabled` attribute or Tailwind's `disabled:*`
+    // variants, so a disabled linked CTA must drop its href, suppress its click
+    // handler, leave the tab order, and expose aria-disabled for assistive tech.
+    if (disabled) {
+      const { onClick: _onClick, ...anchorRest } =
+        rest as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+      return (
+        <a
+          className={cls}
+          role="link"
+          aria-disabled="true"
+          tabIndex={-1}
+          {...anchorRest}
+        >
+          {children}
+        </a>
+      );
+    }
     // Forward the remaining props (onClick, aria-*, data-*, …) to the anchor so
     // linked CTAs keep their handlers, not just the button branch.
     return (
@@ -59,7 +81,7 @@ export function Button({
     );
   }
   return (
-    <button className={cls} {...rest}>
+    <button className={cls} disabled={disabled} {...rest}>
       {children}
     </button>
   );

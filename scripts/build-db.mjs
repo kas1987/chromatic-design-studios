@@ -36,6 +36,9 @@ function readJson(filePath) {
 /** Recursively walk a JSON object, yielding { group, name, value } for every leaf. */
 function* walkTokens(obj, groupParts = []) {
   for (const [key, val] of Object.entries(obj)) {
+    // Skip `$`-prefixed metadata keys (e.g. $mode, $note, $schema) — these are
+    // descriptive annotations, not real tokens, and must not be ingested as rows.
+    if (key.startsWith('$')) continue;
     if (val !== null && typeof val === 'object' && !Array.isArray(val)) {
       yield* walkTokens(val, [...groupParts, key]);
     } else {
@@ -117,6 +120,27 @@ function extractProps(src) {
     }
   }
   return props;
+}
+
+/**
+ * Derive the design tokens a component depends on by matching known token
+ * identifiers against the component source. Token identifiers are the dotted
+ * `group.name` path flattened to Tailwind's hyphen form (e.g. `primary.600` →
+ * `primary-600`, `text.primary` → `text-primary`), which is exactly how they
+ * appear inside utility classes like `bg-primary-600` / `text-text-primary`.
+ *
+ * A match must sit on a class boundary: preceded by the utility separator `-`
+ * or a quote/space, and followed by a quote/space/end. This keeps `primary-600`
+ * from matching the `primary` token and avoids partial-overlap false positives.
+ */
+function extractTokensUsed(src, tokenIdents) {
+  const used = new Set();
+  for (const ident of tokenIdents) {
+    const escaped = ident.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(?:^|[\\s"'\`-])${escaped}(?=$|[\\s"'\`])`);
+    if (re.test(src)) used.add(ident);
+  }
+  return [...used].sort();
 }
 
 /** Parse CSS file into array of { className, properties } objects. */
@@ -228,6 +252,9 @@ function buildSqlite() {
   let componentCount = 0;
   let cssClassCount = 0;
   const sourceFiles = [];
+  // Token identifiers in Tailwind hyphen form, used to derive each component's
+  // token dependency list (tokens_used) from its source.
+  const tokenIdents = new Set();
 
   // ── Tokens ────────────────────────────────────────────────────────────────
   const tokenFiles = fs.readdirSync(TOKENS_DIR).filter(f => f.endsWith('.json'));
@@ -246,6 +273,8 @@ function buildSqlite() {
     for (const { group, name, value } of walkTokens(data)) {
       insertToken.run(category, group || null, name, value, theme);
       tokenCount++;
+      const ident = (group ? `${group}.${name}` : name).replace(/\./g, '-');
+      tokenIdents.add(ident);
     }
   }
 
@@ -260,8 +289,9 @@ function buildSqlite() {
       const src = fs.readFileSync(filePath, 'utf8');
       const name = path.basename(file, '.tsx');
       const props = extractProps(src);
+      const tokensUsed = extractTokensUsed(src, tokenIdents);
       const relPath = path.relative(ROOT, filePath).replace(/\\/g, '/');
-      insertComponent.run(name, relPath, JSON.stringify(props), JSON.stringify([]));
+      insertComponent.run(name, relPath, JSON.stringify(props), JSON.stringify(tokensUsed));
       componentCount++;
     }
   }
