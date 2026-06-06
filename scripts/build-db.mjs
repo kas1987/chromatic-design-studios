@@ -269,11 +269,13 @@ function buildSqlite() {
       token_count     INTEGER DEFAULT 0,
       component_count INTEGER DEFAULT 0
     );
-    CREATE TABLE token_component_refs (
-      token_id     INTEGER,
-      component_id INTEGER,
-      PRIMARY KEY (token_id, component_id)
-    );
+    -- Note: an earlier design declared a normalized token_component_refs join
+    -- table, but the component→token dependency is captured losslessly on each
+    -- component row (components.tokens_used, the exact set of token-backed
+    -- utility classes the component renders). A separate join would need a
+    -- utility-class→token_id resolver that re-derives the token pipeline and
+    -- would drift from it, so the contract is intentionally dropped rather than
+    -- shipped empty. Query dependencies via components.tokens_used.
     CREATE TABLE registry_meta (
       built_at        TEXT NOT NULL,
       token_count     INTEGER NOT NULL,

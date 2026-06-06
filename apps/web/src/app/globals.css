@@ -63,11 +63,14 @@ body {
 }
 
 @layer utilities {
-  /* Glass / holographic surface — Design Law #5: glow, don't blur (kept subtle). */
+  /* Glass / holographic surface — Design Law #5: glow, don't blur. Every value
+     references a design token (AGENTS.md: no hardcoded values); depth comes from
+     the tokenized glow-card shadow instead of a hardcoded backdrop blur, which
+     the design law explicitly avoids. */
   .glass {
     background: var(--color-surface-default);
-    backdrop-filter: blur(12px);
     border: 1px solid var(--color-border-default);
+    box-shadow: var(--glow-card);
   }
   .glow-text {
     text-shadow: var(--glow-intensity-lg) var(--color-glow-primary),
