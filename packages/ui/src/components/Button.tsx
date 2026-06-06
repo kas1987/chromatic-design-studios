@@ -8,8 +8,19 @@ import * as React from "react";
 export type ButtonVariant = "primary" | "ghost" | "secondary";
 export type ButtonSize = "sm" | "md" | "lg";
 
+// Anchor-only attributes that are meaningful for the `href` (<a>) branch and
+// have no equivalent on <button>. Surfaced on ButtonProps so TS callers can type
+// linked CTAs (external/downloadable links) with the same props the runtime
+// already spreads onto the anchor. `type` is deliberately excluded — it would
+// collide with ButtonHTMLAttributes' button `type` ("button"/"submit"/"reset").
+type LinkedButtonAttributes = Pick<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  "target" | "rel" | "download" | "referrerPolicy" | "hrefLang" | "ping" | "media"
+>;
+
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    LinkedButtonAttributes {
   variant?: ButtonVariant;
   size?: ButtonSize;
   /** Render as an <a> when set (keeps the same visual treatment). */
