@@ -11,9 +11,15 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "build:web": "npm run build --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "tsc --noEmit --project apps/web/tsconfig.json"
+    "typecheck": "tsc --noEmit --project apps/web/tsconfig.json",
+    "test": "npm run test --workspaces --if-present",
+    "test:tokens": "npm run test --workspace=packages/tokens",
+    "test:web": "npm run test --workspace=apps/web",
+    "test:e2e": "playwright test",
+    "test:coverage": "npm run test:coverage --workspaces --if-present"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "typescript": "^5.7.0"
   },
   "packageManager": "npm@11.12.1",

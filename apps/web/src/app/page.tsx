@@ -52,7 +52,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="glass mt-auto">
         <div className="max-w-7xl mx-auto px-6 py-4 text-xs text-gray-500 flex justify-between">
-          <span>Chromactic Design Studios v0.1.0</span>
+          <span>Chromatic Design Studios v0.1.0</span>
           <span>Chromactic Harness</span>
         </div>
       </footer>

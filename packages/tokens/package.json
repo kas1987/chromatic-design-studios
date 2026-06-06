@@ -12,7 +12,14 @@
     "./motion": "./src/motion.ts",
     "./effects": "./src/effects.ts"
   },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "@vitest/coverage-v8": "^2.1.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
   }
 }
