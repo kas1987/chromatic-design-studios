@@ -12,3 +12,8 @@
 | CDS-008 | P2 | done | Create design QA checklist |
 | CDS-009 | P2 | done | Create demo hero page |
 | CDS-010 | P2 | done | Update decision log and packaging |
+| CDS-011 | P1 | done | Token pipeline: generate Tailwind theme + CSS vars from 02_design_tokens |
+| CDS-012 | P1 | done | Wire tokens + typography fonts into apps/web; build verification |
+| CDS-013 | P1 | done | Token-driven Hero component in packages/ui (impl 03_components spec) |
+| CDS-014 | P2 | done | visual-design companion bridge (live token tuning -> write-back) |
+| CDS-015 | P3 | deferred | shadcn/ui init (deferred: conflicts with bespoke token theme) |

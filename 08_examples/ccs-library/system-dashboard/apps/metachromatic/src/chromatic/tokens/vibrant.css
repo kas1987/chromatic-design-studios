@@ -1,0 +1,403 @@
+/**
+ * Vibrant Mode Tokens
+ *
+ * Used for: Hero page, onboarding, marketing contexts
+ * Philosophy: "Show the possibility" - expressive, aspirational, welcoming
+ *
+ * Contrast with Precision Mode (working contexts): restrained obsidian/graphite
+ */
+
+/* ============================================
+   Vibrant Mode Background & Base Colors
+   ============================================ */
+
+[data-visual-mode='vibrant'] {
+  /* Base background (deep purple-black) */
+  --bg-vibrant: #0f0a1f;
+  --bg-vibrant-overlay: rgba(168, 85, 247, 0.12);
+
+  /* Override default obsidian in vibrant mode */
+  --bg-obsidian: var(--bg-vibrant);
+}
+
+/* ============================================
+   Vibrant Gradients (Fully Saturated)
+   ============================================ */
+
+[data-visual-mode='vibrant'] {
+  /* Primary gradient (Purple → Cyan) */
+  --gradient-vibrant-primary-start: #a855f7;
+  --gradient-vibrant-primary-end: #06b6d4;
+  --gradient-vibrant-primary: linear-gradient(
+    135deg,
+    var(--gradient-vibrant-primary-start) 0%,
+    var(--gradient-vibrant-primary-end) 100%
+  );
+
+  /* Secondary gradient (Magenta → Blue) */
+  --gradient-vibrant-secondary-start: #ec4899;
+  --gradient-vibrant-secondary-end: #3b82f6;
+  --gradient-vibrant-secondary: linear-gradient(
+    135deg,
+    var(--gradient-vibrant-secondary-start) 0%,
+    var(--gradient-vibrant-secondary-end) 100%
+  );
+
+  /* Accent gradient (Amber → Magenta) */
+  --gradient-vibrant-accent-start: #f59e0b;
+  --gradient-vibrant-accent-end: #ec4899;
+  --gradient-vibrant-accent: linear-gradient(
+    135deg,
+    var(--gradient-vibrant-accent-start) 0%,
+    var(--gradient-vibrant-accent-end) 100%
+  );
+}
+
+/* ============================================
+   Gradient Orbs (Soft Diffused Backgrounds)
+   ============================================ */
+
+[data-visual-mode='vibrant'] {
+  /* Purple orb (large, top-left) */
+  --orb-purple: radial-gradient(
+    circle at center,
+    rgba(168, 85, 247, 0.4) 0%,
+    rgba(168, 85, 247, 0.2) 40%,
+    transparent 70%
+  );
+
+  /* Cyan orb (medium, top-right) */
+  --orb-cyan: radial-gradient(
+    circle at center,
+    rgba(6, 182, 212, 0.3) 0%,
+    rgba(6, 182, 212, 0.15) 40%,
+    transparent 70%
+  );
+
+  /* Magenta orb (large, bottom-center) */
+  --orb-magenta: radial-gradient(
+    circle at center,
+    rgba(236, 72, 153, 0.35) 0%,
+    rgba(236, 72, 153, 0.18) 40%,
+    transparent 70%
+  );
+}
+
+/* ============================================
+   Vibrant Mode Orb Positioning
+   ============================================ */
+
+.vibrant-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.vibrant-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0;
+  animation: orb-fade-in 1s ease-out forwards;
+}
+
+@keyframes orb-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.vibrant-orb-purple {
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: var(--orb-purple);
+}
+
+.vibrant-orb-cyan {
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: var(--orb-cyan);
+  animation-delay: 0.2s;
+}
+
+.vibrant-orb-magenta {
+  bottom: -300px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  background: var(--orb-magenta);
+  animation-delay: 0.4s;
+}
+
+/* ============================================
+   Grid/Dot Pattern Overlay
+   ============================================ */
+
+.vibrant-grid-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: radial-gradient(circle, rgba(168, 85, 247, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.3;
+}
+
+/* ============================================
+   Vibrant Component Styles
+   ============================================ */
+
+/* Hero Cards */
+[data-visual-mode='vibrant'] .hero-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(168, 85, 247, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-visual-mode='vibrant'] .hero-card:hover {
+  box-shadow:
+    0 30px 80px rgba(168, 85, 247, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Hero Buttons (Primary CTA) */
+[data-visual-mode='vibrant'] .hero-btn-primary {
+  background: var(--gradient-vibrant-primary);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow:
+    0 10px 30px rgba(168, 85, 247, 0.4),
+    0 0 40px rgba(168, 85, 247, 0.3);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-visual-mode='vibrant'] .hero-btn-primary:hover {
+  box-shadow:
+    0 15px 40px rgba(168, 85, 247, 0.6),
+    0 0 60px rgba(168, 85, 247, 0.5);
+  transform: scale(1.02) translateY(-2px);
+}
+
+[data-visual-mode='vibrant'] .hero-btn-primary:active {
+  transform: scale(0.98);
+  box-shadow:
+    0 8px 20px rgba(168, 85, 247, 0.5),
+    0 0 30px rgba(168, 85, 247, 0.4);
+}
+
+/* Hero Headlines (Fully Saturated) */
+[data-visual-mode='vibrant'] .hero-headline {
+  background: var(--gradient-vibrant-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Higher glow intensity in vibrant mode */
+  text-shadow:
+    0 0 20px rgba(168, 85, 247, 0.6),
+    0 0 40px rgba(6, 182, 212, 0.4);
+}
+
+/* Feature Icons */
+[data-visual-mode='vibrant'] .feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--gradient-vibrant-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+}
+
+/* Testimonial Cards */
+[data-visual-mode='vibrant'] .testimonial-card {
+  background: rgba(15, 10, 31, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Pricing Cards */
+[data-visual-mode='vibrant'] .pricing-card {
+  background: rgba(15, 10, 31, 0.8);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+[data-visual-mode='vibrant'] .pricing-card:hover {
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateY(-8px);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(168, 85, 247, 0.2);
+}
+
+[data-visual-mode='vibrant'] .pricing-card-featured {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow:
+    0 20px 60px rgba(168, 85, 247, 0.3),
+    0 0 80px rgba(168, 85, 247, 0.2);
+}
+
+/* ============================================
+   Mode Transition Animation
+   ============================================ */
+
+/* Crossfade from Vibrant to Precision */
+@keyframes vibrant-to-precision {
+  0% {
+    background-color: #0f0a1f; /* Purple-black */
+  }
+  100% {
+    background-color: #0a0a0f; /* Obsidian */
+  }
+}
+
+/* Crossfade from Precision to Vibrant */
+@keyframes precision-to-vibrant {
+  0% {
+    background-color: #0a0a0f; /* Obsidian */
+  }
+  100% {
+    background-color: #0f0a1f; /* Purple-black */
+  }
+}
+
+/* Apply transition to app shell */
+[data-visual-mode].transitioning {
+  animation-duration: 800ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+
+[data-visual-mode='vibrant'].transitioning {
+  animation-name: precision-to-vibrant;
+}
+
+[data-visual-mode='precision'].transitioning {
+  animation-name: vibrant-to-precision;
+}
+
+/* Orbs fade out when transitioning to precision */
+[data-visual-mode='precision'] .vibrant-orb {
+  animation: orb-fade-out 500ms ease-out 300ms forwards;
+}
+
+@keyframes orb-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Typography Overrides in Vibrant Mode
+   ============================================ */
+
+[data-visual-mode='vibrant'] {
+  /* Larger hero headline sizes */
+  --text-hero: 72px;
+  --text-title: 48px;
+  --text-subtitle: 32px;
+
+  /* Higher glow intensity */
+  --glow-r1-vibrant:
+    0 0 12px color-mix(in srgb, var(--a) 50%, transparent),
+    0 0 20px color-mix(in srgb, var(--b) 40%, transparent);
+
+  --glow-r2-vibrant:
+    0 0 18px color-mix(in srgb, var(--a) 65%, transparent),
+    0 0 30px color-mix(in srgb, var(--b) 50%, transparent),
+    0 0 45px color-mix(in srgb, var(--a) 30%, transparent);
+
+  --glow-r3-vibrant:
+    0 0 25px color-mix(in srgb, var(--a) 75%, transparent),
+    0 0 45px color-mix(in srgb, var(--b) 60%, transparent),
+    0 0 65px color-mix(in srgb, var(--a) 40%, transparent);
+}
+
+/* Override glow classes in vibrant mode for higher intensity */
+[data-visual-mode='vibrant'] .glow-r1 {
+  text-shadow: var(--glow-r1-vibrant);
+}
+
+[data-visual-mode='vibrant'] .glow-r2 {
+  text-shadow: var(--glow-r2-vibrant);
+}
+
+[data-visual-mode='vibrant'] .glow-r3 {
+  text-shadow: var(--glow-r3-vibrant);
+}
+
+/* ============================================
+   Accessibility: Respect User Preferences
+   ============================================ */
+
+/* High contrast mode disables orbs and reduces blur */
+@media (prefers-contrast: more) {
+  [data-visual-mode='vibrant'] .vibrant-orb {
+    display: none;
+  }
+
+  [data-visual-mode='vibrant'] .hero-card,
+  [data-visual-mode='vibrant'] .testimonial-card,
+  [data-visual-mode='vibrant'] .pricing-card {
+    backdrop-filter: none;
+    background: rgba(15, 10, 31, 0.95);
+  }
+}
+
+/* Reduced motion disables orb animations and transitions */
+@media (prefers-reduced-motion: reduce) {
+  [data-visual-mode='vibrant'] .vibrant-orb {
+    animation: none;
+    opacity: 1;
+  }
+
+  [data-visual-mode].transitioning {
+    animation-duration: 0ms;
+  }
+
+  [data-visual-mode='vibrant'] .hero-card,
+  [data-visual-mode='vibrant'] .hero-btn-primary {
+    transition: none;
+  }
+}
+
+/* Forced colors mode (Windows High Contrast) */
+@media (forced-colors: active) {
+  [data-visual-mode='vibrant'] .vibrant-orb,
+  [data-visual-mode='vibrant'] .vibrant-grid-pattern {
+    display: none;
+  }
+
+  [data-visual-mode='vibrant'] .hero-headline {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    text-shadow: none;
+  }
+}

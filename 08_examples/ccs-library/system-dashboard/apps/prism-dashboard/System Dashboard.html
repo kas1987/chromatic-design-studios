@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>System Dashboard — Psychometric Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="data-connectors.js"></script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg0: #080a12;
+    --bg1: #0c0e1a;
+    --bg2: #111428;
+    --bg3: #181c32;
+    --bg4: #1e2340;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.13);
+    --text: #e2e4f0;
+    --text-muted: #6b7494;
+    --text-dim: #9195aa;
+    --purple: #7c5cfc;
+    --purple-dim: rgba(124,92,252,0.15);
+    --cyan: #22d3ee;
+    --cyan-dim: rgba(34,211,238,0.12);
+    --green: #10d98a;
+    --green-dim: rgba(16,217,138,0.12);
+    --amber: #f59e0b;
+    --red: #f43f5e;
+    --sidebar-w: 220px;
+    --detail-w: 300px;
+    --header-h: 56px;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  html, body { height: 100%; overflow: hidden; background: var(--bg0); color: var(--text); font-family: var(--font); }
+
+  /* ─── Layout ─── */
+  .layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr var(--detail-w); height: 100vh; overflow: hidden; }
+
+  /* ─── Sidebar ─── */
+  .sidebar { background: var(--bg1); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+  .logo-mark { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--purple), var(--cyan)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; letter-spacing: 0.05em; }
+  .logo-text { display: flex; flex-direction: column; }
+  .logo-title { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; color: var(--text); }
+  .logo-sub { font-size: 9px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; }
+
+  .nav { padding: 12px 0; }
+  .nav-section { padding: 8px 16px 4px; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; font-size: 13px; color: var(--text-dim); }
+  .nav-item { width: 100%; border: none; text-align: left; font-family: var(--font); background: transparent; }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--purple-dim); border-left-color: var(--purple); color: var(--text); }
+  .nav-item .nav-icon { width: 16px; height: 16px; opacity: 0.7; flex-shrink: 0; }
+
+  .sidebar-stats { padding: 14px 16px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .sidebar-stats-title { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: baseline; padding: 3px 0; }
+  .stat-label { font-size: 11px; color: var(--text-dim); }
+  .stat-value { font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+  .stat-delta { font-size: 10px; color: var(--green); }
+
+  .sys-status { padding: 14px 16px; }
+  .sys-status-title { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .sys-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+  .sys-label { font-size: 11px; color: var(--text-dim); }
+  .sys-val { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+  .sys-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .sys-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .mini-chart { height: 36px; margin-top: 8px; }
+
+  .sidebar-user { margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b1f8c, var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .user-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .user-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .user-role { font-size: 10px; color: var(--text-muted); }
+
+  /* ─── Main ─── */
+  .main { display: flex; flex-direction: column; overflow: hidden; background: var(--bg0); }
+
+  .topbar { height: var(--header-h); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; background: var(--bg1); }
+  .topbar-title { display: flex; flex-direction: column; }
+  .topbar-title h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .topbar-title p { font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; }
+  .topbar-spacer { flex: 1; }
+  .mode-switch { display: flex; gap: 6px; margin-right: 4px; }
+  .mode-btn { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim); font-size: 11px; }
+  .mode-btn.active { background: var(--purple-dim); border-color: rgba(124,92,252,0.4); color: #d8ccff; }
+
+  .search-bar { display: flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; width: 260px; }
+  .search-bar input { background: none; border: none; outline: none; font-family: var(--font); font-size: 12px; color: var(--text); width: 100%; }
+  .search-bar input::placeholder { color: var(--text-muted); }
+  .search-icon { color: var(--text-muted); font-size: 14px; }
+  .kbd { font-family: var(--mono); font-size: 9px; background: var(--bg4); border: 1px solid var(--border-bright); border-radius: 4px; padding: 1px 5px; color: var(--text-muted); }
+
+  .btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim); }
+  .btn:hover { background: var(--bg4); color: var(--text); border-color: var(--border-bright); }
+  .btn-primary { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .btn-primary:hover { background: #9370ff; }
+
+  .filters-row { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0; }
+  .filter-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--text-dim); cursor: pointer; transition: all 0.15s; }
+  .filter-chip select { background: none; border: none; outline: none; font-family: var(--font); font-size: 11px; color: var(--text-dim); cursor: pointer; padding-right: 2px; appearance: none; }
+  .filter-chip:hover { border-color: var(--border-bright); color: var(--text); }
+
+  .dashboard-scroll { flex: 1; overflow-y: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .dashboard-scroll::-webkit-scrollbar { width: 5px; }
+  .dashboard-scroll::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+  .experience-shell { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .live-stage-panel { margin: 10px 18px 0; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(135deg, rgba(15,17,30,0.96), rgba(11,22,37,0.92)); overflow: hidden; display: none; }
+  .live-stage-panel.visible { display: grid; grid-template-columns: 1.5fr 1fr; min-height: 270px; }
+  .experience-shell.stage-full #dashGrid { display: none; }
+  .experience-shell.stage-full .live-stage-panel.visible { flex: 1; min-height: 0; margin-bottom: 14px; }
+  .stage-main { display: flex; flex-direction: column; border-right: 1px solid var(--border); min-height: 0; }
+  .stage-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--border); background: rgba(7,12,24,0.55); }
+  .stage-title { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: #cbd5e1; font-weight: 600; }
+  .stage-state { font-size: 11px; color: #22d3ee; }
+  .stage-scene { position: relative; flex: 1; min-height: 150px; background: radial-gradient(circle at 50% 20%, rgba(124,92,252,0.22), transparent 62%); }
+  .stage-scene iframe { width: 100%; height: 100%; border: 0; background: #020617; }
+  .stage-overlay { position: absolute; left: 10px; top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .stage-chip { padding: 3px 8px; border-radius: 999px; font-size: 10px; border: 1px solid rgba(148,163,184,0.26); background: rgba(15,23,42,0.62); color: #cbd5e1; }
+  .stage-controls { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 10px; border-top: 1px solid var(--border); background: rgba(2,6,23,0.55); }
+  .stage-btn { border: 1px solid var(--border); background: var(--bg3); color: #aeb8d2; border-radius: 8px; padding: 5px 9px; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .stage-btn.primary { background: var(--purple-dim); border-color: rgba(124,92,252,0.45); color: #e9ddff; }
+  .conversation-bar { display: flex; gap: 8px; align-items: center; padding: 8px 10px 10px; border-top: 1px solid var(--border); background: rgba(2,6,23,0.78); }
+  .conversation-input { flex: 1; border: 1px solid var(--border); border-radius: 8px; background: #0b1220; color: #dbe2ff; font-size: 12px; padding: 8px 10px; }
+  .stage-side { display: flex; flex-direction: column; min-height: 0; }
+  .persona-intel { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .stage-section-title { margin-bottom: 4px; }
+  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .persona-cell { background: rgba(12,18,32,0.74); border: 1px solid var(--border); border-radius: 8px; padding: 6px; }
+  .persona-k { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; }
+  .persona-v { font-size: 12px; color: #d9e2ff; margin-top: 2px; }
+  .mission-stack { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .mission-row { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; font-size: 11px; color: #bcc7e7; }
+  .mission-row span:last-child { color: #22d3ee; }
+  .transcript { padding: 10px 12px; overflow-y: auto; min-height: 0; flex: 1; }
+  .transcript-line { font-size: 11px; line-height: 1.4; color: #d1d9f4; margin-bottom: 7px; }
+  .transcript-line strong { color: #a5b4fc; }
+
+  body.ux-game .layout { grid-template-columns: 1fr; }
+  body.ux-game .sidebar,
+  body.ux-game .detail-panel,
+  body.ux-game .filters-row { display: none; }
+  body.ux-game .topbar { padding: 0 16px; }
+  body.ux-game .topbar-title p { display: none; }
+
+  /* ─── Cards ─── */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+  .card-title { font-size: 9px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+
+  /* ─── Metric strip ─── */
+  .metrics-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .metric-card { padding: 10px 12px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; position: relative; overflow: hidden; transition: border-color 0.3s; }
+  .metric-card:hover { border-color: var(--border-bright); }
+  .metric-card .mc-label { font-size: 8px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); line-height: 1.2; }
+  .metric-card .mc-value { font-size: 24px; font-weight: 700; line-height: 1; color: var(--text); }
+  .metric-card .mc-sup { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+  .metric-card .mc-tag { font-size: 10px; color: var(--green); font-weight: 500; }
+  .metric-card canvas { margin-top: 4px; height: 22px !important; width: 100% !important; }
+
+  /* ─── Mid row 3-panel ─── */
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  .row-2-1 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+  .row-1-2 { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; }
+
+  .panel { padding: 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+  .panel-sm { padding: 12px; }
+
+  /* ─── Big Five bars ─── */
+  .bf-row { display: flex; flex-direction: column; gap: 8px; }
+  .bf-item { display: grid; grid-template-columns: 120px 1fr 32px; align-items: center; gap: 8px; }
+  .bf-label { font-size: 11px; color: var(--text-dim); text-align: right; }
+  .bf-bar-track { height: 5px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .bf-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+  .bf-val { font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-align: right; }
+
+  /* ─── Score ring ─── */
+  .score-ring-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+  .score-ring-inner { position: absolute; text-align: center; }
+  .score-ring-val { font-size: 24px; font-weight: 700; line-height: 1; }
+  .score-ring-sub { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* ─── Tendency bars ─── */
+  .tend-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 0; font-size: 11px; color: var(--text-dim); }
+  .tend-label { width: 110px; font-size: 10px; color: var(--text-dim); }
+  .tend-bar-wrap { flex: 1; height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
+  .tend-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .tend-end { font-size: 10px; color: var(--text-muted); }
+
+  /* ─── Lists ─── */
+  .val-list { display: flex; flex-direction: column; gap: 7px; }
+  .val-row { display: flex; align-items: center; gap: 8px; }
+  .val-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .val-label { font-size: 11px; color: var(--text-dim); flex: 1; }
+  .val-pct { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+
+  /* ─── Stress bars ─── */
+  .stress-list { display: flex; flex-direction: column; gap: 9px; }
+  .stress-row { display: flex; flex-direction: column; gap: 4px; }
+  .stress-header { display: flex; justify-content: space-between; }
+  .stress-label { font-size: 11px; color: var(--text-dim); }
+  .stress-val { font-family: var(--mono); font-size: 11px; color: var(--green); }
+  .stress-track { height: 5px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .stress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.6s ease; }
+
+  /* ─── Anomalies ─── */
+  .anomaly-count { font-size: 42px; font-weight: 700; color: var(--amber); line-height: 1; }
+  .anomaly-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .anomaly-list { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+  .anomaly-item { display: flex; align-items: flex-start; gap: 7px; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+  .anomaly-item::before { content: '●'; color: var(--amber); font-size: 8px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ─── Timeline ─── */
+  .timeline { display: flex; align-items: flex-start; gap: 0; position: relative; padding-top: 8px; }
+  .timeline::before { content: ''; position: absolute; top: 22px; left: 0; right: 0; height: 1px; background: var(--border); }
+  .tl-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tl-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--bg2); z-index: 1; }
+  .tl-label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-align: center; }
+  .tl-date { font-size: 9px; color: var(--text-muted); font-family: var(--mono); text-align: center; }
+
+  /* ─── Connection indicator ─── */
+  .conn-badge { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-family: var(--mono); border: 1px solid; }
+  .conn-badge.live { border-color: rgba(16,217,138,0.3); background: var(--green-dim); color: var(--green); }
+  .conn-badge.mock { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.1); color: var(--amber); }
+  .conn-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .conn-dot.live { animation: pulse 1.5s infinite; }
+
+  /* ─── Detail panel ─── */
+  .detail-panel { background: var(--bg1); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .detail-header { flex-shrink: 0; border-bottom: 1px solid var(--border); }
+  .detail-hero { height: 180px; background: linear-gradient(160deg, #1a0e3a 0%, #0a1a2e 60%, var(--bg0) 100%); position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+  .detail-hero-bg { position: absolute; inset: 0; opacity: 0.3; background: radial-gradient(circle at 70% 40%, var(--purple) 0%, transparent 60%); }
+  .detail-avatar { width: 80px; height: 80px; border-radius: 50%; margin: 0 16px 16px; border: 2px solid rgba(124,92,252,0.4); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #fff; flex-shrink: 0; position: relative; z-index: 1; }
+  .detail-name-wrap { padding-bottom: 16px; position: relative; z-index: 1; }
+  .detail-id { font-family: var(--mono); font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+  .detail-name { font-size: 17px; font-weight: 700; letter-spacing: 0.04em; color: var(--text); }
+  .detail-title { font-size: 11px; color: var(--purple); font-weight: 500; }
+  .detail-rank { position: absolute; top: 14px; right: 14px; font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--cyan); }
+
+  .detail-meta { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); }
+  .detail-meta-item { padding: 10px; border-right: 1px solid var(--border); text-align: center; }
+  .detail-meta-item:last-child { border-right: none; }
+  .detail-meta-item .dmi-val { font-size: 15px; font-weight: 700; color: var(--text); }
+  .detail-meta-item .dmi-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+
+  .detail-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .detail-tab { flex: 1; padding: 8px 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .detail-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  .detail-body { flex: 1; overflow-y: auto; padding: 14px; }
+  .detail-body::-webkit-scrollbar { width: 4px; }
+  .detail-body::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+  .detail-section { margin-bottom: 16px; }
+  .detail-section-title { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .info-item { display: flex; flex-direction: column; gap: 2px; }
+  .info-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .info-value { font-size: 11px; color: var(--text-dim); }
+
+  .key-metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .km-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; }
+  .km-val { font-size: 20px; font-weight: 700; color: var(--text); }
+  .km-label { font-size: 9px; color: var(--text-muted); }
+  .km-sub { font-size: 10px; font-weight: 500; }
+
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { padding: 3px 9px; border-radius: 20px; font-size: 10px; background: var(--bg4); border: 1px solid var(--border); color: var(--text-dim); }
+  .tag.purple { background: var(--purple-dim); border-color: rgba(124,92,252,0.3); color: var(--purple); }
+  .tag.cyan { background: var(--cyan-dim); border-color: rgba(34,211,238,0.2); color: var(--cyan); }
+
+  .character-roster-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .character-roster-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .character-roster-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .character-node-card { border: 1px solid var(--border); background: rgba(12,18,32,0.74); border-radius: 8px; padding: 9px; cursor: pointer; min-height: 116px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s, background 0.15s; font-family: var(--font); text-align: left; color: inherit; appearance: none; }
+  .character-node-card:hover, .character-node-card.active { border-color: rgba(34,211,238,0.38); background: rgba(19,28,49,0.86); }
+  .character-node-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .character-node-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .character-node-title { min-width: 0; }
+  .character-node-name { font-size: 12px; color: var(--text); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .character-node-slug { font-family: var(--mono); font-size: 9px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .character-node-line { font-size: 10px; color: var(--text-dim); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .character-node-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+  .character-node-chip { border: 1px solid rgba(148,163,184,0.18); color: var(--text-muted); background: rgba(15,23,42,0.6); border-radius: 999px; padding: 2px 6px; font-size: 9px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .character-meta-list { display: flex; flex-direction: column; gap: 6px; }
+  .character-meta-row { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--border); font-size: 10px; }
+  .character-meta-key { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .character-meta-value { color: var(--text-dim); text-align: right; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .assess-list { display: flex; flex-direction: column; gap: 1px; }
+  .assess-row { display: grid; grid-template-columns: 1fr 60px 30px 70px; gap: 4px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 10px; }
+  .assess-row:last-child { border-bottom: none; }
+  .assess-name { color: var(--text-dim); }
+  .assess-date { color: var(--text-muted); font-family: var(--mono); }
+  .assess-score { color: var(--cyan); font-family: var(--mono); font-weight: 600; text-align: center; }
+  .assess-status { padding: 2px 6px; border-radius: 10px; background: rgba(16,217,138,0.1); color: var(--green); text-align: center; font-size: 9px; font-weight: 600; }
+
+  .summary-text { font-size: 11px; line-height: 1.6; color: var(--text-dim); }
+
+  /* ─── Live update flash ─── */
+  @keyframes flashBorder { 0%{border-color:rgba(34,211,238,0.5)} 100%{border-color:var(--border)} }
+  .updated { animation: flashBorder 0.8s ease; }
+
+  /* ─── Responsive chart containers ─── */
+  .chart-wrap { position: relative; }
+  canvas { display: block; }
+  .anchor-marker { position: relative; top: -6px; }
+  .stat-delta-sm { font-size: 9px; }
+  .text-red { color: var(--red); }
+  .text-amber { color: var(--amber); }
+  .text-cyan { color: var(--cyan); }
+  .text-green { color: var(--green); }
+  .title-no-margin { margin-bottom: 0; }
+  .flex-shrink-0 { flex-shrink: 0; }
+  .avatar-gradient-default { background: linear-gradient(135deg, #3b1f8c, #7c5cfc); }
+  #bf-o, #bf-c, #bf-e, #bf-a { background: linear-gradient(90deg, #7c5cfc, #22d3ee); }
+  #bf-o { width: 82%; }
+  #bf-c { width: 91%; }
+  #bf-e { width: 68%; }
+  #bf-a { width: 74%; }
+  #bf-n { width: 34%; background: linear-gradient(90deg, #f43f5e, #f59e0b); }
+  .chart-h-110 { height: 110px; }
+  .chart-h-160 { height: 160px; }
+  .chart-h-170 { height: 170px; }
+  .chart-w-120-h-120 { width: 120px; height: 120px; }
+  .legend-row { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+  .legend-item { font-size: 10px; color: var(--text-muted); }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .legend-dot-purple { background: var(--purple); }
+  .legend-dot-cyan-faded { background: var(--cyan); opacity: 0.5; }
+  .legend-line { display: inline-block; width: 8px; height: 2px; margin-right: 4px; vertical-align: middle; }
+  .legend-line-green { background: var(--green); }
+  .legend-line-red { background: var(--red); }
+  .legend-line-cyan { background: var(--cyan); }
+  .flex-row-start { display: flex; gap: 10px; align-items: flex-start; }
+  .flex-row-center { display: flex; gap: 12px; align-items: center; }
+  .ring-wrap-sm { width: 70px; height: 70px; flex-shrink: 0; }
+  .ring-wrap-md { width: 80px; height: 80px; flex-shrink: 0; }
+  .grow-1 { flex: 1; }
+  .col-gap-6 { display: flex; flex-direction: column; gap: 6px; }
+  .center-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .text-center { text-align: center; }
+  .archetype-name { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.1em; text-transform: uppercase; }
+  .archetype-tags-wrap { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 6px; }
+  .span-1 { grid-column: span 1; }
+  .anomaly-panel-gradient { background: linear-gradient(135deg, #12101e 0%, #0d1a2a 100%); }
+  .detail-avatar-gradient { background: linear-gradient(135deg, #3b1f8c, #7c5cfc); }
+  .notes-meta { margin-top: 8px; font-size: 10px; color: var(--text-muted); }
+  .notes-link { color: var(--purple); cursor: pointer; }
+  .timeline-dot-purple { background: #7c5cfc; }
+  .timeline-dot-cyan { background: #22d3ee; }
+  .timeline-dot-green { background: #10d98a; }
+  .timeline-dot-amber { background: #f59e0b; }
+  .timeline-dot-red { background: #f43f5e; }
+  .timeline-dot-violet { background: #a855f7; }
+  .val-dot-purple { background: var(--purple); }
+  .val-dot-cyan { background: var(--cyan); }
+  .cog-item { display: flex; flex-direction: column; gap: 2px; }
+  .cog-item-head { display: flex; justify-content: space-between; font-size: 10px; }
+  .cog-item-label { color: var(--text-dim); }
+  .cog-item-value { color: var(--cyan); font-family: var(--mono); }
+  .cog-track { height: 3px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
+  .cog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width 0.6s; }
+  .archetype-tag { padding: 2px 7px; border-radius: 10px; font-size: 9px; }
+  .archetype-tag-purple { background: rgba(124, 92, 252, 0.13); border: 1px solid rgba(124, 92, 252, 0.27); color: var(--purple); }
+  .archetype-tag-cyan { background: rgba(34, 211, 238, 0.13); border: 1px solid rgba(34, 211, 238, 0.27); color: var(--cyan); }
+  .archetype-tag-green { background: rgba(16, 217, 138, 0.13); border: 1px solid rgba(16, 217, 138, 0.27); color: var(--green); }
+  .archetype-tag-amber { background: rgba(245, 158, 11, 0.13); border: 1px solid rgba(245, 158, 11, 0.27); color: var(--amber); }
+</style>
+</head>
+<body>
+
+<div class="layout" id="root">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">PS</div>
+        <div class="logo-text">
+          <span class="logo-title">PSYCH·OS</span>
+          <span class="logo-sub">Intelligence Platform</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'overview')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'personas')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Personas
+      </button>
+      <button class="nav-item active" type="button" onclick="openDashboardPage(this, 'analysis')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1,11 5,7 8,9 11,5 15,8"/><path d="M12 5h3v3"/></svg>
+        Analysis
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'assessments')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12V6a2 2 0 012-2h8a2 2 0 012 2v6"/><rect x="5" y="8" width="6" height="4"/><path d="M5 8V6"/><path d="M11 8V6"/></svg>
+        Assessments
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'comparisons')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="8" r="3"/><circle cx="11" cy="8" r="3"/></svg>
+        Comparisons
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'segments')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="2" rx="1"/><rect x="1" y="7.5" width="9" height="2" rx="1"/><rect x="1" y="12" width="12" height="2" rx="1"/></svg>
+        Segments
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'models')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/><path d="M9 4.5h5M4.5 9v5"/></svg>
+        Models
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'reports')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h5"/></svg>
+        Reports
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'data-explorer')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="8" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="11" cy="11" r="2"/><path d="M7 7.3l2.2-1.5M7 8.7l2.2 1.5"/></svg>
+        Data Explorer
+      </button>
+      <button class="nav-item" type="button" onclick="openDashboardPage(this, 'settings')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M3.2 12.8l1.4-1.4M11.4 4.6l1.4-1.4"/></svg>
+        Settings
+      </button>
+    </nav>
+
+    <!-- Quick stats -->
+    <div class="sidebar-stats">
+      <div class="sidebar-stats-title">Quick Insights</div>
+      <div class="stat-row"><span class="stat-label">Total Profiles</span><span class="stat-value" id="ss-total">2,548</span></div>
+      <div class="stat-row"><span class="stat-label">Assessed</span><span class="stat-value" id="ss-assessed">2,132 <span class="stat-delta stat-delta-sm">+13.6%</span></span></div>
+      <div class="stat-row"><span class="stat-label">High Risk</span><span class="stat-value text-red" id="ss-risk">312</span></div>
+      <div class="stat-row"><span class="stat-label">Data Points</span><span class="stat-value" id="ss-dp">1.2M</span></div>
+      <div class="stat-row"><span class="stat-label">Avg. Confidence</span><span class="stat-value" id="ss-conf">91%</span></div>
+    </div>
+
+    <!-- System status -->
+    <div class="sys-status">
+      <div class="sys-status-title">System Status</div>
+      <div class="sys-row">
+        <span class="sys-label"><span class="sys-dot green"></span>AI Models Active</span>
+        <span class="sys-val" id="ss-models">8/8</span>
+      </div>
+      <div class="sys-row"><span class="sys-label">Analysis Queue</span><span class="sys-val" id="ss-queue">12</span></div>
+      <div class="sys-row"><span class="sys-label">Last Sync</span><span class="sys-val" id="ss-sync">2m ago</span></div>
+      <div class="sys-row"><span class="sys-label">Data Integrity</span><span class="sys-val" id="ss-integrity">98.8%</span></div>
+      <div class="mini-chart chart-wrap"><canvas id="miniChart" height="36"></canvas></div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <span class="user-name">Aurelius</span>
+        <span class="user-role">Psychometrician</span>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#6b7494" stroke-width="1.5"><path d="M5 3l4 4-4 4"/></svg>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Personality Analysis</h1>
+        <p>Psychometric insights &amp; behavioral intelligence</p>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="mode-switch">
+        <button id="modeMeeting" class="mode-btn" onclick="setUxMode('meeting')">Meeting</button>
+        <button id="modeGame" class="mode-btn" onclick="setUxMode('game')">Game</button>
+        <button id="modeControl" class="mode-btn active" onclick="setUxMode('control')">Control</button>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">⌕</span>
+        <input type="text" placeholder="Search personalities, traits, tags, assessments…" />
+        <span class="kbd">⌘K</span>
+      </div>
+      <div id="connBadge" class="conn-badge mock">
+        <span class="conn-dot"></span>
+        <span id="connLabel">MOCK</span>
+      </div>
+      <button class="btn">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v7M3 5l3 3 3-3"/><path d="M1 9v1a1 1 0 001 1h8a1 1 0 001-1V9"/></svg>
+        Export Report
+      </button>
+      <button class="btn btn-primary" onclick="toggleConnector()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 2"/></svg>
+        <span id="connBtn">Connect Live</span>
+      </button>
+      <button class="btn" onclick="toggleStagePanel()">Stage</button>
+      <button class="btn" id="stageLayoutBtn" onclick="toggleStageLayout()">Split</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-row">
+      <div class="filter-chip">Segment: <select title="Segment"><option>All Segments</option><option>Corporate</option><option>Academic</option><option>Clinical</option></select> ▾</div>
+      <div class="filter-chip">Archetype: <select title="Archetype"><option>All Archetypes</option><option>Strategist</option><option>Catalyst</option><option>Empath</option></select> ▾</div>
+      <div class="filter-chip">Assessment: <select title="Assessment"><option>All Types</option><option>Big Five</option><option>MBTI</option><option>Values</option></select> ▾</div>
+      <div class="filter-chip">Risk: <select title="Risk"><option>All Levels</option><option>Low</option><option>Medium</option><option>High</option></select> ▾</div>
+      <div class="filter-chip">Age: <select title="Age"><option>All Ages</option><option>18–25</option><option>26–35</option><option>36–50</option></select> ▾</div>
+      <div class="filter-chip">Region: <select title="Region"><option>All Regions</option><option>AMER</option><option>EMEA</option><option>APAC</option></select> ▾</div>
+      <div class="filter-chip">More Filters ▾</div>
+    </div>
+
+    <div class="experience-shell" id="experienceShell">
+      <section class="live-stage-panel" id="liveStagePanel">
+        <div class="stage-main">
+          <div class="stage-head">
+            <div>
+              <div class="stage-title" id="stagePersonaName">Mira / Thesmera Locke</div>
+              <div class="stage-state" id="stageMood">Playfully guarded</div>
+            </div>
+            <a class="stage-chip" href="http://localhost:5173/" target="_blank" rel="noreferrer noopener">Open 3D View</a>
+          </div>
+          <div class="stage-scene">
+            <iframe id="liveStageFrame" title="Live Persona Stage" src="legacy/prism_3d_psychometric_app/dist/index.html"></iframe>
+            <div class="stage-overlay">
+              <span class="stage-chip" id="chipEmotion">Emotion: calm</span>
+              <span class="stage-chip" id="chipTrust">Trust 64%</span>
+              <span class="stage-chip" id="chipSuspicion">Suspicion 21%</span>
+              <span class="stage-chip" id="chipVeil">Prismatic Veil: hidden</span>
+            </div>
+          </div>
+          <div class="stage-controls">
+            <button class="stage-btn primary" onclick="appendAction('Talk channel opened')">Talk</button>
+            <button class="stage-btn" onclick="appendAction('Listening mode armed')">Listen</button>
+            <button class="stage-btn" onclick="appendAction('Memory fragments inspected')">Memory</button>
+            <button class="stage-btn" onclick="appendAction('Mission log expanded')">Mission Log</button>
+            <button class="stage-btn" onclick="appendAction('Character switch queued')">Character Switch</button>
+            <button class="stage-btn" onclick="appendAction('Network map requested')">Network Map</button>
+            <button class="stage-btn" onclick="appendAction('Session terminated')">End Session</button>
+          </div>
+          <div class="conversation-bar">
+            <input id="conversationInput" class="conversation-input" placeholder='Speak or type: "Why are you hiding something?"' />
+            <button class="stage-btn primary" onclick="submitConversation()">Send</button>
+          </div>
+        </div>
+        <div class="stage-side">
+          <div class="persona-intel">
+            <div class="card-title stage-section-title">Persona Intelligence</div>
+            <div class="persona-grid">
+              <div class="persona-cell"><div class="persona-k">Role</div><div class="persona-v" id="piRole">Disguised Sister</div></div>
+              <div class="persona-cell"><div class="persona-k">Voice Mode</div><div class="persona-v" id="piVoice">WhisperTech Tier 2</div></div>
+              <div class="persona-cell"><div class="persona-k">Trust</div><div class="persona-v" id="piTrust">64%</div></div>
+              <div class="persona-cell"><div class="persona-k">Affection</div><div class="persona-v" id="piAffection">48%</div></div>
+              <div class="persona-cell"><div class="persona-k">Suspicion</div><div class="persona-v" id="piSuspicion">21%</div></div>
+              <div class="persona-cell"><div class="persona-k">Fragments</div><div class="persona-v" id="piFragments">3 unlocked</div></div>
+            </div>
+          </div>
+          <div class="mission-stack">
+            <div class="card-title stage-section-title">Network / Mission Stack</div>
+            <div class="mission-row"><span>Chase Meter</span><span id="msChase">37%</span></div>
+            <div class="mission-row"><span>Mirror Awareness</span><span id="msMirror">Dormant</span></div>
+            <div class="mission-row"><span>Caetherra Access</span><span id="msAccess">Partial</span></div>
+            <div class="mission-row"><span>Prismatic Veil Path</span><span id="msVeil">Hidden</span></div>
+          </div>
+          <div class="transcript" id="stageTranscript">
+            <div class="transcript-line"><strong>System:</strong> Live Persona Meeting initialized.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard grid -->
+      <div class="dashboard-scroll" id="dashGrid">
+
+      <div id="overview" class="anchor-marker"></div>
+
+      <!-- Row 1: Metric cards -->
+      <div id="analysis" class="anchor-marker"></div>
+      <div class="metrics-row" id="metricsRow">
+        <div class="metric-card" id="mc-overall"><div class="mc-label">Overall Index</div><div class="mc-value"><span id="mv-overall">87</span><span class="mc-sup">/100</span></div><div class="mc-tag" id="mt-overall">Very High</div><canvas id="sp-overall"></canvas></div>
+        <div class="metric-card" id="mc-fit"><div class="mc-label">Psychometric Fit</div><div class="mc-value"><span id="mv-fit">92</span><span class="mc-sup">%</span></div><div class="mc-tag" id="mt-fit">Excellent</div><canvas id="sp-fit"></canvas></div>
+        <div class="metric-card" id="mc-emo"><div class="mc-label">Emotional Stability</div><div class="mc-value"><span id="mv-emo">76</span><span class="mc-sup">%</span></div><div class="mc-tag" id="mt-emo">High</div><canvas id="sp-emo"></canvas></div>
+        <div class="metric-card" id="mc-cog"><div class="mc-label">Cognitive Agility</div><div class="mc-value"><span id="mv-cog">88</span><span class="mc-sup">%</span></div><div class="mc-tag" id="mt-cog">Very High</div><canvas id="sp-cog"></canvas></div>
+        <div class="metric-card" id="mc-risk"><div class="mc-label">Behavioral Risk</div><div class="mc-value text-amber"><span id="mv-risk">28</span><span class="mc-sup">%</span></div><div class="mc-tag text-amber" id="mt-risk">Low</div><canvas id="sp-risk"></canvas></div>
+        <div class="metric-card" id="mc-conf"><div class="mc-label">Data Confidence</div><div class="mc-value"><span id="mv-conf">94</span><span class="mc-sup">%</span></div><div class="mc-tag" id="mt-conf">Very High</div><canvas id="sp-conf"></canvas></div>
+      </div>
+
+      <!-- Live MetaChromatic character nodes -->
+      <div class="panel">
+        <div class="character-roster-head">
+          <div>
+            <div class="card-title title-no-margin">MetaChromatic Character Nodes</div>
+            <div class="character-roster-sub" id="characterSourceLine">Waiting for live character metadata</div>
+          </div>
+          <div class="conn-badge mock flex-shrink-0">
+            <span class="conn-dot"></span>
+            <span id="characterCount">0 Nodes</span>
+          </div>
+        </div>
+        <div class="character-roster-grid" id="characterRoster">
+          <div class="character-node-card">
+            <div class="character-node-top">
+              <div class="character-node-avatar avatar-gradient-default">?</div>
+              <div class="character-node-title">
+                <div class="character-node-name">No live roster yet</div>
+                <div class="character-node-slug">connector pending</div>
+              </div>
+            </div>
+            <div class="character-node-line">Connects through data-connectors.js and waits for Seed Scout, Storyboard, or Voice catalog metadata.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Big Five + Trait Distribution + Radar -->
+      <div class="row-3">
+        <div class="panel">
+          <div class="card-title">Big Five Traits</div>
+          <div class="bf-row" id="bfRow">
+            <div class="bf-item"><span class="bf-label">Openness</span><div class="bf-bar-track"><div class="bf-bar-fill" id="bf-o"></div></div><span class="bf-val" id="bfv-o">82</span></div>
+            <div class="bf-item"><span class="bf-label">Conscientiousness</span><div class="bf-bar-track"><div class="bf-bar-fill" id="bf-c"></div></div><span class="bf-val" id="bfv-c">91</span></div>
+            <div class="bf-item"><span class="bf-label">Extraversion</span><div class="bf-bar-track"><div class="bf-bar-fill" id="bf-e"></div></div><span class="bf-val" id="bfv-e">68</span></div>
+            <div class="bf-item"><span class="bf-label">Agreeableness</span><div class="bf-bar-track"><div class="bf-bar-fill" id="bf-a"></div></div><span class="bf-val" id="bfv-a">74</span></div>
+            <div class="bf-item"><span class="bf-label">Neuroticism</span><div class="bf-bar-track"><div class="bf-bar-fill" id="bf-n"></div></div><span class="bf-val" id="bfv-n">34</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Trait Distribution</div>
+          <div class="chart-wrap chart-h-160"><canvas id="distChart"></canvas></div>
+          <div class="legend-row">
+            <span class="legend-item"><span class="legend-dot legend-dot-purple"></span>Individual</span>
+            <span class="legend-item"><span class="legend-dot legend-dot-cyan-faded"></span>Population Avg.</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Psychometric Radar</div>
+          <div class="chart-wrap chart-h-170"><canvas id="radarChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Row 3: Motivation + Values + Behavioral Tendencies + Archetype -->
+      <div class="row-4">
+        <div class="panel">
+          <div class="card-title">Motivation Drivers</div>
+          <div class="flex-row-start">
+            <div class="score-ring-wrap ring-wrap-sm">
+              <canvas id="motivRing" width="70" height="70"></canvas>
+              <div class="score-ring-inner">
+                <div class="score-ring-val" id="motivScore">85</div>
+                <div class="score-ring-sub">High</div>
+              </div>
+            </div>
+            <div class="val-list grow-1" id="motivList"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Values Alignment</div>
+          <div class="flex-row-start">
+            <div class="score-ring-wrap ring-wrap-sm">
+              <canvas id="valuesRing" width="70" height="70"></canvas>
+              <div class="score-ring-inner">
+                <div class="score-ring-val" id="valuesScore">78</div>
+                <div class="score-ring-sub">High</div>
+              </div>
+            </div>
+            <div class="val-list grow-1" id="valuesList"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Behavioral Tendencies</div>
+          <div class="col-gap-6" id="tendList"></div>
+        </div>
+
+        <div class="panel center-panel">
+          <div class="card-title text-center">Personality Archetype</div>
+          <div class="chart-wrap chart-w-120-h-120"><canvas id="archetypeChart"></canvas></div>
+          <div class="text-center">
+            <div class="archetype-name" id="archetypeName">THE STRATEGIST</div>
+            <div class="archetype-tags-wrap" id="archetypeTags"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Emotional Landscape + Cognitive Profile + Stress -->
+      <div class="row-3">
+        <div class="panel span-1">
+          <div class="card-title">Emotional Landscape</div>
+          <div class="chart-wrap chart-h-110"><canvas id="emotionalChart"></canvas></div>
+          <div class="flex-row-center">
+            <span class="legend-item"><span class="legend-line legend-line-green"></span>Positive</span>
+            <span class="legend-item"><span class="legend-line legend-line-red"></span>Negative</span>
+            <span class="legend-item"><span class="legend-line legend-line-cyan"></span>Stability</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Cognitive Profile</div>
+          <div class="flex-row-center">
+            <div class="score-ring-wrap ring-wrap-md">
+              <canvas id="cogRing" width="80" height="80"></canvas>
+              <div class="score-ring-inner">
+                <div class="score-ring-val" id="cogScore">88</div>
+                <div class="score-ring-sub">Very High</div>
+              </div>
+            </div>
+            <div class="grow-1 col-gap-6" id="cogList"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="card-title">Stress &amp; Resilience</div>
+          <div class="flex-row-center">
+            <div class="score-ring-wrap ring-wrap-sm">
+              <canvas id="stressRing" width="70" height="70"></canvas>
+              <div class="score-ring-inner">
+                <div class="score-ring-val" id="stressScore">76</div>
+                <div class="score-ring-sub">High</div>
+              </div>
+            </div>
+            <div class="stress-list grow-1" id="stressList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Timeline + Anomalies -->
+      <div class="row-2-1">
+        <div class="panel">
+          <div class="card-title">Assessment Timeline</div>
+          <div class="timeline" id="timeline">
+            <div class="tl-item"><div class="tl-dot timeline-dot-purple"></div><div class="tl-label">MBTI</div><div class="tl-date">May 1</div></div>
+            <div class="tl-item"><div class="tl-dot timeline-dot-cyan"></div><div class="tl-label">Big Five</div><div class="tl-date">May 15</div></div>
+            <div class="tl-item"><div class="tl-dot timeline-dot-green"></div><div class="tl-label">Values</div><div class="tl-date">May 28</div></div>
+            <div class="tl-item"><div class="tl-dot timeline-dot-amber"></div><div class="tl-label">Cognitive</div><div class="tl-date">Jun 10</div></div>
+            <div class="tl-item"><div class="tl-dot timeline-dot-red"></div><div class="tl-label">360 Review</div><div class="tl-date">Jun 20</div></div>
+            <div class="tl-item"><div class="tl-dot timeline-dot-violet"></div><div class="tl-label">Behavioral</div><div class="tl-date">Jul 1</div></div>
+          </div>
+        </div>
+
+        <div class="panel anomaly-panel-gradient">
+          <div class="card-title text-amber">Anomaly Detection</div>
+          <div class="anomaly-count" id="anomalyCount">3</div>
+          <div class="anomaly-label">Anomalies Detected</div>
+          <div class="anomaly-list" id="anomalyList"></div>
+        </div>
+      </div>
+
+      </div><!-- /dashboard-scroll -->
+    </div><!-- /experience-shell -->
+  </main>
+
+  <!-- Detail Panel -->
+  <aside class="detail-panel">
+    <div class="detail-header">
+      <div class="detail-hero">
+        <div class="detail-hero-bg"></div>
+        <div class="detail-avatar detail-avatar-gradient" id="detailAvatar">A</div>
+        <div class="detail-name-wrap">
+          <div class="detail-id" id="detailId">PR-2041</div>
+          <div class="detail-name" id="detailName">Aria Chen</div>
+          <div class="detail-title" id="detailTitle">The Architect</div>
+        </div>
+        <div class="detail-rank" id="detailRank">A+</div>
+      </div>
+      <div class="detail-meta">
+        <div class="detail-meta-item"><div class="dmi-val" id="dmi-age">29</div><div class="dmi-label">Age</div></div>
+        <div class="detail-meta-item"><div class="dmi-val" id="dmi-gender">F</div><div class="dmi-label">Gender</div></div>
+        <div class="detail-meta-item"><div class="dmi-val">Human</div><div class="dmi-label">Type</div></div>
+        <div class="detail-meta-item"><div class="dmi-val text-cyan" id="dmi-rank">A+</div><div class="dmi-label">Rank</div></div>
+      </div>
+      <div class="detail-tabs">
+        <div class="detail-tab active" onclick="setDetailTab(this,'overview')">Overview</div>
+        <div class="detail-tab" onclick="setDetailTab(this,'traits')">Traits</div>
+        <div class="detail-tab" onclick="setDetailTab(this,'cognitive')">Cognitive</div>
+        <div class="detail-tab" onclick="setDetailTab(this,'notes')">Notes</div>
+      </div>
+    </div>
+
+    <div class="detail-body" id="detailBody">
+      <div class="detail-section">
+        <div class="detail-section-title">Basic Information</div>
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">Full Name</div><div class="info-value" id="di-name">Aria Chen</div></div>
+          <div class="info-item"><div class="info-label">Also Known As</div><div class="info-value" id="di-alias">The Architect</div></div>
+          <div class="info-item"><div class="info-label">Occupation</div><div class="info-value" id="di-occupation">Strategist / Lead</div></div>
+          <div class="info-item"><div class="info-label">Clearance</div><div class="info-value" id="di-clearance">Level 4</div></div>
+          <div class="info-item"><div class="info-label">Status</div><div class="info-value text-green" id="di-status">Active</div></div>
+          <div class="info-item"><div class="info-label">Cohort</div><div class="info-value" id="di-cohort">Alpha Prime</div></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Summary</div>
+        <div class="summary-text" id="di-summary">Systems thinker with exceptional pattern recognition. Operates with surgical precision under ambiguity. Natural at building scalable frameworks.</div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Key Metrics</div>
+        <div class="key-metrics-grid" id="kmGrid">
+          <div class="km-card"><div class="km-val" id="km-overall">87</div><div class="km-label">Overall Score</div><div class="km-sub text-green" id="km-overall-sub">Very High</div></div>
+          <div class="km-card"><div class="km-val" id="km-fit">92%</div><div class="km-label">Psychometric Fit</div><div class="km-sub text-cyan" id="km-fit-sub">Excellent</div></div>
+          <div class="km-card"><div class="km-val text-amber" id="km-risk">28%</div><div class="km-label">Behavioral Risk</div><div class="km-sub text-amber" id="km-risk-sub">Low</div></div>
+          <div class="km-card"><div class="km-val" id="km-conf">94%</div><div class="km-label">Data Confidence</div><div class="km-sub text-green" id="km-conf-sub">Very High</div></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Tags</div>
+        <div class="tags-wrap" id="characterTags">
+          <span class="tag purple">Strategic Thinker</span>
+          <span class="tag cyan">High Empathy</span>
+          <span class="tag">Independent</span>
+          <span class="tag">Resilient</span>
+          <span class="tag purple">Visionary</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">MetaChromatic Node Metadata</div>
+        <div class="character-meta-list" id="characterMetaList">
+          <div class="character-meta-row"><span class="character-meta-key">Source</span><span class="character-meta-value">connector pending</span></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Assessments</div>
+        <div class="assess-list" id="assessList">
+          <div class="assess-row"><span class="assess-name">Big Five Inventory</span><span class="assess-date">May 15</span><span class="assess-score">88</span><span class="assess-status">Completed</span></div>
+          <div class="assess-row"><span class="assess-name">MBTI Assessment</span><span class="assess-date">May 1</span><span class="assess-score">87</span><span class="assess-status">Completed</span></div>
+          <div class="assess-row"><span class="assess-name">Values Assessment</span><span class="assess-date">May 28</span><span class="assess-score">82</span><span class="assess-status">Completed</span></div>
+          <div class="assess-row"><span class="assess-name">Cognitive Assessment</span><span class="assess-date">Jun 10</span><span class="assess-score">91</span><span class="assess-status">Completed</span></div>
+          <div class="assess-row"><span class="assess-name">Behavioral Assessment</span><span class="assess-date">Jun 1</span><span class="assess-score">85</span><span class="assess-status">Completed</span></div>
+          <div class="assess-row"><span class="assess-name">360 Degree Review</span><span class="assess-date">Jun 20</span><span class="assess-score">88</span><span class="assess-status">Completed</span></div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Notes</div>
+        <div class="summary-text">Exceptional leader with strong vision and execution capability. Continue monitoring stress levels during pressured missions.</div>
+        <div class="notes-meta">Last updated: 2h ago &nbsp;·&nbsp; <span class="notes-link">View All Notes →</span></div>
+        <div id="settings" class="anchor-marker"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="tweaks-panel.jsx" type="text/babel"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#7c5cfc",
+  "updateSpeed": 2000,
+  "showSparklines": true,
+  "connectorSource": "prism_local",
+  "chartStyle": "minimal"
+}/*EDITMODE-END*/;
+
+function TweaksApp() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <TweaksPanel>
+      <TweakSection title="Live Connector">
+        <TweakRadio id="connectorSource" label="Data Source"
+          options={['prism_local','mock','rest','websocket']}
+          value={tweaks.connectorSource}
+          onChange={v => { setTweak('connectorSource', v); window._switchConnector && window._switchConnector(v); }} />
+        <TweakSlider id="updateSpeed" label="Update Interval (ms)"
+          min={1000} max={10000} step={500}
+          value={tweaks.updateSpeed}
+          onChange={v => { setTweak('updateSpeed', v); window._setUpdateSpeed && window._setUpdateSpeed(v); }} />
+      </TweakSection>
+      <TweakSection title="Appearance">
+        <TweakColor id="accentColor" label="Accent Color"
+          value={tweaks.accentColor}
+          onChange={v => { setTweak('accentColor', v); document.documentElement.style.setProperty('--purple', v); }} />
+        <TweakToggle id="showSparklines" label="Show Sparklines"
+          value={tweaks.showSparklines}
+          onChange={v => { setTweak('showSparklines', v); document.querySelectorAll('[id^="sp-"]').forEach(el => el.style.display = v ? '' : 'none'); }} />
+        <TweakRadio id="chartStyle" label="Chart Fill"
+          options={['gradient','solid','minimal']}
+          value={tweaks.chartStyle}
+          onChange={v => setTweak('chartStyle', v)} />
+      </TweakSection>
+    </TweaksPanel>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root').appendChild(Object.assign(document.createElement('div'),{id:'tweaks-root'}))).render(<TweaksApp />);
+</script>
+
+<script>
+// ─── Chart helpers ────────────────────────────────────────────────────────────
+
+Chart.defaults.color = '#6b7494';
+Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+Chart.defaults.font.size = 10;
+
+const PURPLE = '#7c5cfc', CYAN = '#22d3ee', GREEN = '#10d98a',
+      AMBER = '#f59e0b', RED = '#f43f5e';
+
+function sparkGrad(ctx, color) {
+  const g = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+  g.addColorStop(0, color + '40'); g.addColorStop(1, color);
+  return g;
+}
+
+function makeSparkline(canvasId, data, color) {
+  const el = document.getElementById(canvasId);
+  if (!el) return null;
+  const ctx = el.getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: { labels: data.map((_,i)=>i), datasets: [{ data, borderColor: color, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: color+'22' }] },
+    options: { animation: false, responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
+function makeDoughnut(canvasId, value, color) {
+  const el = document.getElementById(canvasId);
+  if (!el) return null;
+  return new Chart(el.getContext('2d'), {
+    type: 'doughnut',
+    data: { datasets: [{ data: [value, 100-value], backgroundColor: [color, '#1e2340'], borderWidth: 0, hoverOffset: 0 }] },
+    options: { cutout: '72%', animation: { duration: 600 }, responsive: true, maintainAspectRatio: true, plugins: { legend:{ display:false }, tooltip:{ enabled:false } } }
+  });
+}
+
+// ─── Sparklines ───────────────────────────────────────────────────────────────
+const sparkMap = {
+  'sp-overall': { id: 'mv-overall', color: PURPLE },
+  'sp-fit':     { id: 'mv-fit',     color: CYAN },
+  'sp-emo':     { id: 'mv-emo',     color: GREEN },
+  'sp-cog':     { id: 'mv-cog',     color: CYAN },
+  'sp-risk':    { id: 'mv-risk',    color: AMBER },
+  'sp-conf':    { id: 'mv-conf',    color: GREEN },
+};
+const sparkCharts = {};
+Object.keys(sparkMap).forEach(k => { sparkCharts[k] = makeSparkline(k, Array(20).fill(50), sparkMap[k].color); });
+
+// ─── Trait distribution (bell-ish) ───────────────────────────────────────────
+const distCtx = document.getElementById('distChart').getContext('2d');
+const distLabels = ['2%\nVery Low','Low','14%\nAverage','High','Very High'];
+const distGrad = distCtx.createLinearGradient(0, 0, 0, 160);
+distGrad.addColorStop(0, PURPLE+'aa'); distGrad.addColorStop(1, PURPLE+'00');
+
+const distChart = new Chart(distCtx, {
+  type: 'line',
+  data: {
+    labels: ['2%', 'Low', '14%', 'High', '34%', '', '10%'],
+    datasets: [
+      { label: 'Individual', data: [2, 8, 14, 28, 34, 18, 10], borderColor: PURPLE, borderWidth: 2, pointRadius: 4, pointBackgroundColor: PURPLE, tension: 0.5, fill: true, backgroundColor: distGrad },
+      { label: 'Pop Avg', data: [5, 12, 22, 30, 22, 12, 5], borderColor: CYAN+'88', borderWidth: 1.5, pointRadius: 2, tension: 0.5, fill: false, borderDash: [4,3] }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600 },
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { grid: { color: '#ffffff08' }, ticks: { font: { size: 9 } } },
+      y: { display: false }
+    }
+  }
+});
+
+// ─── Radar ────────────────────────────────────────────────────────────────────
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+const radarChart = new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['Emotional\nStability', 'Openness', 'Extraversion', 'Agreeableness', 'Conscientiousness', 'Cognitive'],
+    datasets: [
+      { label: 'Individual', data: [76,82,68,74,91,88], borderColor: PURPLE, borderWidth: 2, pointBackgroundColor: PURPLE, pointRadius: 3, fill: true, backgroundColor: PURPLE+'30' },
+      { label: 'Population', data: [65,70,72,68,70,71], borderColor: CYAN+'66', borderWidth: 1.5, pointRadius: 2, fill: false }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600 },
+    plugins: { legend: { display: false } },
+    scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 25 }, grid: { color: '#ffffff10' }, pointLabels: { font: { size: 9 }, color: '#6b7494' }, angleLines: { color: '#ffffff08' } } }
+  }
+});
+
+// ─── Motivation ring ──────────────────────────────────────────────────────────
+let motivRing = makeDoughnut('motivRing', 85, PURPLE);
+
+// ─── Values ring ──────────────────────────────────────────────────────────────
+let valuesRing = makeDoughnut('valuesRing', 78, CYAN);
+
+// ─── Archetype ring ───────────────────────────────────────────────────────────
+let archetypeChart = new Chart(document.getElementById('archetypeChart').getContext('2d'), {
+  type: 'radar',
+  data: {
+    labels: ['Analytical','Independent','Primary','Focused','Decisive'],
+    datasets: [{ data: [85,78,90,72,88], borderColor: PURPLE, borderWidth: 2, pointRadius: 3, pointBackgroundColor: PURPLE, fill: true, backgroundColor: PURPLE+'33' }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600 },
+    plugins: { legend: { display: false } },
+    scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: '#ffffff12' }, pointLabels: { font: { size: 8 }, color: '#6b7494' }, angleLines: { color: '#ffffff08' } } }
+  }
+});
+
+// ─── Emotional landscape ─────────────────────────────────────────────────────
+const emoCtx = document.getElementById('emotionalChart').getContext('2d');
+function emoGrad(color) {
+  const g = emoCtx.createLinearGradient(0,0,0,110);
+  g.addColorStop(0,color+'55'); g.addColorStop(1,color+'00'); return g;
+}
+let emotionalChart = new Chart(emoCtx, {
+  type: 'line',
+  data: {
+    labels: [],
+    datasets: [
+      { label: 'Positive',  data: [], borderColor: GREEN, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: emoGrad(GREEN) },
+      { label: 'Negative',  data: [], borderColor: RED,   borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: emoGrad(RED) },
+      { label: 'Stability', data: [], borderColor: CYAN,  borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: false }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { grid: { color: '#ffffff06' }, ticks: { maxTicksLimit: 6, font: { size: 9 } } },
+      y: { grid: { color: '#ffffff06' }, min: 0, max: 100, ticks: { font: { size: 9 }, stepSize: 50 } }
+    }
+  }
+});
+
+// ─── Cognitive ring ───────────────────────────────────────────────────────────
+let cogRing = makeDoughnut('cogRing', 88, CYAN);
+
+// ─── Stress ring ──────────────────────────────────────────────────────────────
+let stressRing = makeDoughnut('stressRing', 76, GREEN);
+
+// ─── Mini sidebar chart ───────────────────────────────────────────────────────
+const miniCtx = document.getElementById('miniChart').getContext('2d');
+const miniChart = new Chart(miniCtx, {
+  type: 'line',
+  data: { labels: Array(20).fill(''), datasets: [
+    { data: Array(20).fill(0).map(()=>40+Math.random()*40), borderColor: GREEN, borderWidth: 1.2, pointRadius: 0, tension: 0.4, fill: true, backgroundColor: GREEN+'18' }
+  ]},
+  options: { animation: false, responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: { x: { display: false }, y: { display: false } }
+  }
+});
+
+// ─── DOM update helpers ───────────────────────────────────────────────────────
+
+function setEl(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setHtml(id, val) { const el = document.getElementById(id); if (el) el.innerHTML = val; }
+function flash(id) { const el = document.getElementById(id); if (!el) return; el.classList.remove('updated'); void el.offsetWidth; el.classList.add('updated'); }
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[ch]));
+}
+
+let currentCharacters = [];
+let activeCharacterSlug = null;
+
+function gradeLabel(value) {
+  if (value >= 90) return 'Exceptional';
+  if (value >= 80) return 'Very High';
+  if (value >= 70) return 'High';
+  if (value >= 60) return 'Moderate';
+  if (value >= 45) return 'Developing';
+  return 'Low';
+}
+
+function riskLabel(value) {
+  if (value >= 75) return 'Critical';
+  if (value >= 55) return 'Elevated';
+  if (value >= 35) return 'Moderate';
+  return 'Low';
+}
+
+function compactNumber(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '0';
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+  return `${Math.round(num)}`;
+}
+
+function updateMetrics(data) {
+  const map = { overall: 'overall_index', fit: 'psychometric_fit', emo: 'emotional_stability', cog: 'cognitive_agility', risk: 'behavioral_risk', conf: 'data_confidence' };
+  Object.entries(map).forEach(([k, src]) => {
+    const d = data[src]; if (!d) return;
+    setEl('mv-' + k, d.value);
+    setEl('mt-' + k, d.label);
+    const sc = sparkCharts['sp-' + k];
+    if (sc && d.spark) { sc.data.datasets[0].data = d.spark; sc.update('none'); }
+    flash('mc-' + k);
+  });
+
+  const fit = data.psychometric_fit?.value ?? 64;
+  const risk = data.behavioral_risk?.value ?? 21;
+  const emo = data.emotional_stability?.value ?? 58;
+  const overall = data.overall_index?.value ?? 70;
+  const conf = data.data_confidence?.value ?? 82;
+
+  setEl('km-overall', overall);
+  setEl('km-overall-sub', gradeLabel(overall));
+  setEl('km-fit', `${fit}%`);
+  setEl('km-fit-sub', gradeLabel(fit));
+  setEl('km-risk', `${risk}%`);
+  setEl('km-risk-sub', riskLabel(risk));
+  setEl('km-conf', `${conf}%`);
+  setEl('km-conf-sub', gradeLabel(conf));
+
+  setEl('chipTrust', `Trust ${fit}%`);
+  setEl('piTrust', `${fit}%`);
+  setEl('chipSuspicion', `Suspicion ${risk}%`);
+  setEl('piSuspicion', `${risk}%`);
+  setEl('piAffection', `${Math.max(20, Math.round((emo + fit) / 2))}%`);
+  setEl('msChase', `${Math.min(95, Math.max(5, risk + 16))}%`);
+
+  const highRiskProfiles = Math.max(0, Math.round(((Number(data.sample_size) || 2500) * risk) / 100));
+  setEl('ss-risk', compactNumber(highRiskProfiles));
+
+  updateTendencies({
+    items: [
+      { label: 'Decision Making', descriptor: gradeLabel(overall), value: overall, color: PURPLE },
+      { label: 'Risk Tolerance', descriptor: riskLabel(Math.max(0, 100 - risk)), value: Math.max(0, 100 - risk), color: CYAN },
+      { label: 'Stress Response', descriptor: gradeLabel(emo), value: emo, color: GREEN },
+      { label: 'Social Orientation', descriptor: gradeLabel(Math.round((fit + emo) / 2)), value: Math.round((fit + emo) / 2), color: CYAN },
+      { label: 'Adaptability', descriptor: gradeLabel(data.cognitive_agility?.value ?? 68), value: data.cognitive_agility?.value ?? 68, color: GREEN },
+      { label: 'Impulsivity', descriptor: riskLabel(risk), value: risk, color: AMBER },
+    ],
+  });
+}
+
+function updateBigFive(data) {
+  const keys = { o:'Openness', c:'Conscientiousness', e:'Extraversion', a:'Agreeableness', n:'Neuroticism' };
+  Object.entries(keys).forEach(([k, label]) => {
+    const val = data[label]; if (val == null) return;
+    const fill = document.getElementById('bf-' + k);
+    if (fill) fill.style.width = val + '%';
+    setEl('bfv-' + k, val);
+  });
+}
+
+function updateMotivation(data) {
+  setEl('motivScore', data.score);
+  if (motivRing) { motivRing.data.datasets[0].data = [data.score, 100-data.score]; motivRing.update('none'); }
+  const list = document.getElementById('motivList');
+  if (list && data.drivers) {
+    list.innerHTML = data.drivers.map(d => `
+      <div class="val-row">
+        <span class="val-dot val-dot-purple"></span>
+        <span class="val-label">${d.label}</span>
+        <span class="val-pct">${d.value}%</span>
+      </div>`).join('');
+  }
+}
+
+function updateValues(data) {
+  setEl('valuesScore', data.score);
+  if (valuesRing) { valuesRing.data.datasets[0].data = [data.score, 100-data.score]; valuesRing.update('none'); }
+  const list = document.getElementById('valuesList');
+  if (list && data.items) {
+    list.innerHTML = data.items.map(d => `
+      <div class="val-row">
+        <span class="val-dot val-dot-cyan"></span>
+        <span class="val-label">${d.label}</span>
+        <span class="val-pct">${d.value}%</span>
+      </div>`).join('');
+  }
+}
+
+function updateRadar(data) {
+  if (!data) return;
+  radarChart.data.datasets[0].data = data.individual;
+  radarChart.data.datasets[1].data = data.population;
+  radarChart.update('none');
+}
+
+function updateEmotional(data) {
+  if (!data) return;
+  emotionalChart.data.labels = data.labels;
+  emotionalChart.data.datasets[0].data = data.positive;
+  emotionalChart.data.datasets[1].data = data.negative;
+  emotionalChart.data.datasets[2].data = data.stability;
+  emotionalChart.update('none');
+}
+
+function updateCognitive(data) {
+  if (!data) return;
+  setEl('cogScore', data.overall);
+  if (cogRing) { cogRing.data.datasets[0].data = [data.overall, 100-data.overall]; cogRing.update('none'); }
+  const list = document.getElementById('cogList');
+  if (list && data.items) {
+    list.innerHTML = data.items.map(d => `
+      <div class="cog-item">
+        <div class="cog-item-head">
+          <span class="cog-item-label">${d.label}</span>
+          <span class="cog-item-value">${d.value}</span>
+        </div>
+        <div class="cog-track">
+          <div class="cog-fill" data-width="${d.value}"></div>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.cog-fill').forEach(fill => {
+      const width = Number(fill.dataset.width || 0);
+      fill.style.width = `${Math.max(0, Math.min(100, width))}%`;
+    });
+  }
+}
+
+function updateStress(data) {
+  if (!data || !data.length) return;
+  const avg = Math.round(data.reduce((s,d)=>s+d.value,0)/data.length);
+  setEl('stressScore', avg);
+  if (stressRing) { stressRing.data.datasets[0].data = [avg, 100-avg]; stressRing.update('none'); }
+  const list = document.getElementById('stressList');
+  if (list) {
+    list.innerHTML = data.map(d => `
+      <div class="stress-row">
+        <div class="stress-header"><span class="stress-label">${d.label}</span><span class="stress-val">${d.value}%</span></div>
+        <div class="stress-track"><div class="stress-fill" data-width="${d.value}"></div></div>
+      </div>`).join('');
+    list.querySelectorAll('.stress-fill').forEach(fill => {
+      const width = Number(fill.dataset.width || 0);
+      fill.style.width = `${Math.max(0, Math.min(100, width))}%`;
+    });
+  }
+}
+
+function updateAnomalies(data) {
+  if (!data) return;
+  setEl('anomalyCount', data.count);
+  const list = document.getElementById('anomalyList');
+  if (list) list.innerHTML = data.items.map(i => `<div class="anomaly-item">${i}</div>`).join('');
+  const mirrorActive = data.count > 2 || (data.items || []).some(item => /mirror|copy|impersonation|cloned/i.test(item));
+  setEl('msMirror', mirrorActive ? 'Awake' : 'Dormant');
+}
+
+function updateSystem(data) {
+  if (!data) return;
+  const totalProfiles = Number(data.total_profiles || 0);
+  const analysisQueue = Number(data.analysis_queue || 0);
+  const assessedProfiles = Number(data.assessed_profiles || Math.max(0, totalProfiles - analysisQueue));
+  const highRiskProfiles = Number(data.high_risk_profiles || 0);
+  const dataPoints = Number(data.data_points || data.total_data_points || (totalProfiles * 560));
+
+  setEl('ss-total', totalProfiles.toLocaleString());
+  setEl('ss-queue', analysisQueue.toLocaleString());
+  setEl('ss-sync', data.last_sync);
+  setEl('ss-integrity', data.data_integrity);
+  setEl('ss-models', data.ai_models_active);
+  setEl('ss-conf', data.avg_confidence + '%');
+  setHtml('ss-assessed', `${assessedProfiles.toLocaleString()} <span class="stat-delta stat-delta-sm">+${Math.max(1, Math.round((analysisQueue / Math.max(totalProfiles, 1)) * 100 * 1.6))}%</span>`);
+  setEl('ss-risk', compactNumber(highRiskProfiles || Number(document.getElementById('ss-risk')?.textContent?.replace(/[^\d.]/g, '')) || 0));
+  setEl('ss-dp', compactNumber(dataPoints));
+
+  // update mini chart
+  miniChart.data.datasets[0].data.shift();
+  miniChart.data.datasets[0].data.push(30 + Math.random() * 50);
+  miniChart.update('none');
+
+  const queue = analysisQueue;
+  setEl('msAccess', queue > 4 ? 'Contested' : 'Partial');
+  setEl('chipVeil', queue > 4 ? 'Prismatic Veil: stressed' : 'Prismatic Veil: hidden');
+}
+
+function updateTendencies(data) {
+  const list = document.getElementById('tendList');
+  if (!list) return;
+  const fallbackItems = [
+    { label: 'Decision Making', left: 'Strategic',  right: '',          value: 78, color: PURPLE },
+    { label: 'Risk Tolerance',  left: 'Moderate',   right: '',          value: 52, color: CYAN },
+    { label: 'Stress Response', left: 'Resilient',  right: '',          value: 71, color: GREEN },
+    { label: 'Social Orientation', left: 'Ambient', right: '',          value: 44, color: CYAN },
+    { label: 'Adaptability',    left: 'High',       right: '',          value: 80, color: GREEN },
+    { label: 'Impulsivity',     left: 'Low',        right: '',          value: 22, color: AMBER },
+  ];
+
+  const liveItems = Array.isArray(data?.items)
+    ? data.items.map(item => ({
+      label: item.label || 'Signal',
+      left: item.descriptor || item.left || gradeLabel(Number(item.value) || 0),
+      value: Math.max(0, Math.min(100, Number(item.value) || 0)),
+      color: item.color || PURPLE,
+    }))
+    : [];
+
+  const items = liveItems.length ? liveItems : fallbackItems;
+
+  list.innerHTML = items.map(it => `
+    <div class="tend-row">
+      <span class="tend-label">${it.label}</span>
+      <div class="tend-bar-wrap"><div class="tend-bar-fill" data-width="${it.value}" data-color="${it.color}"></div></div>
+      <span class="tend-end">${it.left}</span>
+    </div>`).join('');
+  list.querySelectorAll('.tend-bar-fill').forEach(fill => {
+    const width = Number(fill.dataset.width || 0);
+    fill.style.width = `${Math.max(0, Math.min(100, width))}%`;
+    if (fill.dataset.color) {
+      fill.style.background = fill.dataset.color;
+    }
+  });
+}
+
+function updateProfile(data) {
+  if (!data) return;
+  const name = data.name || data.displayName || 'Character Node';
+  const title = data.title || data.archetype || 'MetaChromatic Character';
+  setEl('detailId', data.id || data.slug || 'character');
+  setEl('detailName', name);
+  setEl('detailTitle', title);
+  setEl('detailRank', data.rank || 'A');
+  setEl('dmi-age', data.age || '—');
+  setEl('dmi-gender', data.gender || '—');
+  setEl('dmi-rank', data.rank || 'A');
+  setEl('di-name', name);
+  setEl('di-alias', title);
+  setEl('di-summary', data.summary);
+  const av = document.getElementById('detailAvatar');
+  if (av) { av.textContent = name[0] || '?'; av.style.background = `linear-gradient(135deg, ${data.avatar_color || PURPLE}88, ${data.avatar_color || PURPLE})`; }
+  const bg = document.querySelector('.detail-hero-bg');
+  if (bg) bg.style.background = `radial-gradient(circle at 70% 40%, ${data.avatar_color || PURPLE} 0%, transparent 60%)`;
+
+  setEl('stagePersonaName', name || 'Persona Node');
+  setEl('piRole', title || 'Profile Subject');
+  setEl('stageMood', deriveMoodFromSummary(data.summary));
+  setEl('chipEmotion', `Emotion: ${deriveEmotionToken(data.summary)}`);
+  setEl('piFragments', `${Math.max(1, Math.min(6, Math.round((data.age || 28) / 8)))} unlocked`);
+}
+
+function profileFromCharacterNode(char) {
+  if (typeof characterToProfile === 'function') return characterToProfile(char, {});
+  const seed = String(char.slug || '').split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  return {
+    name: char.displayName || char.slug || 'Character Node',
+    title: char.title || char.archetype || 'MetaChromatic Character',
+    id: char.slug || 'character',
+    avatar_color: char.avatarColor || PURPLE,
+    gender: char.metadata?.gender || 'F',
+    age: char.metadata?.age || (24 + (seed % 14)),
+    rank: char.archetype || (char.imageCount > 1000 ? 'S' : 'A'),
+    summary: char.personality || 'MetaChromatic character node with live metadata.',
+  };
+}
+
+function renderCharacterTags(char) {
+  const wrap = document.getElementById('characterTags');
+  if (!wrap) return;
+  const tags = [
+    { value: char.archetype || char.title, cls: 'purple' },
+    { value: char.tone, cls: 'cyan' },
+    { value: char.voicePreset ? `Voice ${char.voicePreset}` : '', cls: '' },
+    { value: char.ethnicity || char.nationality, cls: '' },
+    { value: char.suggestedArc, cls: 'purple' },
+    { value: (char.metadataSources || []).join(' + '), cls: 'cyan' },
+  ].filter(t => t.value);
+
+  wrap.innerHTML = tags.length
+    ? tags.map(t => `<span class="tag ${t.cls}">${escapeHtml(t.value)}</span>`).join('')
+    : '<span class="tag">No character metadata</span>';
+}
+
+function renderCharacterMeta(char) {
+  const list = document.getElementById('characterMetaList');
+  if (!list) return;
+  const rows = [
+    ['Slug', char.slug],
+    ['Sources', (char.metadataSources || []).join(' + ')],
+    ['Voice', char.voicePreset || char.voiceProvider],
+    ['Tone', char.tone],
+    ['Archetype', char.archetype || char.title],
+    ['Origin', char.ethnicity || char.nationality],
+    ['Profession', char.profession],
+    ['Taxonomy', char.taxonomyLevel ? `L${char.taxonomyLevel}` : ''],
+    ['LoRA hint', char.loraNameHint],
+    ['Images', char.imageCount ? char.imageCount.toLocaleString() : '0'],
+  ].filter(([_, value]) => value !== null && value !== undefined && value !== '');
+
+  list.innerHTML = rows.map(([key, value]) => `
+    <div class="character-meta-row">
+      <span class="character-meta-key">${escapeHtml(key)}</span>
+      <span class="character-meta-value" title="${escapeHtml(value)}">${escapeHtml(value)}</span>
+    </div>
+  `).join('');
+}
+
+function updateCharacterDetail(char) {
+  if (!char) return;
+  const profile = profileFromCharacterNode(char);
+  updateProfile(profile);
+  setEl('di-occupation', char.profession || char.title || char.archetype || 'Character Node');
+  setEl('di-clearance', char.taxonomyLevel ? `Level ${char.taxonomyLevel}` : 'Metadata');
+  setEl('di-status', 'Live');
+  setEl('di-cohort', (char.metadataSources || []).join(' + ') || char.source || 'MetaChromatic');
+  setEl('piVoice', char.voicePreset || char.voiceProvider || 'Mapped');
+  renderCharacterTags(char);
+  renderCharacterMeta(char);
+  updateArchetypeTags(String(char.archetype || char.title || 'THE STRATEGIST').toUpperCase());
+}
+
+function selectCharacterNode(slug) {
+  const char = currentCharacters.find(c => c.slug === slug);
+  if (!char) return;
+  activeCharacterSlug = slug;
+  document.querySelectorAll('.character-node-card').forEach(card => {
+    card.classList.toggle('active', card.dataset.slug === slug);
+  });
+  updateCharacterDetail(char);
+  appendAction(`Character node selected: ${char.displayName || slug}`);
+}
+
+function updateCharacters(data) {
+  currentCharacters = Array.isArray(data) ? data.filter(Boolean) : [];
+  window.__prismDashboardCharacters = currentCharacters;
+
+  setEl('characterCount', `${currentCharacters.length} Node${currentCharacters.length === 1 ? '' : 's'}`);
+  const sources = [...new Set(currentCharacters.flatMap(c => c.metadataSources || c.source || []))];
+  setEl('characterSourceLine', sources.length ? `Live sources: ${sources.join(' + ')}` : 'No live character source connected');
+
+  const roster = document.getElementById('characterRoster');
+  if (roster) {
+    const visible = currentCharacters.slice(0, 8);
+    roster.innerHTML = visible.length ? visible.map(char => {
+      const chips = [
+        char.archetype || char.title,
+        char.tone,
+        char.voicePreset,
+        char.imageCount ? `${char.imageCount.toLocaleString()} images` : '',
+      ].filter(Boolean).slice(0, 4);
+      return `
+        <button type="button" class="character-node-card" data-slug="${escapeHtml(char.slug)}">
+          <div class="character-node-top">
+            <div class="character-node-avatar dynamic-avatar" data-color="${escapeHtml(char.avatarColor || PURPLE)}">${escapeHtml((char.displayName || char.slug || '?')[0])}</div>
+            <div class="character-node-title">
+              <div class="character-node-name">${escapeHtml(char.displayName || char.slug)}</div>
+              <div class="character-node-slug">${escapeHtml(char.slug)}</div>
+            </div>
+          </div>
+          <div class="character-node-line">${escapeHtml(char.personality || char.profession || 'MetaChromatic character metadata')}</div>
+          <div class="character-node-meta">${chips.map(chip => `<span class="character-node-chip">${escapeHtml(chip)}</span>`).join('')}</div>
+        </button>`;
+    }).join('') : `
+      <div class="character-node-card">
+        <div class="character-node-line">No characters found from Seed Scout, Storyboard, or Voice catalog endpoints.</div>
+      </div>`;
+
+    roster.querySelectorAll('.character-node-card[data-slug]').forEach(card => {
+      card.addEventListener('click', () => selectCharacterNode(card.dataset.slug));
+    });
+    roster.querySelectorAll('.dynamic-avatar').forEach(avatar => {
+      const color = avatar.dataset.color || PURPLE;
+      avatar.style.background = `linear-gradient(135deg, ${color}88, ${color})`;
+    });
+  }
+
+  if (currentCharacters.length > 0) {
+    const nextSlug = currentCharacters.some(c => c.slug === activeCharacterSlug)
+      ? activeCharacterSlug
+      : currentCharacters[0].slug;
+    selectCharacterNode(nextSlug);
+  }
+}
+
+function updateArchetypeTags(archetypeName) {
+  const tags = document.getElementById('archetypeTags');
+  if (!tags) return;
+  const pool = { 'THE STRATEGIST': ['Analytical','Independent','Primary','Focused'],
+                 'THE CATALYST':   ['Energetic','Adaptive','Creative','Bold'],
+                 'THE EMPATH':     ['Empathic','Ethical','Cohesive','Stable'] };
+  const t = pool[archetypeName] || pool['THE STRATEGIST'];
+  const toneClass = ['archetype-tag-purple', 'archetype-tag-cyan', 'archetype-tag-green', 'archetype-tag-amber'];
+  tags.innerHTML = t.map((tag, i) => `<span class="archetype-tag ${toneClass[i] || 'archetype-tag-purple'}">${tag}</span>`).join('');
+}
+
+// ─── Connector wiring ─────────────────────────────────────────────────────────
+
+let currentConnector = ConnectorRegistry.get('primary');
+let uxMode = 'control';
+let stageVisible = false;
+let stageLayout = 'split';
+
+function deriveEmotionToken(summary = '') {
+  const text = String(summary).toLowerCase();
+  if (/guard|caut|risk/.test(text)) return 'guarded';
+  if (/creative|explor|curious/.test(text)) return 'curious';
+  if (/focused|strategic|discipl/.test(text)) return 'focused';
+  return 'calm';
+}
+
+function deriveMoodFromSummary(summary = '') {
+  const token = deriveEmotionToken(summary);
+  if (token === 'guarded') return 'Playfully guarded';
+  if (token === 'curious') return 'Curious and adaptive';
+  if (token === 'focused') return 'Focused and calculating';
+  return 'Measured and attentive';
+}
+
+function appendAction(text) {
+  const transcript = document.getElementById('stageTranscript');
+  if (!transcript) return;
+  const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const line = document.createElement('div');
+  line.className = 'transcript-line';
+  line.innerHTML = `<strong>${ts}</strong> ${text}`;
+  transcript.prepend(line);
+}
+
+function classifyIntent(text) {
+  const t = text.toLowerCase();
+  if (/why|who|explain|truth|hide|secret/.test(t)) return 'Investigation';
+  if (/help|save|support|trust|care/.test(t)) return 'Empathy';
+  if (/mission|target|objective|route|plan/.test(t)) return 'Mission';
+  if (/attack|threat|force|break/.test(t)) return 'Confrontation';
+  return 'Dialogue';
+}
+
+function submitConversation() {
+  const input = document.getElementById('conversationInput');
+  if (!input) return;
+  const msg = input.value.trim();
+  if (!msg) return;
+  const intent = classifyIntent(msg);
+  appendAction(`Player (${intent}): ${msg}`);
+  setEl('msVeil', intent === 'Investigation' ? 'Fracturing' : 'Hidden');
+  if (intent === 'Empathy') {
+    const cur = Number((document.getElementById('piTrust')?.textContent || '64').replace('%', ''));
+    setEl('piTrust', `${Math.min(99, cur + 2)}%`);
+  }
+  input.value = '';
+}
+
+function applyExperienceLayout() {
+  const shell = document.getElementById('experienceShell');
+  const stage = document.getElementById('liveStagePanel');
+  const layoutBtn = document.getElementById('stageLayoutBtn');
+  if (!shell || !stage || !layoutBtn) return;
+
+  stage.classList.toggle('visible', stageVisible);
+  shell.classList.toggle('stage-full', stageVisible && stageLayout === 'full');
+  layoutBtn.textContent = stageLayout === 'full' ? 'Full' : 'Split';
+}
+
+function setUxMode(mode) {
+  uxMode = mode;
+  document.body.classList.remove('ux-meeting', 'ux-game', 'ux-control');
+  document.body.classList.add(`ux-${mode}`);
+
+  document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+  if (mode === 'meeting') document.getElementById('modeMeeting')?.classList.add('active');
+  if (mode === 'game') document.getElementById('modeGame')?.classList.add('active');
+  if (mode === 'control') document.getElementById('modeControl')?.classList.add('active');
+
+  if (mode === 'meeting') {
+    stageVisible = true;
+    stageLayout = 'split';
+    appendAction('Meeting mode engaged');
+  } else if (mode === 'game') {
+    stageVisible = true;
+    stageLayout = 'full';
+    appendAction('Game mode engaged');
+  } else {
+    stageVisible = false;
+    stageLayout = 'split';
+    appendAction('Control room mode engaged');
+  }
+  applyExperienceLayout();
+}
+
+function toggleStagePanel() {
+  stageVisible = !stageVisible;
+  applyExperienceLayout();
+}
+
+function toggleStageLayout() {
+  if (!stageVisible) {
+    stageVisible = true;
+  }
+  stageLayout = stageLayout === 'split' ? 'full' : 'split';
+  applyExperienceLayout();
+}
+
+function resolveBackendOverrides() {
+  return window.__POLYCHROMATIC_BACKEND_URLS__ || window.__PRISM_BACKEND_URLS__ || {};
+}
+
+function createConnector(source, extra = {}) {
+  return new DataConnector(Object.assign({
+    source,
+    backendServiceUrls: resolveBackendOverrides(),
+  }, extra));
+}
+
+const initialConfig = currentConnector && currentConnector.config ? currentConnector.config : {};
+ConnectorRegistry.register('primary', createConnector(initialConfig.source || 'prism_local', initialConfig));
+currentConnector = ConnectorRegistry.get('primary');
+
+function updateMetadata(data) {
+  if (!data) return;
+  window.__prismDashboardMetadata = data;
+  const badge = document.getElementById('connBadge');
+  if (!badge) return;
+  const statuses = data.service_status || {};
+  const statusSummary = Object.entries(statuses)
+    .map(([service, state]) => `${service}:${state}`)
+    .join(' | ');
+  const contract = data.connector_contract || 'connector:unknown';
+  const characterSummary = data.character_count != null
+    ? `\ncharacters:${data.character_count} (${(data.character_sources || []).join(' + ') || 'none'})`
+    : '';
+  badge.title = `${contract}${statusSummary ? `\n${statusSummary}` : ''}${characterSummary}`;
+}
+
+function wireConnector(connector) {
+  connector.subscribe('metrics',    updateMetrics);
+  connector.subscribe('big_five',   updateBigFive);
+  connector.subscribe('motivation', updateMotivation);
+  connector.subscribe('values',     updateValues);
+  connector.subscribe('radar',      updateRadar);
+  connector.subscribe('emotional',  updateEmotional);
+  connector.subscribe('cognitive',  updateCognitive);
+  connector.subscribe('stress',     updateStress);
+  connector.subscribe('anomalies',  updateAnomalies);
+  connector.subscribe('tendencies', updateTendencies);
+  connector.subscribe('system',     updateSystem);
+  connector.subscribe('characters', updateCharacters);
+  connector.subscribe('profile',    updateProfile);
+  connector.subscribe('metadata',   updateMetadata);
+  connector.subscribe('status', (s) => {
+    const badge = document.getElementById('connBadge');
+    const label = document.getElementById('connLabel');
+    if (badge && label) {
+      const isLive = s.source !== 'mock' && s.connected;
+      badge.className = 'conn-badge ' + (isLive ? 'live' : 'mock');
+      badge.querySelector('.conn-dot').className = 'conn-dot ' + (isLive ? 'live' : '');
+      label.textContent = s.source === 'prism_local'
+        ? 'POLYCHROMATIC'
+        : (s.source ? s.source.toUpperCase() : 'OFFLINE');
+    }
+  });
+  connector.subscribe('error', (e) => { if (e.fallback) console.warn('Connector fell back to mock:', e.message); });
+}
+
+wireConnector(currentConnector);
+updateTendencies();
+updateArchetypeTags('THE STRATEGIST');
+currentConnector.connect();
+applyExperienceLayout();
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const DASHBOARD_PAGE_TARGETS = {
+  overview: {
+    shell: '/#/dashboard',
+    local: './System Dashboard.html#overview',
+  },
+  personas: {
+    shell: '/#/profile',
+    local: '../../design/social-engine/Prism Dashboard.html',
+  },
+  analysis: {
+    shell: '/#/dashboard/workspace',
+    local: './System Dashboard.html#analysis',
+  },
+  assessments: {
+    shell: '/#/review',
+    local: '../../design/operational-analytics.html',
+  },
+  comparisons: {
+    shell: '/#/telemetry/workspace',
+    local: '../../design/metachrome-performance-artifact.html',
+  },
+  segments: {
+    shell: '/#/tag',
+    local: '../../design/ol-ops-dashboard.html',
+  },
+  models: {
+    shell: '/#/comfyui',
+    local: '../../codex-ccs/index.html',
+  },
+  reports: {
+    shell: '/#/export',
+    local: '../../design/metachrome-ultimate-dashboard.html',
+  },
+  'data-explorer': {
+    shell: '/#/scraper',
+    local: '../../design/index.html',
+  },
+  settings: {
+    shell: '/#/settings',
+    local: './System Dashboard.html#settings',
+  },
+};
+
+function isShellRoutingContext() {
+  if (typeof window === 'undefined') return false;
+  if (window.__PRISM_NAV_CONTEXT__ === 'shell') return true;
+  const href = String(window.location.href || '');
+  if (href.includes('/#/')) return true;
+  return false;
+}
+
+function resolveNavigationTarget(pageId) {
+  const map = DASHBOARD_PAGE_TARGETS[pageId];
+  if (!map) return '';
+  if (isShellRoutingContext() && map.shell) return map.shell;
+  return map.local || map.shell || '';
+}
+
+function openDashboardPage(el, pageId) {
+  setNav(el);
+  const target = resolveNavigationTarget(pageId);
+  if (!target) return;
+  const current = window.location.pathname || '';
+  const isSelf = target.startsWith('./System Dashboard.html') && /System Dashboard\.html$/i.test(current);
+  if (isSelf) {
+    const hash = target.includes('#') ? target.slice(target.indexOf('#')) : '';
+    if (hash) window.location.hash = hash;
+    return;
+  }
+  window.location.href = target;
+}
+
+function setDetailTab(el, tab) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleConnector() {
+  const btn = document.getElementById('connBtn');
+  const badge = document.getElementById('connBadge');
+  if (currentConnector.config.source !== 'mock') {
+    currentConnector.disconnect();
+    ConnectorRegistry.register('primary', createConnector('mock', { mockInterval: 4000 }));
+    currentConnector = ConnectorRegistry.get('primary');
+    wireConnector(currentConnector);
+    currentConnector.connect();
+    btn.textContent = 'Connect Live';
+    badge.classList.remove('live'); badge.classList.add('mock');
+  } else {
+    // Live mode: pull telemetry from local Prism services
+    currentConnector.disconnect();
+    ConnectorRegistry.register('primary', createConnector('prism_local', { pollInterval: 2000, mockInterval: 2000 }));
+    currentConnector = ConnectorRegistry.get('primary');
+    wireConnector(currentConnector);
+    currentConnector.connect();
+    btn.textContent = 'Disconnect';
+    badge.classList.remove('mock'); badge.classList.add('live');
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && e.target && e.target.id === 'conversationInput') {
+    submitConversation();
+  }
+});
+
+// ─── Tweak hooks ──────────────────────────────────────────────────────────────
+
+window._switchConnector = function(source) {
+  currentConnector.disconnect();
+  ConnectorRegistry.register('primary', createConnector(source, { mockInterval: 3000 }));
+  currentConnector = ConnectorRegistry.get('primary');
+  wireConnector(currentConnector);
+  currentConnector.connect();
+};
+
+window._setUpdateSpeed = function(ms) {
+  currentConnector.disconnect();
+  const cfg = Object.assign({}, currentConnector.config, {
+    backendServiceUrls: resolveBackendOverrides(),
+    mockInterval: ms,
+    pollInterval: ms,
+  });
+  ConnectorRegistry.register('primary', new DataConnector(cfg));
+  currentConnector = ConnectorRegistry.get('primary');
+  wireConnector(currentConnector);
+  currentConnector.connect();
+};
+</script>
+</body>
+</html>

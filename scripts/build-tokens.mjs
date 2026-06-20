@@ -1,0 +1,219 @@
+#!/usr/bin/env node
+/**
+ * build-tokens.mjs — Chromatic Design Studios token pipeline.
+ *
+ * Single source of truth: 02_design_tokens/tokens.*.json.
+ * Emits, for consumption by apps/web (and any Tailwind consumer):
+ *   - apps/web/src/styles/chromatic-tokens.css  (CSS custom properties)
+ *   - apps/web/src/styles/chromatic-theme.ts     (Tailwind theme.extend object)
+ *
+ * Design Law #1 (Token-Driven): every visual value references a token.
+ * Run: node scripts/build-tokens.mjs   (or: npm run tokens)
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const TOKENS_DIR = path.join(ROOT, '02_design_tokens');
+const OUT_DIR = path.join(ROOT, 'apps', 'web', 'src', 'styles');
+
+const read = (f) => JSON.parse(fs.readFileSync(path.join(TOKENS_DIR, f), 'utf8'));
+// Optional light-mode override file (emits a `.light { }` block). Absent = dark only.
+const readOptional = (f) => {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(TOKENS_DIR, f), 'utf8'));
+  } catch {
+    return null;
+  }
+};
+
+// Flatten a nested object into kebab CSS vars + collect a parallel tailwind map.
+function walk(obj, prefix, onLeaf) {
+  for (const [k, v] of Object.entries(obj)) {
+    const key = `${prefix}-${k}`.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    if (v && typeof v === 'object' && !Array.isArray(v)) walk(v, key, onLeaf);
+    else onLeaf(key, v);
+  }
+}
+
+/**
+ * Build the Tailwind `theme.extend` object and the CSS-variable block from the
+ * design-token JSON. Pure (no file writes) so other tooling — e.g.
+ * scripts/build-db.mjs — can import the SAME generated Tailwind keys instead of
+ * re-deriving them and drifting. The CLI entrypoint (main-guard below) writes
+ * the emitted artifacts to apps/web/src/styles/.
+ */
+export function buildTheme() {
+  const colors = read('tokens.colors.json');
+  const spacing = read('tokens.spacing.json');
+  const typography = read('tokens.typography.json');
+  const motion = read('tokens.motion.json');
+  const glow = read('tokens.glow.json');
+
+  const cssVars = [];
+  const pushVar = (name, value) => cssVars.push(`  --${name}: ${value};`);
+
+  // ---- COLORS -----------------------------------------------------------------
+// background, surface, primary.*, accent.*, text.*, semantic.*, border.*,
+// glow.* (rgba), gradient.* (strings).
+const twColors = {};
+for (const group of ['background', 'surface', 'text', 'border', 'semantic', 'glow']) {
+  twColors[group] = {};
+  const prefix = `color-${group}`;
+  walk(colors[group], prefix, (name, val) => {
+    pushVar(name, val);
+    // Tailwind key = the full nested path under the group (kebab), NOT just the
+    // last segment — otherwise sibling tokens like successGlow/warningGlow all
+    // collapse to `glow` and collide (only the last would survive).
+    const key = name.slice(prefix.length + 1);
+    twColors[group][key] = `var(--${name})`;
+  });
+}
+for (const scale of ['primary', 'accent']) {
+  twColors[scale] = {};
+  for (const [step, val] of Object.entries(colors[scale])) {
+    pushVar(`color-${scale}-${step}`, val);
+    twColors[scale][step] = `var(--color-${scale}-${step})`;
+  }
+}
+const twGradient = {};
+for (const [k, val] of Object.entries(colors.gradient)) {
+  pushVar(`gradient-${k}`, val);
+  // keyed as `gradient-<k>` so the Tailwind utility reads bg-gradient-hero etc.
+  twGradient[`gradient-${k}`] = `var(--gradient-${k})`;
+}
+
+// ---- SPACING + RADIUS -------------------------------------------------------
+const twSpacing = {};
+for (const [k, val] of Object.entries(spacing.scale)) {
+  pushVar(`space-${k}`, val);
+  twSpacing[k] = `var(--space-${k})`;
+}
+const twRadius = {};
+for (const [k, val] of Object.entries(spacing.semantic.radius)) {
+  pushVar(`radius-${k}`, val);
+  twRadius[k] = `var(--radius-${k})`;
+}
+
+// ---- TYPOGRAPHY -------------------------------------------------------------
+pushVar('font-heading', `'${typography.family.heading}', system-ui, sans-serif`);
+pushVar('font-body', `'${typography.family.body}', system-ui, sans-serif`);
+pushVar('font-mono', `'${typography.family.mono}', ui-monospace, monospace`);
+const twFontFamily = {
+  heading: ['var(--font-heading)'],
+  body: ['var(--font-body)'],
+  sans: ['var(--font-body)'],
+  mono: ['var(--font-mono)'],
+};
+const twFontSize = {};
+for (const [k, v] of Object.entries(typography.scale)) {
+  pushVar(`text-${k}`, v.rem);
+  twFontSize[k] = [v.rem, { lineHeight: String(v.lineHeight), letterSpacing: v.letterSpacing }];
+}
+// Role utilities (text-label, text-display, text-h1, …). Roles reference scale +
+// lineHeight/letterSpacing/weight token keys; resolve them so `text-<role>` emits
+// a complete utility. Role keys (display/h1/label/…) never collide with scale keys.
+for (const [k, r] of Object.entries(typography.role)) {
+  const sc = typography.scale[r.size];
+  if (!sc) continue;
+  twFontSize[k] = [sc.rem, {
+    lineHeight: String(typography.lineHeight[r.lineHeight] ?? sc.lineHeight),
+    letterSpacing: typography.letterSpacing[r.letterSpacing] ?? sc.letterSpacing,
+    fontWeight: String(typography.weight[r.weight] ?? 400),
+  }];
+}
+const twFontWeight = {};
+for (const [k, v] of Object.entries(typography.weight)) twFontWeight[k] = String(v);
+
+// ---- MOTION -----------------------------------------------------------------
+const twDuration = {};
+for (const [k, val] of Object.entries(motion.duration)) {
+  pushVar(`duration-${k}`, val);
+  twDuration[k] = val;
+}
+const twEasing = {};
+for (const [k, val] of Object.entries(motion.easing)) {
+  pushVar(`ease-${k}`, val);
+  twEasing[k] = val;
+}
+
+// ---- GLOW (box-shadow presets) ---------------------------------------------
+const twBoxShadow = {};
+for (const [k, val] of Object.entries(glow.preset)) {
+  pushVar(`glow-${k}`, val);
+  twBoxShadow[`glow-${k}`] = `var(--glow-${k})`;
+}
+for (const [k, val] of Object.entries(glow.intensity)) {
+  pushVar(`glow-intensity-${k}`, val);
+}
+
+// ---- LIGHT MODE OVERRIDES (.light) -----------------------------------------
+// Emits only the vars present in tokens.colors.light.json — these override the
+// :root (dark) values when the `.light` class is set on <html>. Hue scales
+// (primary.*, accent.*) are intentionally NOT redefined; they are shared.
+const light = readOptional('tokens.colors.light.json');
+const lightVars = [];
+if (light) {
+  const pushLight = (name, value) => lightVars.push(`  --${name}: ${value};`);
+  for (const group of ['background', 'surface', 'text', 'border', 'glow']) {
+    if (!light[group]) continue;
+    walk(light[group], `color-${group}`, (name, val) => pushLight(name, val));
+  }
+  if (light.gradient) {
+    for (const [k, val] of Object.entries(light.gradient)) pushLight(`gradient-${k}`, val);
+  }
+}
+
+// ---- WRITE CSS --------------------------------------------------------------
+const lightBlock = lightVars.length
+  ? `\n/* Light-mode overrides — active when <html class="light">. */\n.light {\n${lightVars.join('\n')}\n}\n`
+  : '';
+const cssOut = `/* AUTO-GENERATED by scripts/build-tokens.mjs — do not edit by hand.
+ * Source of truth: 02_design_tokens/tokens.*.json
+ */
+:root {
+${cssVars.join('\n')}
+}
+${lightBlock}`;
+
+  // ---- TAILWIND THEME -------------------------------------------------------
+  const theme = {
+    colors: { ...twColors, transparent: 'transparent', current: 'currentColor' },
+    spacing: twSpacing,
+    borderRadius: twRadius,
+    fontFamily: twFontFamily,
+    fontSize: twFontSize,
+    fontWeight: twFontWeight,
+    transitionDuration: twDuration,
+    transitionTimingFunction: twEasing,
+    boxShadow: twBoxShadow,
+    backgroundImage: twGradient,
+  };
+
+  return { theme, cssOut, cssVars };
+}
+
+// ---- CLI ENTRYPOINT ---------------------------------------------------------
+// Only write files when run directly (`node scripts/build-tokens.mjs`); imports
+// (e.g. build-db.mjs) get the pure theme via buildTheme() with no side effects.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { theme, cssOut, cssVars } = buildTheme();
+  const tsOut = `// AUTO-GENERATED by scripts/build-tokens.mjs — do not edit by hand.
+// Source of truth: 02_design_tokens/tokens.*.json
+import type { Config } from 'tailwindcss';
+
+export const chromaticTheme: Config['theme'] = {
+  extend: ${JSON.stringify(theme, null, 2)},
+};
+
+export default chromaticTheme;
+`;
+
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(path.join(OUT_DIR, 'chromatic-tokens.css'), cssOut);
+  fs.writeFileSync(path.join(OUT_DIR, 'chromatic-theme.ts'), tsOut);
+
+  console.log(`[build-tokens] wrote ${cssVars.length} CSS vars + Tailwind theme to apps/web/src/styles/`);
+}

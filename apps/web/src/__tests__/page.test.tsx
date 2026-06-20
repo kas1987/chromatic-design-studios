@@ -25,18 +25,20 @@ describe('Home page', () => {
     expect(screen.getByText(/Orchestrate models, prompts, agents/i)).toBeInTheDocument()
   })
 
-  it('renders both CTA buttons', () => {
+  it('renders both hero CTAs', () => {
     render(<Home />)
-    expect(screen.getByRole('button', { name: /Open Dashboard/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Read the PDR/i })).toBeInTheDocument()
+    // Hero CTAs render via the Button component as links (href set).
+    expect(screen.getByRole('link', { name: /Open Dashboard/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Read the PDR/i })).toBeInTheDocument()
   })
 
   it('renders the navigation links', () => {
     render(<Home />)
-    expect(screen.getByRole('link', { name: /Dashboard/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Assets/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Prompts/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Agents/i })).toBeInTheDocument()
+    // Exact names avoid colliding with the "Open Dashboard" hero CTA.
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Assets' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Prompts' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Studio' })).toBeInTheDocument()
   })
 
   it('renders the nav inside a <header> element', () => {
@@ -55,14 +57,15 @@ describe('Home page', () => {
   it('renders a <footer> with correct version text', () => {
     render(<Home />)
     // Correct brand name (not "Chromactic")
-    expect(screen.getByText(/Chromatic Design Studios v0\.1\.0/)).toBeInTheDocument()
+    expect(screen.getByText(/Chromatic Design Studios v0\.4\.0/)).toBeInTheDocument()
   })
 
-  it('CTA buttons are button elements (not anchors)', () => {
+  it('hero CTAs render as anchors (Button with href)', () => {
     render(<Home />)
-    const dashboardBtn = screen.getByRole('button', { name: /Open Dashboard/i })
-    const pdrBtn = screen.getByRole('button', { name: /Read the PDR/i })
-    expect(dashboardBtn.tagName).toBe('BUTTON')
-    expect(pdrBtn.tagName).toBe('BUTTON')
+    // The Hero Button component renders an <a> when an href is supplied.
+    const dashboardCta = screen.getByRole('link', { name: /Open Dashboard/i })
+    const pdrCta = screen.getByRole('link', { name: /Read the PDR/i })
+    expect(dashboardCta.tagName).toBe('A')
+    expect(pdrCta.tagName).toBe('A')
   })
 })

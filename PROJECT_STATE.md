@@ -30,13 +30,17 @@ Implement Chromatic Design Studios scaffold per PDR v0.1.0.
   - ✅ `manifests/artifact_manifest.json`
   - ✅ `validation/VALIDATION_CHECKLIST.md`
   - ✅ `docker-compose.chromatic.yml`
-  - ⬜ `apps/web` npm install and build verification
-  - ⬜ shadcn/ui init in `apps/web`
-  - ⬜ Wire design tokens into `apps/web` Tailwind config
-  - ⬜ Complete acceptance criteria (CDS-001..CDS-010)
+  - ✅ `apps/web` npm install and build verification (next 15.5.19, build green 4/4 pages)
+  - ✅ Token pipeline `scripts/build-tokens.mjs` — CSS vars + Tailwind theme from `02_design_tokens/*.json`
+  - ✅ Wire design tokens into `apps/web` Tailwind config + globals (token-driven, no hardcoded values)
+  - ✅ Inter / IBM Plex Sans / IBM Plex Mono loaded per typography tokens
+  - ✅ `packages/ui` token-driven `Hero` component (impl of `03_components/hero-component.md`), live on home page
+  - ✅ `scripts/chromatic-token-studio.mjs` — bridge to frontend-family `visual-design` companion (live token tuning → write-back)
+  - ✅ Merged `deps/patch-react-next-2026-06-03` (next 15.5.19)
+  - ⬜ shadcn/ui init — DEFERRED: the bespoke token theme is the source of truth; shadcn's init would layer a conflicting theme. Revisit only if shadcn primitives are explicitly wanted.
 
 ## Version
-v0.2.0 — Scaffold Phase
+v0.3.0 — Token-Driven Web (Wave 4 build-out)
 
 ## Last Updated
-2026-05-27
+2026-06-05

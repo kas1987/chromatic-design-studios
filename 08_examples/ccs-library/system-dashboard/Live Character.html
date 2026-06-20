@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRISM — Live Character Intel</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="character-connector.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --c: #9b5cff; --c2: #00f0ff; --bg: #06030e; --panel: rgba(9,4,26,0.88);
+    --border: rgba(155,92,255,0.28); --text: #f0eeff; --muted: #6854a0;
+    --mono: 'JetBrains Mono', monospace; --sans: 'Space Grotesk', sans-serif;
+    --danger: #ff2d75; --warn: #ff8a1c; --good: #10d98a;
+  }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: var(--mono); cursor: none;
+    background-image: radial-gradient(ellipse at 20% 40%, rgba(123,47,255,0.14) 0%, transparent 55%), radial-gradient(ellipse at 80% 70%, rgba(0,240,255,0.07) 0%, transparent 45%); }
+
+  /* Three.js canvas */
+  #canvas3d { position: fixed; inset: 0; display: block; z-index: 0; }
+
+  /* CRT effect */
+  #crt { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    animation: crtFlicker 8s infinite; }
+  @keyframes crtFlicker { 0%,100%{opacity:1} 47%{opacity:1} 50%{opacity:0.96} 52%{opacity:1} 93%{opacity:1} 95%{opacity:0.94} 97%{opacity:1} }
+  #vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(6,3,14,0.85) 100%); }
+  #glitch { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.05s;
+    background: linear-gradient(90deg, rgba(155,92,255,0.08) 0%, transparent 30%, rgba(0,240,255,0.06) 70%, transparent 100%);
+    mix-blend-mode: screen; }
+
+  /* Cursor reticle */
+  #reticle { position: fixed; width: 28px; height: 28px; pointer-events: none; z-index: 100; transform: translate(-50%,-50%); }
+  #reticle::before, #reticle::after { content: ''; position: absolute; background: var(--c); }
+  #reticle::before { width: 1px; height: 100%; left: 50%; top: 0; }
+  #reticle::after  { height: 1px; width: 100%; top: 50%; left: 0; }
+  .reticle-ring { position: absolute; inset: 4px; border: 1px solid var(--c); border-radius: 50%; opacity: 0.6; animation: reticlePulse 2s infinite; }
+  @keyframes reticlePulse { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.15);opacity:1} }
+
+  /* Corner brackets */
+  .corner { position: fixed; width: 40px; height: 40px; z-index: 3; pointer-events: none; }
+  .corner::before, .corner::after { content: ''; position: absolute; background: var(--c); }
+  .corner::before { width: 2px; height: 100%; }
+  .corner::after  { height: 2px; width: 100%; }
+  .corner.tl { top: 14px; left: 14px; }
+  .corner.tl::before { top: 0; left: 0; }
+  .corner.tl::after  { top: 0; left: 0; }
+  .corner.tr { top: 14px; right: 14px; transform: scaleX(-1); }
+  .corner.tr::before { top: 0; left: 0; }
+  .corner.tr::after  { top: 0; left: 0; }
+  .corner.bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+  .corner.bl::before { top: 0; left: 0; }
+  .corner.bl::after  { top: 0; left: 0; }
+  .corner.br { bottom: 14px; right: 14px; transform: scale(-1); }
+  .corner.br::before { top: 0; left: 0; }
+  .corner.br::after  { top: 0; left: 0; }
+
+  /* HUD panels */
+  .hud { position: fixed; z-index: 5; background: rgba(9,4,26,0.88); border: 1px solid var(--border);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 30px rgba(155,92,255,0.12), inset 0 0 20px rgba(155,92,255,0.04); }
+  .hud-title { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 0 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+
+  /* Top bar */
+  #topBar { top: 14px; left: 14px; right: 14px; height: 44px; border-radius: 0;
+    display: flex; align-items: center; gap: 20px; padding: 0 16px;
+    background: rgba(9,4,26,0.94) !important; }
+  .top-logo { font-family: var(--sans); font-size: 15px; font-weight: 700; letter-spacing: 0.2em;
+    background: linear-gradient(90deg, #f0eeff, var(--c)); -webkit-background-clip: text; color: transparent; }
+  .top-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+  .char-id { font-size: 11px; color: var(--c); letter-spacing: 0.12em; }
+  .char-name { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--text); }
+  .char-callsign { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
+  .top-spacer { flex: 1; }
+  .status-badge { padding: 3px 10px; border-radius: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; border: 1px solid; }
+  .status-ACTIVE  { border-color: var(--good); color: var(--good); background: rgba(16,217,138,0.1); }
+  .status-FIELD   { border-color: var(--warn); color: var(--warn); background: rgba(245,158,11,0.1); }
+  .status-STANDBY { border-color: var(--muted); color: var(--muted); background: rgba(74,122,138,0.1); }
+
+  /* REC indicator */
+  .rec { display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--danger); letter-spacing: 0.14em; }
+  .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* Tool buttons */
+  .tools { display: flex; gap: 6px; }
+  .tool-btn { padding: 4px 10px; background: transparent; border: 1px solid var(--border); border-radius: 2px;
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); cursor: none;
+    transition: all 0.15s; text-transform: uppercase; }
+  .tool-btn:hover, .tool-btn.active { border-color: var(--c); color: var(--c); background: rgba(155,92,255,0.12); box-shadow: 0 0 12px rgba(155,92,255,0.2); }
+  .tool-btn.danger.active { border-color: var(--danger); color: var(--danger); background: rgba(255,45,117,0.08); }
+
+  /* Character switcher */
+  #charSwitch { top: 72px; right: 14px; padding: 8px; border-radius: 0; display: flex; flex-direction: column; gap: 4px; }
+  .char-thumb { width: 36px; height: 36px; border-radius: 2px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; cursor: none; transition: all 0.15s; color: var(--muted); }
+  .char-thumb:hover, .char-thumb.active { border-color: var(--c); color: var(--c); background: rgba(0,240,255,0.1); }
+
+  /* Left panel */
+  #leftPanel { top: 72px; left: 14px; width: 210px; padding: 12px; border-radius: 0; }
+  .bio-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(0,240,255,0.06); }
+  .bio-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .bio-value { font-size: 12px; font-weight: 700; color: var(--c); }
+  .bio-bar-track { height: 3px; background: rgba(0,240,255,0.1); border-radius: 1px; margin-top: 4px; overflow: hidden; }
+  .bio-bar-fill { height: 100%; border-radius: 1px; background: var(--c); transition: width 0.8s ease; }
+  .threat-badge { display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+  .threat-level { font-size: 11px; font-weight: 700; }
+  .threat-LOW      { color: var(--good); }
+  .threat-MODERATE { color: var(--warn); }
+  .threat-HIGH     { color: var(--danger); }
+
+  /* Right panel */
+  #rightPanel { top: 72px; right: 60px; width: 210px; padding: 12px; border-radius: 0; }
+  .tag-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+  .tag-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 4px 6px;
+    background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.12); border-radius: 2px; font-size: 10px; color: var(--text); }
+  .tag-remove { color: var(--danger); cursor: none; font-size: 11px; opacity: 0.6; }
+  .tag-remove:hover { opacity: 1; }
+  .trait-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .trait-name { font-size: 9px; color: var(--muted); }
+  .trait-val  { font-size: 11px; color: var(--c); font-weight: 500; }
+
+  /* Scan popup */
+  #scanPopup { position: fixed; z-index: 20; background: rgba(1,12,24,0.94); border: 1px solid var(--c);
+    border-radius: 0; padding: 10px 12px; pointer-events: none; min-width: 180px; display: none; }
+  .scan-popup-title { font-size: 8px; color: var(--c); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+  .scan-metric { font-size: 10px; color: var(--text); padding: 2px 0; border-bottom: 1px solid rgba(0,240,255,0.06); }
+  .scan-metric:last-child { border-bottom: none; }
+
+  /* Floating annotation tags */
+  .float-tag { position: fixed; z-index: 15; pointer-events: auto; cursor: none;
+    background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.4); border-radius: 2px;
+    padding: 2px 7px; font-size: 9px; color: var(--c); letter-spacing: 0.1em;
+    transform: translate(-50%, -110%); white-space: nowrap; }
+  .float-tag::after { content: '●'; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 6px; }
+
+  /* Facial recognition overlay */
+  #faceOverlay { position: fixed; z-index: 10; pointer-events: none; display: none; }
+  .face-box { position: absolute; border: 1px solid var(--c); }
+  .face-box::before, .face-box::after { content: ''; position: absolute; background: var(--c); }
+  .face-box::before { width: 8px; height: 1px; top: 0; left: 0; }
+  .face-box::after  { width: 1px; height: 8px; top: 0; left: 0; }
+  .face-label { position: absolute; top: -14px; left: 0; font-size: 7px; color: var(--c); letter-spacing: 0.12em; }
+  #faceScanLine { position: absolute; left: 0; right: 0; height: 1px; background: var(--c); opacity: 0.5; animation: faceScan 2s linear infinite; }
+  @keyframes faceScan { 0%{top:0} 100%{top:100%} }
+
+  /* Bottom bar */
+  #bottomBar { bottom: 14px; left: 14px; right: 14px; padding: 10px 14px 8px; border-radius: 0; }
+  #waveCanvas { width: 100%; height: 44px; display: block; }
+  #timelineBar { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+  #timelineBar label { font-size: 8px; color: var(--muted); letter-spacing: 0.14em; white-space: nowrap; }
+  #tlScrubber { flex: 1; height: 3px; background: rgba(0,240,255,0.12); border-radius: 2px; outline: none; cursor: none; -webkit-appearance: none; appearance: none; }
+  #tlScrubber::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--c); border: 1px solid #fff; cursor: none; }
+  #tlMarkers { position: relative; display: flex; padding: 4px 0 0; justify-content: space-between; }
+  .tl-mark { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tl-mark-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .tl-mark-label { font-size: 7px; color: var(--muted); white-space: nowrap; }
+  .tl-mark-anom .tl-mark-dot { background: var(--danger); box-shadow: 0 0 4px var(--danger); }
+
+  /* Misc */
+  #gridLabel { position: fixed; bottom: 120px; left: 14px; font-size: 7px; color: rgba(0,240,255,0.25); letter-spacing: 0.2em; }
+  #backBtn { position: fixed; top: 72px; left: 14px; font-size: 8px; color: var(--muted); letter-spacing: 0.12em; cursor: none; z-index: 5; padding: 6px 10px; background: var(--panel); border: 1px solid var(--border); text-decoration: none; }
+  #backBtn:hover { color: var(--c); border-color: var(--c); }
+</style>
+</head>
+<body>
+
+<canvas id="canvas3d"></canvas>
+<div id="crt"></div>
+<div id="vignette"></div>
+<div id="glitch"></div>
+<div id="reticle"><div class="reticle-ring"></div></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- Top HUD -->
+<div class="hud" id="topBar">
+  <span class="top-logo"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" style="vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 6px #9b5cff)"><defs><linearGradient id="plg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9b5cff"/><stop offset="100%" stop-color="#00f0ff"/></linearGradient></defs><polygon points="16,3 29,10 24,27 8,27 3,10" fill="none" stroke="url(#plg)" stroke-width="1.5"/><polygon points="16,3 29,10 16,16 3,10" fill="url(#plg)" opacity="0.3"/><polygon points="16,16 29,10 24,27" fill="url(#plg)" opacity="0.15"/><polygon points="16,16 3,10 8,27" fill="url(#plg)" opacity="0.2"/></svg>PRISM</span>
+  <div class="top-sep"></div>
+  <div style="display:flex;flex-direction:column;gap:1px;">
+    <span class="char-id" id="hudId">PR-2041</span>
+    <span class="char-name" id="hudName">Aria Chen</span>
+  </div>
+  <span class="char-callsign" id="hudCallsign">CODENAME: ARCHITECT</span>
+  <div class="top-sep"></div>
+  <div class="tools">
+    <button class="tool-btn active" id="btnScan" onclick="toggleTool('scan')">Scan</button>
+    <button class="tool-btn" id="btnTag"  onclick="toggleTool('tag')">Tag</button>
+    <button class="tool-btn" id="btnFace" onclick="toggleTool('face')">Face ID</button>
+    <button class="tool-btn danger" id="btnThreat" onclick="toggleTool('threat')">Threat</button>
+  </div>
+  <div class="top-spacer"></div>
+  <span class="status-badge status-ACTIVE" id="hudStatus">ACTIVE</span>
+  <div class="top-sep"></div>
+  <div class="rec"><div class="rec-dot"></div>LIVE</div>
+  <a href="System Dashboard.html" class="tool-btn" style="text-decoration:none;margin-left:6px;">← DASH</a>
+</div>
+
+<!-- Character switcher -->
+<div class="hud" id="charSwitch">
+  <div class="char-thumb active" id="ct0" onclick="switchChar(0)">AC</div>
+  <div class="char-thumb" id="ct1" onclick="switchChar(1)">MW</div>
+  <div class="char-thumb" id="ct2" onclick="switchChar(2)">NO</div>
+</div>
+
+<!-- Left panel: biometrics -->
+<div class="hud" id="leftPanel">
+  <div class="hud-title">Biometric Monitor</div>
+  <div class="bio-item">
+    <span class="bio-label">Heart Rate</span>
+    <span class="bio-value" id="bHR">68 <span style="font-size:8px;color:var(--muted)">bpm</span></span>
+  </div>
+  <div class="bio-item">
+    <span class="bio-label">Neural Freq</span>
+    <span class="bio-value" id="bNF">42.3 <span style="font-size:8px;color:var(--muted)">Hz</span></span>
+  </div>
+  <div class="bio-item">
+    <span class="bio-label">Stress Index</span>
+    <span class="bio-value" id="bSI">18</span>
+  </div>
+  <div class="bio-item">
+    <span class="bio-label">Focus Score</span>
+    <span class="bio-value" id="bFS">91%</span>
+  </div>
+  <div style="padding:4px 0;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+      <span class="bio-label">Sync Rate</span>
+      <span style="font-size:10px;color:var(--good)" id="bSR">98.4%</span>
+    </div>
+    <div class="bio-bar-track"><div class="bio-bar-fill" id="bSRBar" style="width:98.4%"></div></div>
+  </div>
+  <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+    <div class="hud-title" style="margin-bottom:6px;">Threat Assessment</div>
+    <div class="threat-badge">
+      <div class="threat-level threat-LOW" id="threatLevel">LOW</div>
+      <div style="font-size:10px;color:var(--muted)">Risk Score: <span style="color:var(--c)" id="threatScore">18</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Right panel: traits / tags -->
+<div class="hud" id="rightPanel">
+  <div class="hud-title">Trait Markers</div>
+  <div id="traitList" style="margin-bottom:12px;"></div>
+  <div class="hud-title">Annotations</div>
+  <div class="tag-list" id="tagList">
+    <div style="font-size:9px;color:var(--muted);padding:4px 0;">Click character to annotate</div>
+  </div>
+</div>
+
+<!-- Scan popup -->
+<div id="scanPopup">
+  <div class="scan-popup-title" id="spTitle">Neural Core</div>
+  <div id="spMetrics"></div>
+</div>
+
+<!-- Facial recognition overlay -->
+<div id="faceOverlay"></div>
+
+<!-- Bottom: waveform + timeline -->
+<div class="hud" id="bottomBar">
+  <canvas id="waveCanvas" height="44"></canvas>
+  <div id="timelineBar">
+    <label>TIMELINE</label>
+    <input type="range" id="tlScrubber" min="0" max="100" value="100" />
+    <label id="tlTimestamp" style="min-width:70px;text-align:right;">LIVE</label>
+  </div>
+  <div id="tlMarkers"></div>
+</div>
+
+<div id="gridLabel">GRID · SECTOR 7 · ACTIVE SCAN</div>
+
+<script>
+// ── Scene setup ────────────────────────────────────────────────────────────
+const canvas3d = document.getElementById('canvas3d');
+const renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x06030e);
+scene.fog = new THREE.FogExp2(0x06030e, 0.055);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 80);
+camera.position.set(0, 1.5, 7.5);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.target.set(0, 1.2, 0);
+controls.maxDistance = 15;
+controls.minDistance = 2.5;
+controls.enablePan = false;
+
+// ── State ──────────────────────────────────────────────────────────────────
+let charGroup, particles, keyLight, fillLight;
+let zoneMeshes = [], bodyMeshes = [];
+let charHue = 260, charHex = '#7c5cfc';
+let activeTool = 'scan';
+let annotations = [];
+let annotationId = 0;
+let scanZoneData = {};
+let threatData = {};
+let threatOverlay = false;
+let faceOverlayOn = false;
+let t = 0;
+let waveData = new Array(256).fill(0);
+let timelineEvents = [];
+let connector;
+
+// ── Cursor ─────────────────────────────────────────────────────────────────
+const reticle = document.getElementById('reticle');
+const mouse = new THREE.Vector2();
+document.addEventListener('mousemove', e => {
+  reticle.style.left = e.clientX + 'px';
+  reticle.style.top  = e.clientY + 'px';
+  mouse.x =  (e.clientX / innerWidth)  * 2 - 1;
+  mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+});
+
+// ── Character builder ──────────────────────────────────────────────────────
+function buildCharacter(hue) {
+  if (charGroup) scene.remove(charGroup);
+  charGroup = new THREE.Group();
+  bodyMeshes = []; zoneMeshes = [];
+  charHue = hue;
+  charHex = `hsl(${hue},88%,62%)`;
+
+  const color = new THREE.Color(charHex);
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color(0x080320),
+    emissive: new THREE.Color(`hsl(${hue},100%,5%)`),
+    emissiveIntensity: 1,
+    metalness: 0.92, roughness: 0.08,
+  });
+  const edgeMat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85 });
+
+  function part(geo, x, y, z, rx=0, ry=0, rz=0) {
+    const m = new THREE.Mesh(geo, bodyMat.clone());
+    m.position.set(x,y,z); m.rotation.set(rx,ry,rz); m.castShadow = true;
+    charGroup.add(m); bodyMeshes.push(m);
+    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat.clone());
+    lines.position.set(x,y,z); lines.rotation.set(rx,ry,rz);
+    charGroup.add(lines);
+    return m;
+  }
+
+  function zone(id, x, y, z, r) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(r,8,8), new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide}));
+    m.position.set(x,y,z); m.userData.zone = id;
+    charGroup.add(m); zoneMeshes.push(m);
+  }
+
+  // Body
+  part(new THREE.BoxGeometry(0.68,0.84,0.62),    0, 3.08, 0);           // head
+  part(new THREE.CylinderGeometry(0.14,0.17,0.26,6), 0, 2.64, 0);      // neck
+  part(new THREE.BoxGeometry(1.12,0.98,0.50),    0, 2.08, 0);           // upper torso
+  part(new THREE.BoxGeometry(0.92,0.62,0.46),    0, 1.30, 0);           // lower torso
+  part(new THREE.BoxGeometry(0.84,0.30,0.42),    0, 0.88, 0);           // pelvis
+  // Left arm
+  part(new THREE.CylinderGeometry(0.12,0.10,0.82,6), -0.74, 2.10, 0, 0,0, 0.18);
+  part(new THREE.CylinderGeometry(0.10,0.08,0.76,6), -0.96, 1.42, 0, 0,0, 0.22);
+  part(new THREE.BoxGeometry(0.17,0.26,0.09),   -1.12, 0.98, 0);
+  // Right arm
+  part(new THREE.CylinderGeometry(0.12,0.10,0.82,6),  0.74, 2.10, 0, 0,0,-0.18);
+  part(new THREE.CylinderGeometry(0.10,0.08,0.76,6),  0.96, 1.42, 0, 0,0,-0.22);
+  part(new THREE.BoxGeometry(0.17,0.26,0.09),    1.12, 0.98, 0);
+  // Left leg
+  part(new THREE.CylinderGeometry(0.18,0.15,0.98,6), -0.28, 0.30, 0);
+  part(new THREE.CylinderGeometry(0.12,0.10,0.86,6), -0.28,-0.54, 0);
+  part(new THREE.BoxGeometry(0.21,0.14,0.40),   -0.28,-1.08, 0.10);
+  // Right leg
+  part(new THREE.CylinderGeometry(0.18,0.15,0.98,6),  0.28, 0.30, 0);
+  part(new THREE.CylinderGeometry(0.12,0.10,0.86,6),  0.28,-0.54, 0);
+  part(new THREE.BoxGeometry(0.21,0.14,0.40),    0.28,-1.08, 0.10);
+
+  // Scan zones
+  zone('head',  0, 3.08, 0, 0.50);
+  zone('chest', 0, 2.08, 0, 0.65);
+  zone('core',  0, 1.30, 0, 0.52);
+  zone('larm', -0.96, 1.48, 0, 0.44);
+  zone('rarm',  0.96, 1.48, 0, 0.44);
+  zone('legs',  0, -0.12, 0, 0.58);
+
+  scene.add(charGroup);
+}
+
+// ── Particles ──────────────────────────────────────────────────────────────
+function buildParticles(hue) {
+  if (particles) scene.remove(particles);
+  const count = 300;
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = 2.0 + Math.random() * 2.2;
+    const θ = Math.random() * Math.PI * 2;
+    const φ = Math.acos(2 * Math.random() - 1);
+    pos[i*3]   = r * Math.sin(φ) * Math.cos(θ);
+    pos[i*3+1] = r * Math.cos(φ) + 1.4;
+    pos[i*3+2] = r * Math.sin(φ) * Math.sin(θ);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  particles = new THREE.Points(geo, new THREE.PointsMaterial({
+    color: new THREE.Color(`hsl(${hue},100%,68%)`),
+    size: 0.032, transparent: true, opacity: 0.65, sizeAttenuation: true,
+  }));
+  scene.add(particles);
+}
+
+// ── Grid floor ─────────────────────────────────────────────────────────────
+function buildGrid(hue) {
+  const grid = new THREE.GridHelper(24, 40, new THREE.Color(`hsl(${hue},80%,12%)`), new THREE.Color(`hsl(${hue},60%,8%)`));
+  grid.position.y = -1.3;
+  scene.add(grid);
+}
+
+// ── Lights ─────────────────────────────────────────────────────────────────
+function buildLights(hue) {
+  scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.07));
+  keyLight = new THREE.PointLight(new THREE.Color(`hsl(${hue},100%,68%)`), 5.5, 16);
+  keyLight.position.set(-3, 6, 4);
+  fillLight = new THREE.PointLight(new THREE.Color(`hsl(${(hue+130)%360},90%,60%)`), 2.5, 14);
+  fillLight.position.set(3.5, 3, -3);
+  const rim = new THREE.PointLight(0x9966ff, 1.2, 10);
+  rim.position.set(0, -1, -4);
+  scene.add(keyLight, fillLight, rim);
+}
+
+// ── Init scene ─────────────────────────────────────────────────────────────
+function initScene(hue) {
+  buildCharacter(hue);
+  buildParticles(hue);
+  buildGrid(hue);
+  buildLights(hue);
+  // Update CSS var
+  document.documentElement.style.setProperty('--c', `hsl(${hue},90%,62%)`);
+  document.documentElement.style.setProperty('--border', `hsla(${hue},90%,62%,0.18)`);
+}
+
+initScene(260);
+
+// ── Raycaster ──────────────────────────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const scanPopup = document.getElementById('scanPopup');
+let hoveredZone = null;
+
+function doRaycast() {
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(zoneMeshes);
+  if (hits.length > 0) {
+    const zoneId = hits[0].object.userData.zone;
+    if (zoneId !== hoveredZone) {
+      hoveredZone = zoneId;
+      showScanPopup(zoneId);
+    }
+  } else {
+    hoveredZone = null;
+    scanPopup.style.display = 'none';
+  }
+}
+
+function showScanPopup(zoneId) {
+  const zd = scanZoneData[zoneId];
+  if (!zd) return;
+  const el = scanPopup;
+  el.style.display = 'block';
+  el.style.left = (parseFloat(reticle.style.left) + 20) + 'px';
+  el.style.top  = (parseFloat(reticle.style.top) - 20) + 'px';
+  document.getElementById('spTitle').textContent = zd.label;
+  document.getElementById('spMetrics').innerHTML = zd.metrics.map(m =>
+    `<div class="scan-metric">${m}</div>`).join('');
+}
+
+// ── Annotations ────────────────────────────────────────────────────────────
+function addAnnotation(worldPos, label) {
+  const id = ++annotationId;
+  const div = document.createElement('div');
+  div.className = 'float-tag';
+  div.id = 'ann' + id;
+  div.textContent = label || `TAG·${String(id).padStart(2,'0')}`;
+  document.body.appendChild(div);
+  annotations.push({ id, worldPos: worldPos.clone(), div, label: div.textContent });
+  refreshTagList();
+}
+
+function removeAnnotation(id) {
+  const idx = annotations.findIndex(a => a.id === id);
+  if (idx < 0) return;
+  annotations[idx].div.remove();
+  annotations.splice(idx, 1);
+  refreshTagList();
+}
+
+function refreshTagList() {
+  const list = document.getElementById('tagList');
+  if (!annotations.length) {
+    list.innerHTML = '<div style="font-size:9px;color:var(--muted);padding:4px 0;">Click character to annotate</div>';
+    return;
+  }
+  list.innerHTML = annotations.map(a =>
+    `<div class="tag-item">
+      <span style="font-size:8px;color:var(--muted);margin-right:4px;">●</span>${a.label}
+      <span class="tag-remove" onclick="removeAnnotation(${a.id})">✕</span>
+    </div>`).join('');
+}
+
+function updateAnnotationPositions() {
+  const vec = new THREE.Vector3();
+  annotations.forEach(a => {
+    vec.copy(a.worldPos);
+    if (charGroup) vec.applyMatrix4(charGroup.matrixWorld);
+    vec.project(camera);
+    const x = (vec.x * 0.5 + 0.5) * innerWidth;
+    const y = (-(vec.y) * 0.5 + 0.5) * innerHeight;
+    a.div.style.left = x + 'px';
+    a.div.style.top  = y + 'px';
+  });
+}
+
+// ── Click handler ──────────────────────────────────────────────────────────
+canvas3d.addEventListener('click', e => {
+  if (activeTool !== 'tag') return;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(bodyMeshes.concat(zoneMeshes));
+  if (hits.length > 0) {
+    const pt = hits[0].point;
+    // Simple prompt substitute — cycle through labels
+    const labels = ['ANOMALY','SCAN POINT','MARKER','NOTE','FLAG','REGION'];
+    const lbl = labels[annotations.length % labels.length];
+    addAnnotation(pt, lbl);
+  }
+});
+
+// ── Tool toggles ───────────────────────────────────────────────────────────
+function toggleTool(tool) {
+  if (tool === 'threat') {
+    threatOverlay = !document.getElementById('btnThreat').classList.contains('active');
+    document.getElementById('btnThreat').classList.toggle('active');
+    applyThreatOverlay(threatOverlay);
+    return;
+  }
+  if (tool === 'face') {
+    faceOverlayOn = !document.getElementById('btnFace').classList.contains('active');
+    document.getElementById('btnFace').classList.toggle('active');
+    document.getElementById('faceOverlay').style.display = faceOverlayOn ? 'block' : 'none';
+    updateFaceOverlay();
+    return;
+  }
+  activeTool = tool;
+  ['scan','tag'].forEach(k => {
+    document.getElementById('btn' + k.charAt(0).toUpperCase() + k.slice(1))
+      .classList.toggle('active', k === tool);
+  });
+  scanPopup.style.display = 'none';
+}
+
+// ── Threat overlay ─────────────────────────────────────────────────────────
+function applyThreatOverlay(on) {
+  bodyMeshes.forEach((m, i) => {
+    if (on) {
+      const zones = ['head','chest','core','larm','rarm','legs'];
+      const zId = zones[Math.floor(i / Math.ceil(bodyMeshes.length / 6))] || 'core';
+      const score = (threatData.zones && threatData.zones[zId]) || 20;
+      const col = score > 60 ? '#ff2d75' : score > 35 ? '#f59e0b' : '#10d98a';
+      m.material.emissive = new THREE.Color(col);
+      m.material.emissiveIntensity = 0.6;
+    } else {
+      m.material.emissive = new THREE.Color(`hsl(${charHue},100%,6%)`);
+      m.material.emissiveIntensity = 1;
+    }
+  });
+}
+
+// ── Face overlay ───────────────────────────────────────────────────────────
+function updateFaceOverlay() {
+  const fo = document.getElementById('faceOverlay');
+  if (!faceOverlayOn || !charGroup) return;
+  const vec = new THREE.Vector3(0, 3.08, 0);
+  vec.applyMatrix4(charGroup.matrixWorld);
+  vec.project(camera);
+  const sx = (vec.x * 0.5 + 0.5) * innerWidth;
+  const sy = (-(vec.y) * 0.5 + 0.5) * innerHeight;
+  const sz = camera.position.distanceTo(charGroup.position);
+  const boxSize = Math.max(40, 320 / sz);
+  fo.innerHTML = `<div class="face-box" style="left:${sx-boxSize/2}px;top:${sy-boxSize*0.6}px;width:${boxSize}px;height:${boxSize*1.1}px;">
+    <div class="face-label">ID MATCH · 98.4%</div>
+    <div id="faceScanLine" style="animation-duration:${1.5+Math.random()}s"></div>
+    <div style="position:absolute;bottom:-14px;left:0;font-size:7px;color:var(--c);letter-spacing:.1em;">ARIA CHEN · PR-2041</div>
+  </div>`;
+}
+
+// ── Waveform ───────────────────────────────────────────────────────────────
+const waveCanvas = document.getElementById('waveCanvas');
+const wCtx = waveCanvas.getContext('2d');
+
+function resizeWaveCanvas() {
+  waveCanvas.width  = waveCanvas.offsetWidth;
+  waveCanvas.height = 44;
+}
+
+function drawWaveform() {
+  const w = waveCanvas.width, h = waveCanvas.height;
+  wCtx.clearRect(0, 0, w, h);
+  if (!waveData.length) return;
+  const sliceW = w / waveData.length;
+  wCtx.beginPath();
+  wCtx.strokeStyle = `hsl(${Math.round(charHue)},90%,65%)`;
+  wCtx.lineWidth = 1.6;
+  wCtx.shadowBlur = 10;
+  wCtx.shadowColor = `hsl(${Math.round(charHue)},90%,65%)`;
+  waveData.forEach((v, i) => {
+    const x = i * sliceW;
+    const y = h * 0.5 + v * h * 0.38;
+    i === 0 ? wCtx.moveTo(x, y) : wCtx.lineTo(x, y);
+  });
+  wCtx.stroke();
+}
+
+// ── Timeline ───────────────────────────────────────────────────────────────
+function renderTimeline(events) {
+  timelineEvents = events;
+  const markers = document.getElementById('tlMarkers');
+  if (!events.length) return;
+  const colors = ['#7c5cfc','#22d3ee','#10d98a','#f59e0b','#f43f5e','#a855f7'];
+  markers.innerHTML = events.map((ev, i) => {
+    const d = new Date(ev.ts);
+    const label = d.toLocaleDateString('en',{month:'short',day:'numeric'});
+    return `<div class="tl-mark ${ev.anomaly ? 'tl-mark-anom' : ''}">
+      <div class="tl-mark-dot" style="background:${ev.anomaly ? '#f43f5e' : colors[i%colors.length]}"></div>
+      <div class="tl-mark-label">${ev.label.split(' ').slice(-1)[0]}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('tlScrubber').addEventListener('input', function() {
+  const val = +this.value;
+  const lbl = document.getElementById('tlTimestamp');
+  if (val >= 99) { lbl.textContent = 'LIVE'; return; }
+  if (timelineEvents.length) {
+    const idx = Math.floor((val / 100) * (timelineEvents.length - 1));
+    const ev = timelineEvents[idx];
+    const d = new Date(ev.ts);
+    lbl.textContent = d.toLocaleDateString('en',{month:'short',day:'numeric'});
+  }
+});
+
+// ── Glitch ─────────────────────────────────────────────────────────────────
+const glitch = document.getElementById('glitch');
+setInterval(() => {
+  if (Math.random() < 0.12) {
+    glitch.style.opacity = '1';
+    canvas3d.style.transform = `translateX(${(Math.random()-.5)*3}px)`;
+    setTimeout(() => { glitch.style.opacity='0'; canvas3d.style.transform=''; }, 90);
+  }
+}, 2800);
+
+// ── HUD data update ────────────────────────────────────────────────────────
+function setText(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function updateBiometrics(b) {
+  setText('bHR', `${b.heart_rate} bpm`);
+  setText('bNF', `${b.neural_freq} Hz`);
+  setText('bSI', b.stress_index);
+  setText('bFS', `${b.focus}%`);
+  setText('bSR', `${b.sync_rate}%`);
+  const bar = document.getElementById('bSRBar');
+  if (bar) bar.style.width = b.sync_rate + '%';
+}
+
+function updateProfile(p) {
+  setText('hudId', p.id);
+  setText('hudName', p.name);
+  setText('hudCallsign', 'CODENAME: ' + p.callsign);
+  const sb = document.getElementById('hudStatus');
+  if (sb) { sb.textContent = p.status; sb.className = 'status-badge status-' + p.status; }
+  // Char thumbs
+  document.querySelectorAll('.char-thumb').forEach((el,i) => el.classList.toggle('active', i === currentCharIdx));
+  // Traits
+  const traits = [
+    { name:'Cognitive',   val: Math.round(80+Math.random()*18) + '%' },
+    { name:'Behavioral',  val: Math.round(75+Math.random()*20) + '%' },
+    { name:'Emotional',   val: Math.round(70+Math.random()*25) + '%' },
+    { name:'Social',      val: Math.round(65+Math.random()*30) + '%' },
+    { name:'Resilience',  val: Math.round(78+Math.random()*18) + '%' },
+  ];
+  const tl = document.getElementById('traitList');
+  if (tl) tl.innerHTML = traits.map(t =>
+    `<div class="trait-row"><span class="trait-name">${t.name}</span><span class="trait-val">${t.val}</span></div>`
+  ).join('');
+}
+
+function updateThreat(d) {
+  threatData = d;
+  const tlEl = document.getElementById('threatLevel');
+  const tsEl = document.getElementById('threatScore');
+  if (tlEl) tlEl.className = 'threat-level threat-' + d.level;
+  if (tlEl) tlEl.textContent = d.level;
+  if (tsEl) tsEl.textContent = d.score;
+  if (threatOverlay) applyThreatOverlay(true);
+}
+
+// ── Connector setup ────────────────────────────────────────────────────────
+let currentCharIdx = 0;
+
+function wireConnector(cc) {
+  connector = cc;
+  cc.subscribe('profile',    p => updateProfile(p));
+  cc.subscribe('biometrics', b => updateBiometrics(b));
+  cc.subscribe('scan_zones', z => { scanZoneData = z; });
+  cc.subscribe('voice_wave', w => { waveData = w; });
+  cc.subscribe('timeline',   t => renderTimeline(t));
+  cc.subscribe('threat',     d => updateThreat(d));
+}
+
+function switchChar(idx) {
+  currentCharIdx = idx;
+  const char = window.PRISM_CHARACTERS[idx];
+  initScene(char.avatar_hue);
+  if (connector) connector.switchCharacter(idx);
+}
+
+// Boot connector
+const cc = new CharacterConnector({ source: 'mock', mockInterval: 2000 });
+wireConnector(cc);
+cc.connect();
+
+// ── Animate ────────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.016;
+  controls.update();
+
+  if (charGroup) {
+    charGroup.rotation.y += 0.0025;
+    charGroup.position.y = Math.sin(t * 0.75) * 0.045;
+  }
+  if (particles) {
+    particles.rotation.y += 0.0012;
+    particles.rotation.x = Math.sin(t * 0.3) * 0.06;
+  }
+  if (keyLight)  keyLight.intensity  = 5.5 + Math.sin(t * 1.1) * 0.8;
+  if (fillLight) fillLight.intensity = 2.5 + Math.sin(t * 0.7 + 1.2) * 0.5;
+
+  // Scan mode raycasting
+  if (activeTool === 'scan') doRaycast();
+  else scanPopup.style.display = 'none';
+
+  // Tag annotation projection
+  updateAnnotationPositions();
+
+  // Face overlay update (every 30 frames)
+  if (faceOverlayOn && Math.round(t * 60) % 30 === 0) updateFaceOverlay();
+
+  drawWaveform();
+  renderer.render(scene, camera);
+}
+
+// ── Resize ─────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  resizeWaveCanvas();
+});
+
+resizeWaveCanvas();
+animate();
+</script>
+</body>
+</html>

@@ -40,7 +40,27 @@ services:
       - ollama_data:/root/.ollama
     profiles: ["local-models"]
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: cds-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ccs
+      POSTGRES_USER: ccs
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    profiles: ["db"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ccs -d ccs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   n8n_data:
   open_webui_data:
   ollama_data:
+  postgres_data:

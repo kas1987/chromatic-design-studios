@@ -8,9 +8,13 @@
     "packages/*"
   ],
   "scripts": {
+    "tokens": "node scripts/build-tokens.mjs",
+    "db:build": "node scripts/build-db.mjs",
     "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "node --experimental-strip-types apps/api/src/index.ts",
     "build:web": "npm run build --workspace=apps/web",
     "lint": "npm run lint --workspaces --if-present",
+    "pretypecheck": "npm run tokens",
     "typecheck": "tsc --noEmit --project apps/web/tsconfig.json",
     "test": "npm run test --workspaces --if-present",
     "test:tokens": "npm run test --workspace=packages/tokens",
@@ -18,12 +22,15 @@
     "test:e2e": "playwright test",
     "test:coverage": "npm run test:coverage --workspaces --if-present"
   },
+  "dependencies": {
+    "postgres": "^3.4.0"
+  },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
     "typescript": "^5.7.0"
   },
   "packageManager": "npm@11.12.1",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.6.0"
   }
 }

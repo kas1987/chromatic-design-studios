@@ -1,9 +1,11 @@
 import { vi, describe, it, expect, afterEach } from 'vitest'
 
-// Must be mocked before layout is imported — vi.mock is hoisted automatically
+// Must be mocked before layout is imported — vi.mock is hoisted automatically.
+// Layout uses Inter (UI/heading), IBM Plex Sans (body), IBM Plex Mono (code).
 vi.mock('next/font/google', () => ({
-  Geist: () => ({ variable: '--font-geist-sans', className: 'mock-geist' }),
-  Geist_Mono: () => ({ variable: '--font-geist-mono', className: 'mock-geist-mono' }),
+  Inter: () => ({ variable: '--font-inter', className: 'mock-inter' }),
+  IBM_Plex_Sans: () => ({ variable: '--font-plex-sans', className: 'mock-plex-sans' }),
+  IBM_Plex_Mono: () => ({ variable: '--font-plex-mono', className: 'mock-plex-mono' }),
 }))
 
 import { render } from '@testing-library/react'
@@ -12,11 +14,14 @@ import RootLayout from '../app/layout'
 
 describe('layout metadata', () => {
   it('has the correct page title', () => {
-    expect(metadata.title).toBe('Chromatic Design Studios')
+    // title is a template object: { default, template }
+    expect(metadata.title).toMatchObject({ default: 'Chromatic Design Studios' })
   })
 
   it('has the correct page description', () => {
-    expect(metadata.description).toBe('Local-first AI design and operations control center')
+    expect(metadata.description).toContain(
+      'Local-first AI design and operations control center'
+    )
   })
 })
 

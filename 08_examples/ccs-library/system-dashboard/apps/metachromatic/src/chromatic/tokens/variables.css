@@ -1,0 +1,271 @@
+:root {
+  /* Backgrounds (Hexora-inspired) */
+  --void: #0a0a0f;
+  --bg-obsidian: #070a12;
+  --bg-graphite: #141620;
+  --bg-elevated: #1a1d2e;
+  --mercury: #c7ced8;
+
+  /* Chromatic Accent Colors (from Figma) */
+  --chromatic-indigo: #4f6bff;
+  --chromatic-cyan: #2de2e6;
+  --chromatic-magenta: #c77dff;
+  --chromatic-teal: #00f5d4;
+  --chromatic-violet: #7b61ff;
+  --chromatic-pink: #ec4899;
+  --chromatic-orange: #fb923c;
+
+  /* Glass (Enhanced from Figma) */
+  --glass-bg: rgba(11, 16, 32, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25), 0 2px 10px rgba(0, 0, 0, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  --glass-blur: 26px;
+  --radius: 16px;
+
+  /* Glass Variants */
+  --glass-strong-bg: rgba(11, 16, 32, 0.26);
+  --glass-strong-border: rgba(255, 255, 255, 0.16);
+  --glass-strong-blur: 36px;
+  --glass-strong-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.3), 0 2px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.16);
+
+  --glass-subtle-bg: rgba(11, 16, 32, 0.18);
+  --glass-subtle-border: rgba(255, 255, 255, 0.1);
+  --glass-subtle-blur: 20px;
+  --glass-subtle-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.12);
+
+  /* Typography */
+  --font-ui: 'JetBrains Mono', Consolas, Monaco, monospace;
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --text: rgba(255, 255, 255, 0.95);
+  --text-light: rgba(255, 255, 255, 0.75);
+  --text-muted: rgba(255, 255, 255, 0.65);
+  --text-dim: rgba(255, 255, 255, 0.4);
+
+  /* Input chrome */
+  --input-ring: rgba(255, 255, 255, 0.06);
+  --input-ring-focus: rgba(255, 255, 255, 0.12);
+
+  /* Glass opacity variants (for borders and subtle UI) */
+  --glass-border-lightest: rgba(255, 255, 255, 0.04);
+  --glass-border-lighter: rgba(255, 255, 255, 0.05);
+  --glass-border-light: rgba(255, 255, 255, 0.07);
+  --glass-border-dim: rgba(255, 255, 255, 0.08);
+  --glass-overlay-subtle: rgba(255, 255, 255, 0.2);
+
+  /* Focus */
+  --focus: rgba(199, 206, 216, 0.65);
+
+  /* Surfaces */
+  --surface-hover: rgba(199, 206, 216, 0.1);
+
+  /* Spacing (design system scale) */
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+
+  /* Mode Gradient Colors */
+  --mode-browse-start: #3b82f6;
+  --mode-browse-end: #06b6d4;
+  --mode-tag-start: #8b5cf6;
+  --mode-tag-end: #d946ef;
+  --mode-review-start: #f59e0b;
+  --mode-review-end: #ef4444;
+  --mode-export-start: #10b981;
+  --mode-export-end: #06b6d4;
+  --mode-settings-start: #7b61ff;
+  --mode-settings-end: #c77dff;
+
+  /* Fallbacks (dynamic gradients, edge cases) */
+  --fallback-white: #ffffff;
+
+  /* UI Specific Colors */
+  --ui-icon-muted: #9292a8;
+  --ui-catalog-text: #a8e6cf;
+  --ui-layers-active: #7ba3ff;
+  --glass-dropdown-bg: rgba(11, 16, 32, 0.92);
+
+  /* Rating */
+  --rating-gold: #ffc800;
+
+  /* Z-Index Hierarchy (Stacking Context Protocol) */
+  --z-base: 1;
+  --z-sticky: 10; /* Sticky headers, sidebars */
+  --z-glass: 20; /* Glass panels, drawers */
+  --z-dropdown: 30; /* Dropdowns, tooltips, popovers */
+  --z-modal-backdrop: 100; /* Modal backdrops */
+  --z-modal: 101; /* Modal content */
+  --z-modal-priority: 102; /* Priority modals (compare, detail) */
+  --z-lightbox: 300; /* Fullscreen lightbox */
+
+  /* Aurora proportion tier system */
+  --aurora-elite: #a855f7;
+  --aurora-standard: #6366f1;
+  --aurora-athletic: #10b981;
+
+  /* Social platform colors */
+  --onlyfans-blue: #00aff0;
+
+  /* Functional */
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --success-border: rgba(16, 185, 129, 0.4);
+  --processing: #06b6d4;
+  --processing-bg: rgba(6, 182, 212, 0.2);
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #6366f1;
+
+  /* Error blends (favorites delete button) */
+  --error-light-blend: #ff8aa8;
+  --error-dark-blend: #ff5f7a;
+
+  /* LevelLab badge colors — L1–L8 base tones */
+  --level-1: #94a3b8;
+  --level-2: #8098b8;
+  --level-3: #34d399;
+  --level-4: #6ee7b7;
+  --level-5: #fbbf24;
+  --level-6: #f87171;
+  --level-7: #d8b4fe;
+  --level-8: #f9a8d4;
+
+  /* LevelLab score gradient — green → red scale */
+  --level-score-1: #2ee59d;
+  --level-score-2: #52d9a0;
+  --level-score-3: #7bcda3;
+  --level-score-4: #a4c0a6;
+  --level-score-5: #cdb4a9;
+  --level-score-6: #f6a8ac;
+  --level-score-7: #f77c88;
+  --level-score-8: #ef4444;
+
+  /* GQI Tier Colors */
+  --color-gqi-a: #10b981; /* A: 8.5-10 — emerald */
+  --color-gqi-b: #06b6d4; /* B: 7-8.4 — cyan */
+  --color-gqi-c: #f59e0b; /* C: 5.5-6.9 — amber */
+  --color-gqi-d: #f43f5e; /* D: 4-5.4 — rose */
+  --color-gqi-f: #be123c; /* F: <4 — dark rose */
+
+  /* Intimacy level progression */
+  --intimacy-1: #5a5a6e;
+  --intimacy-2: #7a7aae;
+  --intimacy-3: #8b82f6;
+  --intimacy-4: #a855f7;
+  --intimacy-5: #d946ef;
+  --intimacy-6: #f43f5e;
+}
+
+/* ============================================================
+   LIGHT THEME — soft frosted surfaces, dark text
+   ============================================================ */
+html[data-theme='light'] {
+  /* Backgrounds */
+  --void: #eef1f8;
+  --bg-obsidian: #f0f3fa;
+  --bg-graphite: #e2e6f0;
+  --bg-elevated: #ffffff;
+
+  /* Text */
+  --text: #1a1a2e;
+  --text-light: rgba(26, 26, 46, 0.75);
+  --text-muted: rgba(26, 26, 46, 0.55);
+  --text-dim: rgba(26, 26, 46, 0.35);
+
+  /* Glass surfaces — frosted white */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  --glass-blur: 20px;
+
+  --glass-strong-bg: rgba(255, 255, 255, 0.8);
+  --glass-strong-border: rgba(0, 0, 0, 0.1);
+  --glass-strong-blur: 28px;
+  --glass-strong-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+
+  --glass-subtle-bg: rgba(255, 255, 255, 0.5);
+  --glass-subtle-border: rgba(0, 0, 0, 0.06);
+  --glass-subtle-blur: 14px;
+  --glass-subtle-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
+
+  /* Border opacity variants */
+  --glass-border-lightest: rgba(0, 0, 0, 0.02);
+  --glass-border-lighter: rgba(0, 0, 0, 0.03);
+  --glass-border-light: rgba(0, 0, 0, 0.05);
+  --glass-border-dim: rgba(0, 0, 0, 0.07);
+  --glass-overlay-subtle: rgba(0, 0, 0, 0.08);
+
+  /* Input chrome */
+  --input-ring: rgba(0, 0, 0, 0.08);
+  --input-ring-focus: rgba(0, 0, 0, 0.16);
+
+  /* Focus */
+  --focus: rgba(26, 26, 46, 0.45);
+
+  /* Surfaces */
+  --surface-hover: rgba(0, 0, 0, 0.05);
+
+  /* Neutrals */
+  --graphite: rgba(200, 206, 220, 0.55);
+  --mercury: #4a4a6e;
+  --panel: rgba(255, 255, 255, 0.65);
+  --glass-dropdown-bg: rgba(238, 241, 248, 0.97);
+}
+
+/* Override .dark legacy aliases inside light theme */
+html[data-theme='light'] .dark {
+  --text: #1a1a2e;
+  --text-muted: rgba(26, 26, 46, 0.55);
+  --text-dim: rgba(26, 26, 46, 0.35);
+  --panel: rgba(255, 255, 255, 0.65);
+  --bg-graphite: #e2e6f0;
+  --glass-blur: 20px;
+  --graphite: rgba(200, 206, 220, 0.55);
+  --mercury: #4a4a6e;
+}
+
+/* ============================================================
+   COLOR THEME — deep chromatic dark, more vivid accents
+   ============================================================ */
+html[data-theme='color'] {
+  /* Darker, more saturated backgrounds */
+  --void: #04061a;
+  --bg-obsidian: #060919;
+  --bg-graphite: #0c1028;
+  --bg-elevated: #121630;
+
+  /* Glass with deeper saturation */
+  --glass-bg: rgba(6, 9, 30, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-blur: 32px;
+
+  --glass-strong-bg: rgba(6, 9, 30, 0.55);
+  --glass-strong-border: rgba(255, 255, 255, 0.22);
+  --glass-strong-blur: 40px;
+
+  --glass-subtle-bg: rgba(6, 9, 30, 0.3);
+  --glass-subtle-border: rgba(255, 255, 255, 0.12);
+
+  --glass-dropdown-bg: rgba(6, 9, 30, 0.96);
+
+  /* Push chromatic accents to their full values */
+  --chromatic-indigo: #6278ff;
+  --chromatic-cyan: #3df4f8;
+  --chromatic-magenta: #db90ff;
+  --chromatic-teal: #12ffdc;
+  --chromatic-violet: #9175ff;
+  --chromatic-pink: #ff5aac;
+  --chromatic-orange: #fd9a5c;
+}

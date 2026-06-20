@@ -1,0 +1,43 @@
+{
+  "$mode": "light",
+  "$note": "Light-mode OVERRIDES only — keys here replace their dark counterparts in tokens.colors.json when the `.light` class is active. Hue scales (primary.*, accent.*) are NOT redefined; they are shared. Seed values below are a derived starting point — tune them live with `scripts/chromatic-token-studio.mjs screen-light` + the visual-design companion, then `apply-light`.",
+  "background": {
+    "default": "#faf9fc",
+    "elevated": "#ffffff",
+    "overlay": "#f1eef9"
+  },
+  "surface": {
+    "default": "#ffffff",
+    "hover": "#f4f2fb",
+    "active": "#ece8f7",
+    "disabled": "#f6f6f9"
+  },
+  "text": {
+    "primary": "#1a1530",
+    "secondary": "#4b4564",
+    "muted": "#6b6486",
+    "disabled": "#9b96ad",
+    "inverse": "#faf9fc",
+    "onprimary": "#ffffff"
+  },
+  "border": {
+    "default": "#e6e2f0",
+    "hover": "#cfc8e4",
+    "focus": "#7c3aed",
+    "active": "#0891b2"
+  },
+  "glow": {
+    "primary": "rgba(124,58,237,0.22)",
+    "primaryStrong": "rgba(124,58,237,0.38)",
+    "accent": "rgba(8,145,178,0.20)",
+    "accentStrong": "rgba(8,145,178,0.34)",
+    "white": "rgba(26,21,48,0.08)",
+    "whiteStrong": "rgba(26,21,48,0.16)"
+  },
+  "gradient": {
+    "hero": "linear-gradient(135deg, #faf9fc 0%, #ede9fe 55%, #ddd6fe 100%)",
+    "holographic": "linear-gradient(180deg, rgba(124,58,237,0.10) 0%, rgba(6,182,212,0.04) 100%)",
+    "glowEdge": "radial-gradient(circle at 50% 0%, rgba(124,58,237,0.16), transparent 70%)",
+    "accentSweep": "linear-gradient(90deg, #6d28d9 0%, #0891b2 100%)"
+  }
+}

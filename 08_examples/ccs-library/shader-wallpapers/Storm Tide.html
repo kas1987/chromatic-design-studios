@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Storm Tide — MetaChromatic Wallpaper</title>
+<link rel="icon" href="lib/metachromatic-icon.svg">
+<link rel="stylesheet" href="lib/wallpaper.css">
+</head>
+<body>
+<div id="mc-vignette"></div>
+
+<script type="x-shader/x-fragment" id="frag">
+void main(){
+  vec2 st = gl_FragCoord.xy / u_res;
+  vec2 m  = (u_mouse - 0.5);
+  float t = u_time * (0.4 + u_motion*0.6);
+  vec3 rp = rippleAt(st);
+
+  vec2 z = (st - 0.5)*0.94 + 0.5;            // zoom headroom for movement
+  z += (u_mouse - 0.5) * vec2(0.022, 0.013); // parallax look-around
+
+  float below = smoothstep(0.50, 0.32, st.y);  // 1 underwater · 0 above the surface
+
+  // ── base: always gently alive ──
+  vec2 sway = vec2(sin(st.y*8.0 + t*0.7), cos(st.x*7.0 + t*0.55)) * 0.0026 * (0.4 + below);
+  vec2 sBase = z + sway;
+  vec3 base = bg(sBase);
+
+  // ── effect: refraction + ripples ──
+  float n  = fbm(st*vec2(6.0,11.0) + vec2(0.0, -t*1.3));
+  vec2 refr = vec2(n - 0.5, fbm(st*vec2(8.0,13.0) + vec2(3.0, t)) - 0.5);
+  vec2 disp = refr*0.028*below + rp.xy*0.055;
+  vec3 fx = bg(sBase + disp);
+
+  // caustic shafts under the surface
+  float caust = pow(fbm(st*vec2(5.0,3.0) + vec2(t*0.5, -t)), 3.0);
+  fx += mix(vec3(0.45,0.8,1.0), palRamp(0.35), 0.5) * caust * 0.55 * below;
+
+  // crest highlight where a ripple passes
+  fx += rp.z * mix(vec3(0.7,0.9,1.0), palRamp(0.5), 0.4) * 0.9;
+
+  // rain streaks above the waterline
+  float colx = floor(st.x*240.0);
+  float ph = hash11(colx);
+  float streak = smoothstep(0.95, 1.0, fract(st.y*0.55 - t*(1.3+ph) + ph*7.0));
+  streak *= step(0.86, hash11(colx + 11.0));
+  fx += streak * (1.0 - below) * 0.30 * vec3(0.8,0.9,1.0);
+
+  vec3 col = mix(base, fx, u_blend);
+  col += rp.z * 0.30;                         // touch glow regardless of blend
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+
+<script src="lib/chrome-dock.js"></script>
+<script src="lib/shader-runtime.js"></script>
+<script>
+  MCWallpaper.init({ index: 3, fragId: 'frag', motion: 0.6, blend: 0.5, image: 'assets/bg/ocean.jpg' });
+</script>
+</body>
+</html>
