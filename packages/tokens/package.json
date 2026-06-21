@@ -1,25 +1,73 @@
 {
   "name": "@chromatic/tokens",
-  "version": "0.1.0",
-  "private": true,
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "version": "0.5.0",
+  "description": "Chromatic design tokens — the single source of truth for color, spacing, typography, motion, and glow. Token-driven, framework-agnostic.",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./index.ts",
-    "./colors": "./src/colors.ts",
-    "./spacing": "./src/spacing.ts",
-    "./typography": "./src/typography.ts",
-    "./motion": "./src/motion.ts",
-    "./effects": "./src/effects.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./colors": {
+      "types": "./dist/colors.d.ts",
+      "import": "./dist/colors.mjs",
+      "require": "./dist/colors.cjs"
+    },
+    "./spacing": {
+      "types": "./dist/spacing.d.ts",
+      "import": "./dist/spacing.mjs",
+      "require": "./dist/spacing.cjs"
+    },
+    "./typography": {
+      "types": "./dist/typography.d.ts",
+      "import": "./dist/typography.mjs",
+      "require": "./dist/typography.cjs"
+    },
+    "./motion": {
+      "types": "./dist/motion.d.ts",
+      "import": "./dist/motion.mjs",
+      "require": "./dist/motion.cjs"
+    },
+    "./effects": {
+      "types": "./dist/effects.d.ts",
+      "import": "./dist/effects.mjs",
+      "require": "./dist/effects.cjs"
+    },
+    "./css": "./css/tokens.css",
+    "./tailwind": "./tailwind/preset.cjs",
+    "./figma": "./figma/tokens.json",
+    "./styledictionary": "./styledictionary/tokens.json",
+    "./package.json": "./package.json"
   },
+  "files": [
+    "dist",
+    "css",
+    "tailwind",
+    "figma",
+    "styledictionary",
+    "README.md"
+  ],
   "scripts": {
+    "build": "node ./scripts/build.mjs",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^2.1.0",
+    "@types/node": "^22.0.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"
-  }
+  },
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "chromatic",
+    "tailwind",
+    "figma-tokens"
+  ]
 }

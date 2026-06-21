@@ -5,42 +5,37 @@ Implement Chromatic Design Studios scaffold per PDR v0.1.0.
 
 ## Status
 - Wave 1 (Foundation) — **COMPLETE**
-  - Brand manifest and visual language
-  - Design tokens (color, spacing, typography, motion, glow)
-  - Governance playbooks (GO mode, confidence gates, model routing)
 - Wave 2 (Build) — **COMPLETE**
-  - CSS library skeleton (base, layout, components, effects)
-  - Claude Design bridge prompt
-  - OpenArt layered asset prompts
-  - Hero component spec
 - Wave 3 (QA + Demo) — **COMPLETE**
-  - Design QA checklist
-  - Demo hero page
-  - Packaging and appendices
-- Wave 4 (Scaffold) — **IN PROGRESS**
-  - ✅ Monorepo root manifest (`package.json`)
-  - ✅ `apps/web` — Next.js + TypeScript + Tailwind scaffold
-  - ✅ `apps/api/` and `apps/worker/` — placeholder READMEs
-  - ✅ `packages/*` — UI, tokens, prompts, agents, workflows, schemas
-  - ✅ `services/*` — LiteLLM, n8n, Open WebUI, ComfyUI, Ollama docs/configs
-  - ✅ `docs/PDR/`, `docs/playbooks/`, `docs/architecture/` — PDR content migrated
-  - ✅ `handoffs/AGENT_HANDOFF_QUEUE.md`
-  - ✅ `prompts/` — Claude Design and Codex scaffold prompts
-  - ✅ `scripts/` — Bootstrap helpers (.ps1 + .sh)
-  - ✅ `manifests/artifact_manifest.json`
-  - ✅ `validation/VALIDATION_CHECKLIST.md`
-  - ✅ `docker-compose.chromatic.yml`
-  - ✅ `apps/web` npm install and build verification (next 15.5.19, build green 4/4 pages)
-  - ✅ Token pipeline `scripts/build-tokens.mjs` — CSS vars + Tailwind theme from `02_design_tokens/*.json`
-  - ✅ Wire design tokens into `apps/web` Tailwind config + globals (token-driven, no hardcoded values)
-  - ✅ Inter / IBM Plex Sans / IBM Plex Mono loaded per typography tokens
-  - ✅ `packages/ui` token-driven `Hero` component (impl of `03_components/hero-component.md`), live on home page
-  - ✅ `scripts/chromatic-token-studio.mjs` — bridge to frontend-family `visual-design` companion (live token tuning → write-back)
-  - ✅ Merged `deps/patch-react-next-2026-06-03` (next 15.5.19)
-  - ⬜ shadcn/ui init — DEFERRED: the bespoke token theme is the source of truth; shadcn's init would layer a conflicting theme. Revisit only if shadcn primitives are explicitly wanted.
+- Wave 4 (Scaffold) — **COMPLETE** (v0.3.0 shipped 2026-06-05)
+- Wave 5 (Platform Surface) — **COMPLETE** (v0.4.0 shipped 2026-06-21)
+  - ✅ Route added: `/components` — 21-component index grouped by Form / Layout / Display / Feedback / Navigation
+  - ✅ Route added: `/tokens` — color ramps, spacing, typography, motion, glow explorer
+  - ✅ Route added: `/examples` — 10-pattern gallery with shipped/draft badges
+  - ✅ Route added: `/playground` — live primary-scale HSL sliders writing CSS vars at runtime
+  - ✅ Global primary nav wired into all routes
+  - ✅ Landing page rewritten: surface grid + differentiators + CTA pair
+  - ✅ README.md refreshed positioning ("front-end resource platform")
+  - ✅ `docs/CHANGELOG.md` published (v0.1.0 → v0.4.0 history)
+  - ✅ SWOT artifact: `docs/research/chromatic-design-studios-swot-2026-06-21.md`
+  - ✅ Beads: fresh local Dolt DB (`chromatic_design_studios`, prefix `cds-*`); 5 wave epics queued
+  - ✅ `.agents/handoffs/latest.json` refreshed (was 23 days stale)
+  - ✅ Build: 10/10 pages prerendered; typecheck green
+  - ✅ Tests: 17/17 web + 44/44 tokens + 13/13 E2E
+  - ✅ Playwright port bumped to 3006 (Grafana conflict on 3000)
+- Wave 6 (Component Library) — **COMPLETE** (v0.5.0 shipped 2026-06-21)
+  - ✅ shadcn-overlay decision: bespoke token-driven (not shadcn) — CDS tokens are the source of truth
+  - ✅ 18 new components shipped: Modal, Drawer, Toast, Tabs, Dropdown, Menu, Tooltip, Avatar, Toggle, Slider, Progress, Skeleton, Table, Pagination, Alert, Sheet, Separator, Kbd
+  - ✅ Total: 23 components across 5 categories (Form / Layout / Display / Feedback / Navigation)
+  - ✅ All components token-driven (no hardcoded values)
+  - ✅ All accessibility-wired (ARIA, keyboard, focus-visible, reduced-motion)
+  - ✅ `packages/ui` barrel updated with all 23 components
+  - ✅ `/components` route shows full library with category grouping + status counts
+  - ✅ Specs: `03_components/library-v0.5.0-specs.md` (agent-readable)
+  - ✅ Tests: 19/19 new component tests; 36/36 total web tests + 44/44 tokens + 13/13 E2E
 
 ## Version
-v0.3.0 — Token-Driven Web (Wave 4 build-out)
+v0.5.0 — Component Library (Wave 6 complete)
 
 ## Last Updated
-2026-06-05
+2026-06-21

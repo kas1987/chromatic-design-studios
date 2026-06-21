@@ -1,7 +1,43 @@
 {
-  "updated_at": "2026-05-29T12:00:00Z",
-  "agent": "cursor-auto",
-  "mission_id": "DESIGN-STUDIOS-INIT-GOV",
-  "handoff_path": null,
-  "note": "Rig normalized with AGENTS.md/CLAUDE.md. Create GitHub remote per chromatic-harness-v2-p2f."
+  "updated_at": "2026-06-21T12:00:00Z",
+  "agent": "claude-auto",
+  "mission_id": "CDS-WAVE-5-PLATFORM-SURFACE",
+  "mode": "autonomous",
+  "branch": "Main",
+  "head": "7d005bc",
+  "version_target": "v0.4.0",
+  "previous_handoff": {
+    "updated_at": "2026-05-29T12:00:00Z",
+    "agent": "cursor-auto",
+    "mission_id": "DESIGN-STUDIOS-INIT-GOV",
+    "note": "Rig normalized with AGENTS.md/CLAUDE.md. Create GitHub remote per chromatic-harness-v2-p2f."
+  },
+  "completed": [
+    "SWOT + 90-day roadmap published: docs/research/chromatic-design-studios-swot-2026-06-21.md",
+    "Route added: /components (21-component index grouped by category)",
+    "Route added: /tokens (color ramps, spacing, typography, motion, glow)",
+    "Route added: /examples (10-pattern gallery with shipped/draft badges)",
+    "Route added: /playground (live primary-scale HSL sliders, writes CSS vars at runtime)",
+    "Global primary nav wired into all routes (Components / Tokens / Examples / Playground / Studio)",
+    "Landing page rewritten: surface grid + differentiators + CTA pair",
+    "CHANGELOG.md created (v0.1.0 -> v0.4.0 history)",
+    "Beads: fresh local Dolt DB; 5 wave epics queued"
+  ],
+  "next_wave": {
+    "id": "WAVE-6",
+    "name": "Component Library to 21+",
+    "decision_required": "shadcn/ui overlay path confirmed (recommended)",
+    "target": "v0.5.0",
+    "depends_on": "Wave 5 build green + tests green"
+  },
+  "blockers": [],
+  "notes": [
+    "Beads Dolt embedded backend has a known writer-lock issue on Windows; falling back to SQLite-compatible JSONL until resolved. Issue tracker remains usable; CLI works in fallback mode.",
+    "Beats the 23-day handoff staleness from 2026-05-29 - handoff hygiene is restored."
+  ],
+  "links": {
+    "swot": "docs/research/chromatic-design-studios-swot-2026-06-21.md",
+    "changelog": "docs/CHANGELOG.md",
+    "roadmap": "docs/research/chromatic-design-studios-swot-2026-06-21.md#6-recommended-90-day-roadmap"
+  }
 }

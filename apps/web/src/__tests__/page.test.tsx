@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import Home from '../app/page'
 
-describe('Home page', () => {
+describe('Home page (v0.4.0 Platform Surface)', () => {
   it('renders without crashing', () => {
     const { container } = render(<Home />)
     expect(container).toBeTruthy()
@@ -16,28 +16,33 @@ describe('Home page', () => {
   it('renders the hero heading', () => {
     render(<Home />)
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
-    expect(screen.getByText('AI Design')).toBeInTheDocument()
-    expect(screen.getByText('Control Center')).toBeInTheDocument()
+    expect(screen.getByText('A Front-end')).toBeInTheDocument()
+    expect(screen.getByText('Resource Platform')).toBeInTheDocument()
   })
 
   it('renders the hero description', () => {
     render(<Home />)
-    expect(screen.getByText(/Orchestrate models, prompts, agents/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Token-driven, agent-readable, locally runnable/i),
+    ).toBeInTheDocument()
   })
 
   it('renders both hero CTAs', () => {
     render(<Home />)
-    // Hero CTAs render via the Button component as links (href set).
-    expect(screen.getByRole('link', { name: /Open Dashboard/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Read the PDR/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: /Browse components/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: /Explore tokens/i }),
+    ).toBeInTheDocument()
   })
 
-  it('renders the navigation links', () => {
+  it('renders the global primary nav', () => {
     render(<Home />)
-    // Exact names avoid colliding with the "Open Dashboard" hero CTA.
-    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Assets' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Prompts' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Components' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Tokens' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Examples' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Playground' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Studio' })).toBeInTheDocument()
   })
 
@@ -56,16 +61,25 @@ describe('Home page', () => {
 
   it('renders a <footer> with correct version text', () => {
     render(<Home />)
-    // Correct brand name (not "Chromactic")
-    expect(screen.getByText(/Chromatic Design Studios v0\.4\.0/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Chromatic Design Studios v0\.4\.0/),
+    ).toBeInTheDocument()
   })
 
   it('hero CTAs render as anchors (Button with href)', () => {
     render(<Home />)
-    // The Hero Button component renders an <a> when an href is supplied.
-    const dashboardCta = screen.getByRole('link', { name: /Open Dashboard/i })
-    const pdrCta = screen.getByRole('link', { name: /Read the PDR/i })
-    expect(dashboardCta.tagName).toBe('A')
-    expect(pdrCta.tagName).toBe('A')
+    const browseCta = screen.getByRole('link', { name: /Browse components/i })
+    const exploreCta = screen.getByRole('link', { name: /Explore tokens/i })
+    expect(browseCta.tagName).toBe('A')
+    expect(exploreCta.tagName).toBe('A')
+  })
+
+  it('renders the surface grid with all four route cards', () => {
+    render(<Home />)
+    // Each surface card surfaces the route as a Link with the path text.
+    expect(screen.getByText('/components')).toBeInTheDocument()
+    expect(screen.getByText('/tokens')).toBeInTheDocument()
+    expect(screen.getByText('/examples')).toBeInTheDocument()
+    expect(screen.getByText('/playground')).toBeInTheDocument()
   })
 })

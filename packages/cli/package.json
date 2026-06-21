@@ -1,0 +1,32 @@
+{
+  "name": "chromatic-ui",
+  "version": "0.5.0",
+  "description": "CLI for adding Chromatic Design Studios components and tokens to your project.",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "chromatic-ui": "./bin/chromatic-ui.mjs"
+  },
+  "main": "./bin/chromatic-ui.mjs",
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "scripts": {
+    "test": "node --test ./bin/__tests__/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@chromatic/tokens": "^0.5.0"
+  },
+  "keywords": [
+    "chromatic",
+    "design-system",
+    "cli",
+    "components",
+    "tailwind"
+  ]
+}

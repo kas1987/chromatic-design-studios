@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Home page smoke tests', () => {
+test.describe('Home page smoke tests (v0.4.0 Platform Surface)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
   })
@@ -12,30 +12,33 @@ test.describe('Home page smoke tests', () => {
   test('hero heading is visible', async ({ page }) => {
     const heading = page.getByRole('heading', { level: 1 })
     await expect(heading).toBeVisible()
-    await expect(heading).toContainText('AI Design')
+    await expect(heading).toContainText('Front-end')
+    await expect(heading).toContainText('Resource Platform')
   })
 
-  test('navigation links are present', async ({ page }) => {
-    // Exact names avoid colliding with the "Open Dashboard" hero CTA.
-    await expect(page.getByRole('link', { name: 'Dashboard', exact: true })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Assets', exact: true })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Prompts', exact: true })).toBeVisible()
+  test('global nav links are present', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Components', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Tokens', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Examples', exact: true })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Playground', exact: true })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Studio', exact: true })).toBeVisible()
   })
 
-  test('CTA buttons are visible and interactive', async ({ page }) => {
-    // Hero CTAs render via the Button component as links (href set), not <button>.
-    const dashboardCta = page.getByRole('link', { name: 'Open Dashboard' })
-    const pdrCta = page.getByRole('link', { name: 'Read the PDR' })
-    await expect(dashboardCta).toBeVisible()
-    await expect(pdrCta).toBeVisible()
-    await dashboardCta.click()
-    await pdrCta.click()
+  test('hero CTAs navigate to the right routes', async ({ page }) => {
+    const browseCta = page.getByRole('link', { name: 'Browse components' })
+    const exploreCta = page.getByRole('link', { name: 'Explore tokens' })
+    await expect(browseCta).toBeVisible()
+    await expect(exploreCta).toBeVisible()
+    await browseCta.click()
+    await expect(page).toHaveURL(/\/components$/)
+    await page.goto('/')
+    await exploreCta.click()
+    await expect(page).toHaveURL(/\/tokens$/)
   })
 
   test('no console errors on page load', async ({ page }) => {
     const errors: string[] = []
-    page.on('console', msg => {
+    page.on('console', (msg) => {
       if (msg.type() === 'error') errors.push(msg.text())
     })
     await page.waitForLoadState('networkidle')
@@ -58,7 +61,22 @@ test.describe('Home page smoke tests', () => {
     await page.goto('/')
     const heading = page.getByRole('heading', { level: 1 })
     await expect(heading).toBeVisible()
-    // Nav is hidden on mobile (hidden md:flex)
-    await expect(page.getByRole('navigation')).not.toBeVisible()
+    // ThemeToggle still rendered in the mobile header (visible always)
+    await expect(page.getByRole('button', { name: /switch to (dark|light) mode/i })).toBeVisible()
   })
+})
+
+test.describe('Platform routes (v0.4.0)', () => {
+  for (const route of ['/components', '/tokens', '/examples', '/playground', '/studio']) {
+    test(`${route} renders without errors`, async ({ page }) => {
+      const errors: string[] = []
+      page.on('console', (msg) => {
+        if (msg.type() === 'error') errors.push(msg.text())
+      })
+      await page.goto(route)
+      await expect(page.getByRole('main')).toBeVisible()
+      await expect(page.getByRole('banner')).toBeVisible()
+      expect(errors).toHaveLength(0)
+    })
+  }
 })

@@ -1,0 +1,32 @@
+{
+  "name": "chromatic-agent",
+  "version": "0.5.0",
+  "description": "Render Chromatic Design Studios component specs into TSX. Spec-as-source-of-truth.",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "chromatic-agent": "./bin/chromatic-agent.mjs"
+  },
+  "main": "./bin/chromatic-agent.mjs",
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "scripts": {
+    "test": "node --test ./bin/__tests__/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@chromatic/tokens": "^0.5.0"
+  },
+  "keywords": [
+    "chromatic",
+    "agent",
+    "spec",
+    "tsx",
+    "design-system"
+  ]
+}
