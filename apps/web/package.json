@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@chromatic/stash-client": "*",
     "@chromatic/tokens": "*",
     "@chromatic/ui": "*",
     "next": "^15.1.0",

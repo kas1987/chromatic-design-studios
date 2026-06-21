@@ -84,6 +84,7 @@ function Nav() {
           <Link href="/components" className="hover:text-text-primary">Components</Link>
           <Link href="/tokens" className="text-text-primary">Tokens</Link>
           <Link href="/examples" className="hover:text-text-primary">Examples</Link>
+          <Link href="/generated" className="hover:text-text-primary">Generated</Link>
           <Link href="/playground" className="hover:text-text-primary">Playground</Link>
           <Link href="/studio" className="hover:text-text-primary">Studio</Link>
         </nav>

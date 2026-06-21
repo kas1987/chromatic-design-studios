@@ -16,7 +16,19 @@ const CLI = path.resolve(
   'chromatic-agent.mjs',
 );
 
-function runCli(args, cwd) {
+// Tests invoke the CLI with a relative spec path. Resolve that path against
+// the chromatic-design-studios repo root (4 levels up from this file:
+// __tests__ → bin → agent → packages → repo) so the suite passes regardless
+// of which workspace cwd npm selects.
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+  '..',
+  '..',
+);
+
+function runCli(args, cwd = REPO_ROOT) {
   return spawnSync('node', [CLI, ...args], {
     cwd,
     encoding: 'utf8',
@@ -43,13 +55,13 @@ test('list prints the 3 starter components', () => {
 });
 
 test('check passes for a renderable spec', () => {
-  const r = runCli(['check', '03_components/button.md'], process.cwd());
+  const r = runCli(['check', '03_components/button.md']);
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /Button is renderable/);
 });
 
 test('check fails for a missing spec', () => {
-  const r = runCli(['check', '03_components/nonexistent.md'], process.cwd());
+  const r = runCli(['check', '03_components/nonexistent.md']);
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /not found/i);
 });
@@ -58,10 +70,7 @@ test('render emits TSX for a known component', () => {
   const dir = tempDir();
   try {
     const outFile = path.join(dir, 'ButtonDemo.tsx');
-    const r = runCli(
-      ['render', '03_components/button.md', outFile],
-      process.cwd(),
-    );
+    const r = runCli(['render', '03_components/button.md', outFile]);
     assert.equal(r.status, 0, r.stderr);
     assert.ok(fs.existsSync(outFile));
     const txt = fs.readFileSync(outFile, 'utf8');
@@ -73,7 +82,7 @@ test('render emits TSX for a known component', () => {
 });
 
 test('render without output writes to stdout', () => {
-  const r = runCli(['render', '03_components/badge.md'], process.cwd());
+  const r = runCli(['render', '03_components/badge.md']);
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /import \{ Badge \} from "@chromatic\/ui"/);
 });
@@ -84,7 +93,7 @@ test('render fails for an unknown component (confidence gate)', () => {
     // Write a fake spec for a non-existent component
     const specPath = path.join(dir, 'phantom.md');
     fs.writeFileSync(specPath, '# Phantom\nStatus: stable\n');
-    const r = runCli(['render', specPath], process.cwd());
+    const r = runCli(['render', specPath]);
     assert.notEqual(r.status, 0);
     assert.match(r.stderr, /confidence too low|no template found/i);
   } finally {
