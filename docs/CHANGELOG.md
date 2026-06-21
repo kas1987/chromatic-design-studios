@@ -2,6 +2,43 @@
 
 All notable changes to Chromatic Design Studios are recorded here. Versions follow [SemVer](https://semver.org/) lightly: breaking token changes are major, additive components are minor, fixes are patch.
 
+## v1.0.0-rc+1 — Wave A Bridge (2026-06-21, commit 693184b)
+
+**Shipped the cross-repo bridge that pairs CDS with the ComfyUI-Harness Stash media library.**
+
+### Added
+
+- `@chromatic/stash-client` package — typed GraphQL client for Stash (`:9999`)
+  with a 24-image deterministic mock fallback. `createStashClientOrMock()` probes
+  the URL with a 1s timeout and returns the mock when unreachable, so `/generated`
+  always renders and dev never blocks on Stash.
+- `/generated` route in `apps/web/src/app/generated/` — paginated image grid with
+  tag filtering, rating / newest / title sorting, copy-prompt button per card, and
+  workflow-id provenance for cross-repo traceability. Live vs Demo data badge in
+  the nav reflects the real Stash state.
+- `Generated` nav entry added to all platform routes (landing, `/components`,
+  `/tokens`, `/examples`, `/playground`) for consistency.
+
+### Fixed
+
+- `packages/agent` test suite: REPO_ROOT resolution + cwd handling so the CLI
+  smoke tests pass when invoked via `npm --workspaces` (which changes cwd to each
+  package). 7/7 pass from any cwd.
+
+### Tests
+
+- 5 new vitest cases for `GeneratedGrid`. **107/107 total across 5 workspaces**
+  (web 41, agent 7, ui 7, stash-client 8, tokens 44). Build: 16 routes
+  prerendered; `/generated` ships at 1.39 kB. Typecheck: clean.
+
+### Cross-references
+
+- Documents the joint roadmap to becoming a Claude Design–class resource
+  platform: `docs/research/comfyui-harness-cds-joint-swot-2026-06-21.md`.
+- Next: merge `feat/visual-asset-registry` on the ComfyUI-Harness side to
+  align the Stash GraphQL schema with the asset-registry JSON Schema
+  (tracked in `BRANCH_HYGIENE.md`).
+
 ## v0.4.0 — Platform Surface — 2026-06-21
 
 **Shipped the public-facing surface of the platform.**

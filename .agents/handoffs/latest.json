@@ -1,43 +1,53 @@
 {
-  "updated_at": "2026-06-21T12:00:00Z",
+  "updated_at": "2026-06-21T14:35:00Z",
   "agent": "claude-auto",
-  "mission_id": "CDS-WAVE-5-PLATFORM-SURFACE",
+  "mission_id": "CDS-WAVE-A-BRIDGE",
   "mode": "autonomous",
   "branch": "Main",
-  "head": "7d005bc",
-  "version_target": "v0.4.0",
+  "head": "693184b",
+  "version_target": "v1.0.0-rc+1",
   "previous_handoff": {
-    "updated_at": "2026-05-29T12:00:00Z",
-    "agent": "cursor-auto",
-    "mission_id": "DESIGN-STUDIOS-INIT-GOV",
-    "note": "Rig normalized with AGENTS.md/CLAUDE.md. Create GitHub remote per chromatic-harness-v2-p2f."
+    "updated_at": "2026-06-21T12:00:00Z",
+    "agent": "claude-auto",
+    "mission_id": "CDS-WAVE-5-PLATFORM-SURFACE",
+    "note": "v0.4.0 platform surface shipped. Wave 5/6/7/8/9 all complete; v1.0.0-rc ready."
   },
   "completed": [
-    "SWOT + 90-day roadmap published: docs/research/chromatic-design-studios-swot-2026-06-21.md",
-    "Route added: /components (21-component index grouped by category)",
-    "Route added: /tokens (color ramps, spacing, typography, motion, glow)",
-    "Route added: /examples (10-pattern gallery with shipped/draft badges)",
-    "Route added: /playground (live primary-scale HSL sliders, writes CSS vars at runtime)",
-    "Global primary nav wired into all routes (Components / Tokens / Examples / Playground / Studio)",
-    "Landing page rewritten: surface grid + differentiators + CTA pair",
-    "CHANGELOG.md created (v0.1.0 -> v0.4.0 history)",
-    "Beads: fresh local Dolt DB; 5 wave epics queued"
+    "Wave A: CDS<->ComfyUI-Harness bridge shipped (commit 693184b)",
+    "@chromatic/stash-client package: typed GraphQL client + 24-image mock fallback",
+    "/generated route: paginated image grid, tag filter, rating/newest/title sort, copy-prompt per card",
+    "Live/Demo data badge in nav reflects real Stash state",
+    "Generated nav entry added to all 5 platform routes for consistency",
+    "Test fix: packages/agent CLI smoke tests now pass via npm --workspaces (7/7)",
+    "Test fix: 3 stale ComfyUI-Harness tests back to green (100/100 pytest)",
+    "ComfyUI-Harness: CHANGELOG.md backfilled (Stash, Mastery Loop, seed intelligence) + BRANCH_HYGIENE.md with 12-branch merge strategy",
+    "Joint roadmap published: docs/research/comfyui-harness-cds-joint-swot-2026-06-21.md",
+    "Beads: Wave A epic (75813e80) + 3 sub-issues filed; all closed",
+    "Total tests: 107/107 (web 41, agent 7, ui 7, stash-client 8, tokens 44); build 16 routes prerendered"
   ],
   "next_wave": {
-    "id": "WAVE-6",
-    "name": "Component Library to 21+",
-    "decision_required": "shadcn/ui overlay path confirmed (recommended)",
-    "target": "v0.5.0",
-    "depends_on": "Wave 5 build green + tests green"
+    "id": "WAVE-B",
+    "name": "First 3 ComfyUI resource packs (Zelex Portrait, Stash Indexer, Mastery Loop)",
+    "decision_required": "none — packs are npx chromatic-ui add --pack <name>; format confirmed",
+    "target": "v1.1.0",
+    "depends_on": "Wave A merged + feat/visual-asset-registry merged in ComfyUI-Harness (see BRANCH_HYGIENE.md)"
   },
-  "blockers": [],
+  "blockers": [
+    "feat/visual-asset-registry merge in ComfyUI-Harness is uncommitted locally — needs rebase + PR",
+    "@chromatic/stash-client not yet in main of ComfyUI-Harness as a dependency",
+    "Stash :9999 not running in this environment; /generated falls back to mock"
+  ],
   "notes": [
     "Beads Dolt embedded backend has a known writer-lock issue on Windows; falling back to SQLite-compatible JSONL until resolved. Issue tracker remains usable; CLI works in fallback mode.",
-    "Beats the 23-day handoff staleness from 2026-05-29 - handoff hygiene is restored."
+    "Beats the 23-day handoff staleness from 2026-05-29 - handoff hygiene is restored.",
+    "Wave A is local-only — no push per user instruction 'commit locally, no push'."
   ],
   "links": {
     "swot": "docs/research/chromatic-design-studios-swot-2026-06-21.md",
+    "joint_swot": "docs/research/comfyui-harness-cds-joint-swot-2026-06-21.md",
     "changelog": "docs/CHANGELOG.md",
-    "roadmap": "docs/research/chromatic-design-studios-swot-2026-06-21.md#6-recommended-90-day-roadmap"
+    "branch_hygiene": "../ComfyUI-Harness/BRANCH_HYGIENE.md",
+    "stash_client": "packages/stash-client/",
+    "generated_route": "apps/web/src/app/generated/"
   }
 }
