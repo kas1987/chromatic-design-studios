@@ -5,7 +5,10 @@
  * Subcommands:
  *   init                  Scaffold tokens + base config into the current project.
  *   add <component>       Copy a component source into ./components/chromatic/.
+ *   add --pack <name>     Copy a whole ComfyUI pack into ./components/chromatic/packs/.
  *   list                  List available components.
+ *   packs [list]          List available ComfyUI resource packs.
+ *   packs show <name>     Print a pack's manifest.
  *   tokens                Emit a CSS layer with the design tokens.
  *   doctor                Verify project setup (Tailwind present, etc.).
  *
@@ -31,7 +34,10 @@ Usage:
 Commands:
   init                  Scaffold tokens + base config into ./components/chromatic
   add <name>            Add a single component (e.g. "button", "modal")
+  add --pack <name>     Add a ComfyUI resource pack (e.g. "zelex-portrait")
   list                  List available components
+  packs [list]          List available ComfyUI resource packs
+  packs show <name>     Print a pack's manifest.yaml
   tokens                Emit @chromatic/tokens CSS layer to ./app/globals.css
   doctor                Check project setup
 
@@ -57,6 +63,27 @@ function listComponents() {
   return fs.readdirSync(dir).filter((f) => f.endsWith('.tsx'));
 }
 
+function listPacks() {
+  const dir = path.join(TEMPLATES, 'packs');
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+}
+
+function copyDir(srcDir, destDir) {
+  ensureDir(destDir);
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    const src = path.join(srcDir, entry.name);
+    const dest = path.join(destDir, entry.name);
+    if (entry.isDirectory()) {
+      copyDir(src, dest);
+    } else if (entry.isFile()) {
+      copyFile(src, dest);
+    }
+  }
+}
+
 function cmdInit() {
   const cwd = process.cwd();
   const target = path.join(cwd, 'components', 'chromatic');
@@ -70,12 +97,26 @@ function cmdInit() {
   console.log('  3. See https://github.com/kas1987/chromatic-design-studios for docs.');
 }
 
-function cmdAdd(name) {
+function cmdAdd(name, opts = {}) {
   if (!name) {
-    console.error('Usage: chromatic-ui add <component>');
+    console.error('Usage: chromatic-ui add <component>  OR  chromatic-ui add --pack <name>');
     process.exit(1);
   }
   const target = path.join(process.cwd(), 'components', 'chromatic');
+
+  if (opts.pack) {
+    const packName = name;
+    const packDir = path.join(TEMPLATES, 'packs', packName);
+    if (!fs.existsSync(packDir) || !fs.statSync(packDir).isDirectory()) {
+      console.error(`Pack "${packName}" not found. Run: chromatic-ui packs list`);
+      process.exit(1);
+    }
+    const dest = path.join(target, 'packs', packName);
+    copyDir(packDir, dest);
+    console.log(`Added pack ${packName}.`);
+    return;
+  }
+
   ensureDir(target);
   const safe = name.replace(/[^a-zA-Z0-9-_]/g, '');
   // Try exact match, lowercase, title-case
@@ -98,6 +139,30 @@ function cmdAdd(name) {
   }
   copyFile(matched, path.join(target, path.basename(matched)));
   console.log(`Added ${path.basename(matched)}. Import it from "@/components/chromatic".`);
+}
+
+function cmdPacks(sub, name) {
+  const packs = listPacks();
+  if (!sub || sub === 'list') {
+    console.log(`Available packs (${packs.length}):`);
+    for (const p of packs) console.log(`  - ${p}`);
+    return;
+  }
+  if (sub === 'show') {
+    if (!name) {
+      console.error('Usage: chromatic-ui packs show <name>');
+      process.exit(1);
+    }
+    const manifest = path.join(TEMPLATES, 'packs', name, 'manifest.yaml');
+    if (!fs.existsSync(manifest)) {
+      console.error(`Pack "${name}" not found. Run: chromatic-ui packs list`);
+      process.exit(1);
+    }
+    console.log(fs.readFileSync(manifest, 'utf8'));
+    return;
+  }
+  console.error(`Unknown packs subcommand: ${sub}`);
+  process.exit(1);
 }
 
 function cmdList() {
@@ -155,7 +220,11 @@ if (cmd === '--help' || cmd === '-h' || !cmd) {
 } else if (cmd === 'init') {
   cmdInit();
 } else if (cmd === 'add') {
-  cmdAdd(args[1]);
+  const isPack = args.includes('--pack');
+  const filtered = args.filter((a) => a !== '--pack');
+  cmdAdd(filtered[1], { pack: isPack });
+} else if (cmd === 'packs') {
+  cmdPacks(args[1], args[2]);
 } else if (cmd === 'list') {
   cmdList();
 } else if (cmd === 'tokens') {

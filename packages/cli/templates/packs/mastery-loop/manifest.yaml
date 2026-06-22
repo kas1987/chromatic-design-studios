@@ -1,0 +1,24 @@
+name: mastery-loop
+displayName: Mastery Loop Pack
+version: 1.0.0
+description: >-
+  Closed-loop grading harness for ComfyUI outputs. Implements the
+  Golden Seed Mastery Loop from ComfyUI-Harness (mastery_db,
+  mastery_loop, mastery_mcp). Use to evolve a winning prompt / seed /
+  workflow combo through scored iterations.
+tags:
+  - closed-loop
+  - grading
+  - mastery
+lane: image
+producer: comfyui-harness
+workflow_id: portrait_headshot_v1_graph_v001
+inputs:
+  - workflows/mastery-loop.v1.graph.json
+  - prompts/mastery.yaml
+  - models.yaml
+notes: |
+  Drop into your ComfyUI install root; pair with the
+  `python 07_SCRIPTS/run_matrix.py` runner for full
+  closed-loop execution. The CLI copies everything into
+  ./components/chromatic/packs/mastery-loop/.

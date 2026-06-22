@@ -1,0 +1,40 @@
+{
+  "id": "zelex_t2i_four_prompt_v1",
+  "version": 1,
+  "displayName": "Zelex T2I Four Prompt",
+  "producer": "comfyui-harness",
+  "kind": "image.t2i",
+  "inputs": {
+    "checkpoint": "zelex-realistic-v9.safetensors",
+    "vae": "vae-ft-mse-840000.safetensors",
+    "loras": [
+      { "name": "zelex-detail-v1.safetensors", "strength_model": 0.85, "strength_clip": 0.85 },
+      { "name": "zelex-eyes-v1.safetensors", "strength_model": 0.7, "strength_clip": 0.7 }
+    ]
+  },
+  "graph": {
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": 424242,
+        "steps": 30,
+        "cfg": 7.0,
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "denoise": 1.0
+      }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": { "text": "{{positive}}" }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": { "text": "{{negative}}" }
+    }
+  },
+  "outputs": {
+    "images": ["SaveImage"]
+  },
+  "notes": "Reference graph for the Zelex Portrait Pack. Replace {{positive}} / {{negative}} from prompts/zelex.yaml at runtime. Full ComfyUI node graph lives in ComfyUI-Harness 01_WORKFLOWS/zelex_t2i_four_prompt.v1.graph.json."
+}

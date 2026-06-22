@@ -1,0 +1,45 @@
+{
+  "id": "mastery_loop_v1",
+  "version": 1,
+  "displayName": "Mastery Loop (closed-loop grading)",
+  "producer": "comfyui-harness",
+  "kind": "image.t2i.loop",
+  "loop": {
+    "iterations": 5,
+    "scoring_dimensions": [
+      "prompt_adherence_score",
+      "aesthetic_score",
+      "face_detail_score",
+      "composition_score",
+      "technical_quality_score",
+      "user_preference_score"
+    ],
+    "selection": "argmax(weighted_sum)",
+    "mutation": "phrase_swap"
+  },
+  "graph": {
+    "3": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": "{{rolling_seed}}",
+        "steps": 30,
+        "cfg": 7.5,
+        "sampler_name": "euler",
+        "scheduler": "normal"
+      }
+    },
+    "6": {
+      "class_type": "CLIPTextEncode",
+      "inputs": { "text": "{{mutated_positive}}" }
+    },
+    "7": {
+      "class_type": "CLIPTextEncode",
+      "inputs": { "text": "{{negative}}" }
+    }
+  },
+  "outputs": {
+    "ranked": ["06_RESULTS/leaderboard.csv"],
+    "manifest": ["04_RUNS/run_manifest.jsonl"]
+  },
+  "notes": "Reference graph for the Mastery Loop Pack. Drive with python -m mastery_loop run --pack mastery-loop on the ComfyUI-Harness side."
+}

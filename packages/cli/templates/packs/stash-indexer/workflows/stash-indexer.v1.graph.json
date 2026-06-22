@@ -1,0 +1,28 @@
+{
+  "id": "stash_indexer_v1",
+  "version": 1,
+  "displayName": "Stash Indexer (metadata emission)",
+  "producer": "comfyui-harness",
+  "kind": "utility.metadata",
+  "graph": {
+    "1": {
+      "class_type": "StashScanOutputs",
+      "inputs": {
+        "output_root": "{{OUTPUT_ROOT}}",
+        "manifest_path": "{{MANIFEST_PATH}}"
+      }
+    },
+    "2": {
+      "class_type": "StashEmitSidecar",
+      "inputs": {
+        "scan_node": ["1", 0],
+        "sidecar_format": "json"
+      }
+    }
+  },
+  "outputs": {
+    "sidecars": [".meta.json"],
+    "manifest": "registry.jsonl"
+  },
+  "notes": "Reference graph for the Stash Indexer Pack. Pair with @chromatic/stash-client in the consuming CDS app."
+}

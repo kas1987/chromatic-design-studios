@@ -1,0 +1,30 @@
+# Zelex four-prompt prompt matrix — 4 stylistically distinct portrait
+# generations on the same seed. Mirrors the ComfyUI-Harness
+# prompt_matrix_zelex.yaml.
+
+defaults:
+  negative: "blurry, low quality, watermark, text, logo, deformed, extra fingers"
+  steps: 30
+  cfg: 7.0
+  sampler: Euler
+  scheduler: normal
+  width: 1024
+  height: 1024
+
+matrix:
+  - id: zelex-cinematic
+    positive: >-
+      professional cinematic headshot, 85mm lens, studio key + fill,
+      neutral expression, sharp eyes, shallow depth of field
+  - id: zelex-editorial
+    positive: >-
+      high-fashion editorial portrait, hard rim light, magazine cover,
+      confident gaze, clean backdrop, color graded
+  - id: zelex-natural
+    positive: >-
+      natural-light outdoor portrait, golden hour, soft bokeh,
+      candid expression, film grain, gentle smile
+  - id: zelex-studio
+    positive: >-
+      clean studio portrait, softbox lighting, neutral background,
+      hands relaxed, classic three-quarter angle

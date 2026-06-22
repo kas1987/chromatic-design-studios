@@ -1,0 +1,24 @@
+name: zelex-portrait
+displayName: Zelex Portrait Pack
+version: 1.0.0
+description: >-
+  Reference ComfyUI workflow, prompt matrix, and LoRA refs for the Zelex T2I
+  four-prompt portrait lane. Derived from ComfyUI-Harness workflow
+  zelex_t2i_four_prompt_v1_graph_v001. Pairs with the Stash image grid in CDS.
+tags:
+  - portrait
+  - headshot
+  - zelex
+  - t2i
+lane: image
+producer: comfyui-harness
+workflow_id: zelex_t2i_four_prompt_v1_graph_v001
+inputs:
+  - workflows/zelex_t2i_four_prompt.v1.graph.json
+  - prompts/zelex.yaml
+  - models.yaml
+notes: |
+  This is a copy-paste pack — drop the files into your ComfyUI
+  install root (workflows go in ComfyUI/workflows/, prompts in
+  your prompt library, models in models/loras/). The CLI copies
+  everything into ./components/chromatic/packs/zelex-portrait/.

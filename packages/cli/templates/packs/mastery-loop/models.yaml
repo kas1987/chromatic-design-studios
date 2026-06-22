@@ -1,0 +1,18 @@
+# Mastery Loop Pack — defaults aligned with the portrait_headshot lane.
+# LoRA / model pointers only; binaries live at D:\.000_AI\Models.
+
+loras:
+  - name: portrait-detail-v2
+    path: loras/portrait-detail-v2.safetensors
+    strength: 0.6
+    notes: Subtle detail lift; tuned for the mastery loop's incremental gains.
+checkpoints:
+  - name: zelex-realistic-v9
+    path: checkpoints/zelex-realistic-v9.safetensors
+    notes: Default starting checkpoint for the mastery loop.
+vae:
+  - name: vae-ft-mse-840000
+    path: vae/vae-ft-mse-840000.safetensors
+
+# Resolve locally with:
+#   python -m mastery_loop run --pack mastery-loop

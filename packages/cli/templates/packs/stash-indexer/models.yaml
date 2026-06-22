@@ -1,0 +1,10 @@
+# Stash Indexer Pack — no model weights required.
+# This is a metadata-only pack; it walks outputs and emits .meta.json sidecars.
+
+loras: []
+checkpoints: []
+vae: []
+
+# Resolve locally with:
+#   python 07_SCRIPTS/stash_integration.py --all --trigger-scan
+# See ComfyUI-Harness docs/COMFYUI_INTEGRATION_MAP.md for the Stash integration.

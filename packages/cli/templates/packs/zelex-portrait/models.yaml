@@ -1,0 +1,24 @@
+# LoRA / model references for the Zelex Portrait Pack.
+# These are pointers to the canonical model inventory — binary weights live
+# at D:\.000_AI\Models on the workstation; they are NOT bundled in this pack.
+
+loras:
+  - name: zelex-detail-v1
+    path: loras/zelex-detail-v1.safetensors
+    strength: 0.85
+    notes: Increases facial detail without overcooking.
+  - name: zelex-eyes-v1
+    path: loras/zelex-eyes-v1.safetensors
+    strength: 0.7
+    notes: Subtle eye sharpness boost.
+checkpoints:
+  - name: zelex-realistic-v9
+    path: checkpoints/zelex-realistic-v9.safetensors
+    notes: Default for the four-prompt lane.
+vae:
+  - name: vae-ft-mse-840000
+    path: vae/vae-ft-mse-840000.safetensors
+    notes: Default VAE — consistent with the rest of the harness.
+
+# Resolve locally with:
+#   python -m comfyui_harness resolve-loras --pack zelex-portrait

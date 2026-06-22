@@ -1,0 +1,23 @@
+# Stash Indexer — no prompts.
+# This pack emits metadata sidecars, not generated outputs.
+# The "prompt" is the workflow ID + batch seed + matrix cell.
+
+defaults:
+  prompt_format: "stash-sidecar"
+  sidecar_keys:
+    - id
+    - title
+    - path
+    - thumbnail
+    - tags
+    - rating
+    - createdAt
+    - workflowId
+    - prompt
+    - width
+    - height
+
+# Run via:
+#   chromatic-ui add --pack stash-indexer
+#   cd components/chromatic/packs/stash-indexer
+#   python ../../../node_modules/.bin/stash-scan  # future helper

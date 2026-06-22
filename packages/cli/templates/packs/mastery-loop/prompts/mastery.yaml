@@ -1,0 +1,28 @@
+# Mastery Loop — starting prompt. The loop evolves this across iterations
+# using the 6-dimension scoring matrix in ComfyUI-Harness matrix_config.yaml
+# (prompt_adherence=0.30, aesthetic=0.20, face_detail=0.15, composition=0.15,
+# technical=0.10, user_preference=0.10).
+
+defaults:
+  negative: "blurry, low quality, watermark, text, logo"
+  steps: 30
+  cfg: 7.5
+  sampler: Euler
+  scheduler: normal
+  width: 1024
+  height: 1024
+  seed_strategy: rolling
+  seed_jitter: 7
+
+starting_prompt:
+  positive: >-
+    professional headshot, 85mm lens, studio lighting, neutral background,
+    sharp eyes, three-quarter angle, calm expression
+  iteration_count: 5
+  mutation_strategy: phrase_swap
+  mutation_pool:
+    - "cinematic"
+    - "editorial"
+    - "natural-light"
+    - "high-key"
+    - "low-key"

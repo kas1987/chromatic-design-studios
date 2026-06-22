@@ -1,0 +1,23 @@
+name: stash-indexer
+displayName: Stash Indexer Pack
+version: 1.0.0
+description: >-
+  Utility scripts for indexing ComfyUI outputs into Stash, including the
+  sidecar metadata generator and the scan-assets walker. Pairs with the
+  ComfyUI-Harness asset-registry schema (governance/asset-registry.schema.json)
+  and the CDS @chromatic/stash-client package.
+tags:
+  - utility
+  - indexer
+  - stash
+lane: utility
+producer: comfyui-harness
+workflow_id: none
+inputs:
+  - workflows/stash-indexer.v1.graph.json
+  - prompts/INDEX-PROMPT.yaml
+  - models.yaml
+notes: |
+  Utility pack — drop the workflow JSON into your ComfyUI install
+  to wire up Stash sidecar emission. The CDS /generated route
+  consumes the resulting JSONL via @chromatic/stash-client.
