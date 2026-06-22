@@ -85,3 +85,65 @@ describe("mockStashClient", () => {
     expect(new Set(tags).size).toBe(tags.length);
   });
 });
+
+describe("mockStashClient videos", () => {
+  it("listVideos returns the 12-item default page", async () => {
+    const client = createMockStashClient();
+    const page = await client.listVideos();
+    expect(page.items.length).toBe(12);
+    expect(page.total).toBe(12);
+    expect(page.page).toBe(1);
+    expect(page.hasMore).toBe(false);
+  });
+
+  it("listVideos paginates", async () => {
+    const client = createMockStashClient();
+    const page1 = await client.listVideos({ page: 1, pageSize: 5 });
+    const page2 = await client.listVideos({ page: 2, pageSize: 5 });
+    const page3 = await client.listVideos({ page: 3, pageSize: 5 });
+    expect(page1.items.length).toBe(5);
+    expect(page2.items.length).toBe(5);
+    expect(page3.items.length).toBe(2);
+    expect(page1.hasMore).toBe(true);
+    expect(page3.hasMore).toBe(false);
+    const ids1 = new Set(page1.items.map((v) => v.id));
+    expect(page2.items.some((v) => ids1.has(v.id))).toBe(false);
+  });
+
+  it("listVideos items have i2v defaults (model, fps, durationSec)", async () => {
+    const client = createMockStashClient();
+    const page = await client.listVideos();
+    for (const v of page.items) {
+      expect(v.model).toMatch(/stable-video-diffusion/);
+      expect(v.fps).toBeGreaterThan(0);
+      expect(v.durationSec).toBeGreaterThan(0);
+      expect(v.workflowId).toBe("svd_img2vid_v1");
+      expect(v.tags).toContain("i2v");
+    }
+  });
+
+  it("listVideos filters by tag and search", async () => {
+    const client = createMockStashClient();
+    const allI2V = await client.listVideos({ tag: "i2v" });
+    expect(allI2V.items.length).toBe(12);
+    const matches = await client.listVideos({ search: "landscape" });
+    for (const v of matches.items) {
+      const haystack = [
+        v.title.toLowerCase(),
+        ...v.tags.map((t) => t.toLowerCase()),
+        v.workflowId?.toLowerCase() ?? "",
+        v.model?.toLowerCase() ?? "",
+      ].join(" ");
+      expect(haystack).toContain("landscape");
+    }
+  });
+
+  it("getVideo returns the matching fixture or null", async () => {
+    const client = createMockStashClient();
+    const v = await client.getVideo("vid-001");
+    expect(v).not.toBeNull();
+    expect(v?.title).toMatch(/i2v Run #001/);
+    const missing = await client.getVideo("does-not-exist");
+    expect(missing).toBeNull();
+  });
+});

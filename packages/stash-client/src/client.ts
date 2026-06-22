@@ -1,4 +1,4 @@
-import type { StashClient, StashImage, StashPage, StashQuery } from "./types";
+import type { StashClient, StashImage, StashPage, StashQuery, StashVideo, StashVideoPage } from "./types";
 import { DEFAULT_PAGE_SIZE } from "./types";
 import { createMockStashClient } from "./mock";
 
@@ -47,6 +47,54 @@ const GET_IMAGE_QUERY = /* GraphQL */ `
 const LIST_TAGS_QUERY = /* GraphQL */ `
   query ListTags {
     tags
+  }
+`;
+
+const LIST_VIDEOS_QUERY = /* GraphQL */ `
+  query ListVideos($input: VideoListInput!) {
+    listVideos(input: $input) {
+      items {
+        id
+        title
+        path
+        thumbnail
+        tags
+        rating
+        createdAt
+        workflowId
+        prompt
+        model
+        durationSec
+        fps
+        frames
+        sourceImageId
+      }
+      total
+      page
+      pageSize
+      hasMore
+    }
+  }
+`;
+
+const GET_VIDEO_QUERY = /* GraphQL */ `
+  query GetVideo($id: ID!) {
+    video(id: $id) {
+      id
+      title
+      path
+      thumbnail
+      tags
+      rating
+      createdAt
+      workflowId
+      prompt
+      model
+      durationSec
+      fps
+      frames
+      sourceImageId
+    }
   }
 `;
 
@@ -118,6 +166,32 @@ export function createStashClient(opts: CreateStashClientOptions): StashClient {
     async listTags(): Promise<string[]> {
       const data = await graphqlFetch<{ tags: string[] }>(url, LIST_TAGS_QUERY, {});
       return data.tags;
+    },
+
+    async listVideos(query: StashQuery = {}): Promise<StashVideoPage> {
+      const data = await graphqlFetch<{ listVideos: StashVideoPage }>(
+        url,
+        LIST_VIDEOS_QUERY,
+        {
+          input: {
+            search: query.search ?? null,
+            tag: query.tag ?? null,
+            page: query.page ?? 1,
+            pageSize: query.pageSize ?? DEFAULT_PAGE_SIZE,
+            sort: query.sort ?? "newest",
+          },
+        },
+      );
+      return data.listVideos;
+    },
+
+    async getVideo(id: string): Promise<StashVideo | null> {
+      const data = await graphqlFetch<{ video: StashVideo | null }>(
+        url,
+        GET_VIDEO_QUERY,
+        { id },
+      );
+      return data.video;
     },
   };
 }
