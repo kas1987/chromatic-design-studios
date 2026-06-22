@@ -33,6 +33,7 @@ export function GeneratedGrid({ items }: Props) {
     <ul
       className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
       data-testid="generated-grid"
+      aria-label="Generated images"
     >
       {items.map((img) => (
         <li key={img.id}>

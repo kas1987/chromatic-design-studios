@@ -26,14 +26,15 @@ function VideoCard({ video }: { video: StashVideo }) {
 
   async function copyPrompt() {
     const text = video.prompt ?? video.title;
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1500);
     try {
       if (typeof navigator !== "undefined" && navigator.clipboard) {
         await navigator.clipboard.writeText(text);
       }
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      setCopied(false);
+      // clipboard unavailable (SSR, headless, permission denied) — UI state
+      // already updated above so the user sees feedback either way.
     }
   }
 

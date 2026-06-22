@@ -40,6 +40,7 @@ function Nav({ isLive }: { isLive: boolean }) {
           <Link href="/tokens" className="hover:text-text-primary">Tokens</Link>
           <Link href="/examples" className="hover:text-text-primary">Examples</Link>
           <Link href="/generated" className="text-text-primary">Generated</Link>
+          <Link href="/video" className="hover:text-text-primary">Video</Link>
           <Link href="/playground" className="hover:text-text-primary">Playground</Link>
           <Link href="/studio" className="hover:text-text-primary">Studio</Link>
         </nav>
