@@ -51,12 +51,33 @@
     "tailwind",
     "figma",
     "styledictionary",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kas1987/chromatic-design-studios.git",
+    "directory": "packages/tokens"
+  },
+  "bugs": {
+    "url": "https://github.com/kas1987/chromatic-design-studios/issues"
+  },
+  "homepage": "https://github.com/kas1987/chromatic-design-studios#readme",
+  "author": {
+    "name": "Chromatic Harness",
+    "url": "https://github.com/kas1987"
+  },
   "scripts": {
     "build": "node ./scripts/build.mjs",
+    "prepublishOnly": "npm test && npm run build",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dry-run": "npm publish --dry-run --access public"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
