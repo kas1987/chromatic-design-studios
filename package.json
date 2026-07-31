@@ -19,5 +19,8 @@
   "packageManager": "npm@11.12.1",
   "engines": {
     "node": ">=20.0.0"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true
   }
 }
